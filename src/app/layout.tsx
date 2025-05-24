@@ -1,0 +1,26 @@
+import "~/styles/globals.css";
+
+import { type Metadata } from "next";
+import { Nunito } from "next/font/google";
+
+export const metadata: Metadata = {
+  title: "AI Flow Studio",
+  description: "TODO: Add a description for AI Flow Studio",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  keywords: ["AI Flow Studio", "Whiteboard AI", "Nodes", "Flow"],
+};
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" className={nunito.variable}>
+      <body>{children}</body>
+    </html>
+  );
+}
