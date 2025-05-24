@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import {
   ReactFlow,
   applyEdgeChanges,
@@ -8,15 +8,18 @@ import {
   type EdgeChange,
   type NodeChange,
   type Connection,
+  Background,
+  BackgroundVariant,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { initialEdges, initialNodes } from "./initial";
 import { nodeTypes } from "./config";
 import type { AppNode } from "~/Types/nodes";
+import { edgesAtom, nodesAtom } from "./atoms";
+import { useAtom } from "jotai";
 
 export default function Whiteboard() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [nodes, setNodes] = useAtom(nodesAtom);
+  const [edges, setEdges] = useAtom(edgesAtom);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<AppNode>[]) =>
@@ -43,6 +46,8 @@ export default function Whiteboard() {
       nodeTypes={nodeTypes}
       fitView
       colorMode="dark"
-    />
+    >
+      <Background variant={BackgroundVariant.Dots} />
+    </ReactFlow>
   );
 }
