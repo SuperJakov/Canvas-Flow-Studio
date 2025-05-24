@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Providers from "./_components/providers";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { Header } from "./_components/Header";
 
 export const metadata: Metadata = {
   title: "AI Flow Studio",
@@ -24,7 +25,10 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <ConvexAuthNextjsServerProvider>
         <Providers>
-          <body>{children}</body>
+          <body>
+            <Header />
+            {children}
+          </body>
         </Providers>
       </ConvexAuthNextjsServerProvider>
     </html>
