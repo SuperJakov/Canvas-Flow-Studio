@@ -10,7 +10,6 @@ import {
   Lock,
   LockOpen,
   Play,
-  PlayCircle,
   Square,
 } from "lucide-react";
 
