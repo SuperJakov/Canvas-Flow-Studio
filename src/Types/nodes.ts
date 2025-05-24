@@ -2,6 +2,8 @@ import type { Edge, Node } from "@xyflow/react";
 
 export type TextEditorNodeData = {
   text: string;
+  isLocked: boolean;
+  isRunning: boolean;
 };
 
 export type TextEditorNodeType = Node<TextEditorNodeData, "textEditor">;

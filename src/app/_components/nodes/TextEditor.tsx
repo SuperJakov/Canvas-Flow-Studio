@@ -3,13 +3,42 @@ import { useCallback, type ChangeEvent } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { TextEditorNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
-import { updateNodeDataAtom } from "~/app/whiteboard/atoms";
+import { edgesAtom, updateNodeDataAtom } from "~/app/whiteboard/atoms";
+import {
+  AlertCircle,
+  GripVertical,
+  Lock,
+  LockOpen,
+  Play,
+  PlayCircle,
+  Square,
+} from "lucide-react";
 
 export default function TextEditorNode({
   data,
   id,
 }: NodeProps<TextEditorNodeType>) {
+  const { isLocked, isRunning } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
+  const [edges] = useAtom(edgesAtom);
+  const hasOutgoingConnections = edges.some((edge) => edge.source === id);
+
+  function toggleRunning() {
+    updateNodeData({
+      nodeId: id,
+      nodeType: "textEditor",
+      updatedData: { isRunning: !isRunning },
+    });
+  }
+
+  function toggleLock() {
+    updateNodeData({
+      nodeId: id,
+      nodeType: "textEditor",
+      updatedData: { isLocked: !isLocked },
+    });
+  }
+
   const onChange = useCallback(
     (evt: ChangeEvent<HTMLTextAreaElement>) => {
       updateNodeData({
@@ -22,15 +51,46 @@ export default function TextEditorNode({
   );
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+    <div className="overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2 outline-gray-200">
       <Handle type="target" position={Position.Top} />
-      <div>
+      <div className="flex items-center justify-between px-1 py-2">
+        <div className="flex items-center">
+          <GripVertical size={18} />
+          <span className="mr-2 font-medium text-black">Text</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            className="nodrag cursor-pointer rounded p-1 text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
+            onClick={toggleLock}
+          >
+            {isLocked ? <Lock size={18} /> : <LockOpen size={18} />}
+          </button>
+          <button
+            className={`cursor-pointer rounded p-1 ${hasOutgoingConnections ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900" : "cursor-not-allowed text-gray-400"} nodrag`}
+            onClick={toggleRunning}
+            title={
+              hasOutgoingConnections ? "Run node" : "Cannot run: no connections"
+            }
+            disabled={!hasOutgoingConnections}
+          >
+            {isRunning ? (
+              <Square size={18} />
+            ) : hasOutgoingConnections ? (
+              <Play size={18} fill="currentColor" />
+            ) : (
+              <AlertCircle size={18} />
+            )}
+          </button>
+        </div>
+      </div>
+      <div className="bg-gray-700">
         <textarea
           id="text"
           name="text"
           onChange={onChange}
-          className={`nodrag field-sizing-content max-h-[130px] min-h-[130px] w-full max-w-[290px] min-w-[290px] resize-none rounded border border-gray-300 px-2 py-1 text-xl font-bold focus:border-blue-500 focus:outline-none`}
+          className={`nodrag field-sizing-content max-h-[130px] min-h-[130px] w-full max-w-[290px] min-w-[290px] resize-none rounded border-none px-2 py-1 text-xl font-bold text-white focus:border-blue-500 focus:outline-none`}
           value={data.text}
+          placeholder="Type..."
         />
       </div>
       <Handle type="source" position={Position.Bottom} id="a" />
