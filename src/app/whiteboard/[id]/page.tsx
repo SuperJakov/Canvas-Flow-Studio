@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import WhiteboardPage from "../WhiteboardPage";
+import type { Id } from "convex/_generated/dataModel";
 
 type Props = {
   params: Promise<{
@@ -13,17 +13,25 @@ type Props = {
 
 export default async function WhiteboardPageWithId({ params }: Props) {
   const { id } = await params;
+
   const token =
     (await (await auth()).getToken({ template: "convex" })) ?? undefined;
   if (!token) redirect("/sign-in");
-  // Check if whiteboard exists
-  const whiteboard = await fetchQuery(
-    api.whiteboards.getWhiteboard,
-    { id: id as Id<"whiteboards"> }, // id will be validated
-    { token },
-  );
+
+  let whiteboard = null;
+  try {
+    whiteboard = await fetchQuery(
+      api.whiteboards.getWhiteboard,
+      { id: id as Id<"whiteboards"> },
+      { token },
+    );
+  } catch (err) {
+    console.log("Invalid whiteboard ID format:", id, err);
+    redirect("/");
+  }
+
   if (!whiteboard) {
-    console.log("Whiteboard not found, redirecting to home, id:", id);
+    console.log("Whiteboard not found:", id);
     redirect("/");
   }
 
