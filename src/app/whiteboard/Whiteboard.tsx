@@ -21,7 +21,8 @@ import { useDnD } from "./DnDContext"; // Ensure this path is correct
 import { v4 as uuidv4 } from "uuid";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
-import type { Id, Doc } from "convex/_generated/dataModel";
+import type { Id } from "convex/_generated/dataModel";
+import { Loader2 } from "lucide-react";
 
 // Simple debounce utility
 function debounce<Args extends unknown[]>(
@@ -82,61 +83,105 @@ export default function Whiteboard({ id }: Props) {
       // Consider redirecting or showing an error message here
     }
   }, [whiteboardData, setNodes, setEdges, id]);
-
-  // Debounced save function
+  // Memoize the debounced save function
   const debouncedSave = useCallback(
-    debounce(async (currentNodes: AppNode[], currentEdges: AppEdge[]) => {
-      if (!id || !initialLoadDone.current || !whiteboardData) {
-        // Don't save if no ID, initial load not done, or original data wasn't loaded (e.g. not found)
-        return;
-      }
+    (currentNodes: AppNode[], currentEdges: AppEdge[]) => {
+      const save = debounce(async () => {
+        if (!id || !initialLoadDone.current) {
+          console.log("Skipping save: not initialized or no id");
+          return;
+        }
 
-      // Ensure nodes and edges are in the format Convex expects.
-      // Only save nodes with a defined type.
-      const nodesToSave = currentNodes
-        .filter(
-          (n): n is AppNode & { type: string } => typeof n.type === "string",
-        )
-        .map((n) => ({
-          id: n.id,
-          type: n.type,
-          position: n.position,
-          data: n.data /*, width: n.width, height: n.height*/,
+        console.log("Starting save process...");
+        console.log(
+          `Preparing to save ${currentNodes.length} nodes and ${currentEdges.length} edges`,
+        );
+
+        const nodesToSave = currentNodes
+          .filter(
+            (n): n is AppNode & { type: string } => typeof n.type === "string",
+          )
+          .map((n) => ({
+            id: n.id,
+            type: n.type,
+            position: n.position,
+            data: n.data,
+          }));
+
+        const edgesToSave = currentEdges.map((e) => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+          animated: e.animated,
         }));
-      const edgesToSave = currentEdges.map((e) => ({
-        id: e.id,
-        source: e.source,
-        target: e.target,
-        sourceHandle: e.sourceHandle,
-        targetHandle: e.targetHandle,
-        animated: e.animated,
-      }));
 
-      console.log("Attempting to save whiteboard content:", {
-        id,
-        nodes: nodesToSave,
-        edges: edgesToSave,
-      });
-      try {
-        await updateContentMutation({
-          id,
-          nodes: nodesToSave,
-          edges: edgesToSave,
-        });
-        console.log("Whiteboard content saved successfully.");
-      } catch (error) {
-        console.error("Failed to save whiteboard content:", error);
-        // Optionally, notify the user (e.g., with a toast)
-      }
-    }, 1500), // Save 1.5 seconds after the last change
-    [id, updateContentMutation, whiteboardData], // Add whiteboardData to dependencies
+        console.log(
+          "Filtered nodes:",
+          nodesToSave.length,
+          "Filtered edges:",
+          edgesToSave.length,
+        );
+
+        try {
+          console.time("Save operation");
+          await updateContentMutation({
+            id,
+            nodes: nodesToSave,
+            edges: edgesToSave,
+          });
+          console.timeEnd("Save operation");
+          console.log("✅ Save completed successfully");
+        } catch (error) {
+          console.error("❌ Failed to save whiteboard content:", error);
+        }
+      }, 500);
+
+      save();
+    },
+    [id, updateContentMutation],
+  );
+
+  // Keep track of the last saved state
+  const lastSavedRef = useRef<{ nodes: AppNode[]; edges: AppEdge[] } | null>(
+    null,
   );
 
   // Effect to save changes when nodes or edges atoms are updated
   useEffect(() => {
-    if (initialLoadDone.current && whiteboardData) {
-      // Only save if loaded and data was present
+    if (!initialLoadDone.current || !whiteboardData) {
+      console.log(
+        "Skipping save effect: initial load not done or no whiteboard data",
+      );
+      return;
+    }
+
+    // Initialize lastSavedRef if it hasn't been set yet
+    if (lastSavedRef.current === null) {
+      console.log("Initializing lastSavedRef with current data");
+      lastSavedRef.current = {
+        nodes: nodes,
+        edges: edges,
+      };
+      // Don't return here - we want to save the initial state
+    }
+
+    // Check if nodes or edges have actually changed from what's saved
+    const hasNodesChanged =
+      JSON.stringify(nodes) !== JSON.stringify(lastSavedRef.current?.nodes);
+    const hasEdgesChanged =
+      JSON.stringify(edges) !== JSON.stringify(lastSavedRef.current?.edges);
+
+    console.log("Checking for changes:", { hasNodesChanged, hasEdgesChanged });
+
+    if (hasNodesChanged || hasEdgesChanged) {
+      console.log(
+        "Detected changes in nodes or edges, triggering debouncedSave",
+      );
       debouncedSave(nodes, edges);
+      // Update last saved state
+      lastSavedRef.current = { nodes, edges };
+    } else {
+      console.log("No changes detected, not saving");
     }
   }, [nodes, edges, debouncedSave, whiteboardData]);
 
@@ -204,7 +249,7 @@ export default function Whiteboard({ id }: Props) {
   if (id && whiteboardData === undefined) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-800 text-white">
-        Loading whiteboard...
+        <Loader2 className="mr-2 animate-spin" size={40} />
       </div>
     );
   }
