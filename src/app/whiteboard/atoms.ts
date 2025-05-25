@@ -2,8 +2,8 @@ import { atom } from "jotai";
 import { type AppEdge, type AppNode } from "~/Types/nodes";
 import { initialEdges, initialNodes } from "./initial";
 
-export const nodesAtom = atom<AppNode[]>(initialNodes);
-export const edgesAtom = atom<AppEdge[]>(initialEdges); // Edges can be added later if needed
+export const nodesAtom = atom<AppNode[]>([]);
+export const edgesAtom = atom<AppEdge[]>([]); // Edges can be added later if needed
 
 export const updateNodeDataAtom = atom(
   null,
