@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import Loading from "../loading";
+import Link from "next/link";
 
 export default function WhiteboardsClient() {
   const whiteboards = useQuery(api.whiteboards.listWhiteboards);
@@ -19,7 +20,7 @@ export default function WhiteboardsClient() {
 
   const handleCreateWhiteboard = async () => {
     setErrorMessage(null);
-    const title = newWhiteboardName.trim() ?? "Untitled Whiteboard";
+    const title = newWhiteboardName.trim() || "Untitled Whiteboard";
     try {
       const newWhiteboardId = await convexCreateWhiteboard({ title });
       setNewWhiteboardName("");
@@ -38,10 +39,6 @@ export default function WhiteboardsClient() {
           : "An unknown error occurred while creating the whiteboard.",
       );
     }
-  };
-
-  const handleOpenWhiteboard = (id: Id<"whiteboards">) => {
-    router.push(`/whiteboard/${id}`);
   };
 
   const handleDeleteWhiteboard = async (id: Id<"whiteboards">) => {
@@ -67,7 +64,7 @@ export default function WhiteboardsClient() {
   };
 
   if (whiteboards === undefined) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
@@ -77,14 +74,6 @@ export default function WhiteboardsClient() {
           <div className="flex items-center">
             <h1 className="text-3xl font-bold">Your Whiteboards</h1>
           </div>
-          {(whiteboards?.length ?? 0) > 0 && whiteboards[0] && (
-            <Link
-              href={`/whiteboard/${whiteboards[0]._id}`}
-              className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-600"
-            >
-              Back to Editor
-            </Link>
-          )}
         </div>
 
         <div className="mb-8 rounded-lg bg-gray-800 p-6">
@@ -164,12 +153,11 @@ export default function WhiteboardsClient() {
                     </p>
                   </div>
                   <div className="mt-4 flex justify-between">
-                    <button
-                      onClick={() => handleOpenWhiteboard(whiteboard._id)}
-                      className="cursor-pointer rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-500"
-                    >
-                      Open
-                    </button>
+                    <Link href={`/whiteboard/${whiteboard._id}`}>
+                      <button className="cursor-pointer rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-500">
+                        Open
+                      </button>
+                    </Link>
                     <button
                       onClick={() => handleDeleteWhiteboard(whiteboard._id)}
                       className="cursor-pointer rounded bg-red-600 px-3 py-1 text-white hover:bg-red-500"

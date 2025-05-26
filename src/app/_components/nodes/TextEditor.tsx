@@ -3,7 +3,11 @@ import { useCallback, type ChangeEvent } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { TextEditorNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
-import { edgesAtom, updateNodeDataAtom } from "~/app/whiteboard/atoms";
+import {
+  edgesAtom,
+  executeNodeAtom,
+  updateNodeDataAtom,
+} from "~/app/whiteboard/atoms";
 import {
   AlertCircle,
   GripVertical,
@@ -19,10 +23,16 @@ export default function TextEditorNode({
 }: NodeProps<TextEditorNodeType>) {
   const { isLocked, isRunning } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
+  const [, executeNode] = useAtom(executeNodeAtom);
   const [edges] = useAtom(edgesAtom);
   const hasOutgoingConnections = edges.some((edge) => edge.source === id);
 
   function toggleRunning() {
+    if (!isRunning === true) {
+      executeNode({
+        nodeId: id,
+      });
+    }
     updateNodeData({
       nodeId: id,
       nodeType: "textEditor",

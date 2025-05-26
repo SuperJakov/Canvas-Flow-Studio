@@ -10,7 +10,7 @@ const TextEditorNodeData = v.object({
 
 const AppNode = v.object({
   id: v.string(),
-  type: v.literal("textEditor"),
+  type: v.optional(v.literal("textEditor")), // Optional for undefined values
   data: TextEditorNodeData,
   position: v.object({
     x: v.number(),

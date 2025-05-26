@@ -11,6 +11,8 @@ export const initialNodes: AppNode[] = [
     type: "textEditor",
     data: {
       text: "This is a text editor node",
+      isLocked: false,
+      isRunning: false,
     },
     position: { x: 400, y: 125 },
   },

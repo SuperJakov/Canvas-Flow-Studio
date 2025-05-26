@@ -1,6 +1,6 @@
+import { initialEdges, initialNodes } from "~/app/whiteboard/initial";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
 
 // --- Node schema (adjust this as your design evolves) ---
 const TextEditorNodeData = v.object({
@@ -35,15 +35,15 @@ export const createWhiteboard = mutation({
   handler: async (ctx, { title }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
+    console.log("title: ", title);
     const now = BigInt(Date.now());
     return await ctx.db.insert("whiteboards", {
-      title,
+      title: title.trim() === "" ? title : "Untitled Whiteboard",
       createdAt: now,
       updatedAt: now,
       ownerId: identity.subject,
-      nodes: [],
-      edges: [],
+      nodes: initialNodes,
+      edges: initialEdges,
     });
   },
 });
