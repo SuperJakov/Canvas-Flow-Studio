@@ -56,26 +56,26 @@ export default function WhiteboardHeader({ id }: Props) {
               <ChevronsLeft />
               <span>Whiteboards</span>
             </Link>
-          </div>
+          </div>{" "}
           <div>
-            {isEditing ? (
+            {whiteboard ? (
               <input
                 type="text"
-                value={title}
+                value={isEditing ? title : (whiteboard?.title ?? "Untitled")}
                 onChange={handleTitleChange}
                 onBlur={handleTitleSubmit}
                 onKeyDown={handleKeyDown}
-                className="border-b border-white/20 bg-transparent px-2 text-center text-white outline-none focus:border-white/50"
-                autoFocus
-              />
-            ) : (
-              <span
-                className="cursor-pointer text-white hover:text-white/80"
                 onClick={startEditing}
-              >
-                {whiteboard?.title ?? "Untitled"}
-              </span>
-            )}
+                onFocus={startEditing}
+                className={`field-sizing-content min-w-40 rounded bg-transparent px-2 text-center text-white ${
+                  isEditing
+                    ? "ring-2 ring-blue-500 outline-none"
+                    : "cursor-pointer hover:text-white/80 hover:ring-2 hover:ring-gray-500"
+                }`}
+                readOnly={!isEditing}
+                autoFocus={isEditing}
+              />
+            ) : null}
           </div>
           <div className="flex items-center space-x-4">
             <button className="h-8 cursor-pointer rounded bg-blue-500 px-4 text-white">
