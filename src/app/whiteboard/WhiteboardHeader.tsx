@@ -48,7 +48,7 @@ export default function WhiteboardHeader({ id }: Props) {
   };
 
   return (
-    <header className="fixed z-50 h-14 w-full bg-gray-900/80 backdrop-blur-sm">
+    <header className="fixed z-50 h-14 w-full bg-gray-900/80 text-white backdrop-blur-sm">
       <div className="container mx-auto h-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-full items-center justify-between">
           <div className="flex items-center text-white">
@@ -56,7 +56,7 @@ export default function WhiteboardHeader({ id }: Props) {
               <ChevronsLeft />
               <span>Whiteboards</span>
             </Link>
-          </div>{" "}
+          </div>
           <div>
             {whiteboard ? (
               <input
