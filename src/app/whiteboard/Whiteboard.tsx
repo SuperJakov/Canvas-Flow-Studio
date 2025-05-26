@@ -15,7 +15,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "./config";
 import type { AppEdge, AppNode } from "~/Types/nodes"; // Ensure this path is correct
-import { edgesAtom, nodesAtom } from "./atoms"; // Ensure this path is correct
+import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms"; // Ensure this path is correct
 import { useAtom } from "jotai";
 import { useDnD } from "./DnDContext"; // Ensure this path is correct
 import { v4 as uuidv4 } from "uuid";
@@ -57,6 +57,7 @@ export default function Whiteboard({ id }: Props) {
   );
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
+  const [isExecuting] = useAtom(isExecutingNodeAtom);
   const [dndType] = useDnD(); // Renamed to avoid conflict with node 'type'
   const { screenToFlowPosition } = useReactFlow();
 
@@ -90,6 +91,10 @@ export default function Whiteboard({ id }: Props) {
       const save = debounce(async () => {
         if (!id || !initialLoadDone.current) {
           console.log("Skipping save: not initialized or no id");
+          return;
+        }
+        if (isExecuting) {
+          console.warn("Skipping save: a node is currently executing");
           return;
         }
 
@@ -139,7 +144,7 @@ export default function Whiteboard({ id }: Props) {
 
       save();
     },
-    [id, updateContentMutation],
+    [id, updateContentMutation, isExecuting],
   );
 
   // Keep track of the last saved state
@@ -257,7 +262,7 @@ export default function Whiteboard({ id }: Props) {
   if (id && whiteboardData === null) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-800 text-white">
-        Whiteboard not found or access denied.{" "}
+        Whiteboard not found or access denied.
         <Link href="/whiteboards" className="underline">
           Go to whiteboards page to create a new one.
         </Link>
