@@ -51,8 +51,11 @@ export default function WhiteboardHeader({ id }: Props) {
     <header className="fixed z-50 h-14 w-full bg-gray-900/80 text-white backdrop-blur-sm">
       <div className="container mx-auto h-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-full items-center justify-between">
-          <div className="flex items-center text-white">
-            <Link href="/whiteboards" className="flex items-center gap-1">
+          <div className="flex items-center">
+            <Link
+              href="/whiteboards"
+              className="flex items-center gap-1 hover:underline"
+            >
               <ChevronsLeft />
               <span>Whiteboards</span>
             </Link>
