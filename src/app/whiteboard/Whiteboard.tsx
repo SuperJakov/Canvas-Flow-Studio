@@ -234,7 +234,18 @@ export default function Whiteboard({ id }: Props) {
             data: { text: "", isLocked: false, isRunning: false },
           };
           break;
-        // Add cases for "imageNode", "instruction", "comment" if they are actual node types
+        case "image":
+          newNode = {
+            id: newNodeId,
+            type: dndType, // Use dndType consistently
+            position,
+            data: {
+              imageUrl: null,
+              isLocked: false,
+              isRunning: false,
+            },
+          };
+          break;
         default:
           console.error(`Unknown node type on drag & drop: ${dndType}`);
           return;

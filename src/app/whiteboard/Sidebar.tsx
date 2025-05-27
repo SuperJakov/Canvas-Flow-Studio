@@ -55,7 +55,7 @@ export default function Sidebar() {
           <div
             className="flex h-10 w-10 cursor-grab items-center justify-center rounded border border-gray-700 bg-purple-900/50 p-2 text-white hover:bg-purple-800/50"
             draggable
-            onDragStart={(e) => onDragStart(e, "imageNode")}
+            onDragStart={(e) => onDragStart(e, "image")}
             onDragEnd={onDragEnd}
             title="Image Node"
           >

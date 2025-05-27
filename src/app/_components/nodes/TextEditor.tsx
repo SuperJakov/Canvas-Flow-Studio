@@ -29,7 +29,7 @@ export default function TextEditorNode({
 
   function toggleRunning() {
     if (!isRunning === true) {
-      executeNode({
+      void executeNode({
         nodeId: id,
       });
     }

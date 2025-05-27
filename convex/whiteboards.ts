@@ -1,31 +1,7 @@
 import { initialEdges, initialNodes } from "~/app/whiteboard/initial";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-
-// --- Node schema (adjust this as your design evolves) ---
-const TextEditorNodeData = v.object({
-  text: v.string(),
-  isLocked: v.boolean(),
-  isRunning: v.boolean(),
-});
-
-const AppNode = v.object({
-  id: v.string(),
-  type: v.literal("textEditor"),
-  data: TextEditorNodeData,
-  position: v.object({
-    x: v.number(),
-    y: v.number(),
-  }),
-});
-
-const AppEdge = v.object({
-  id: v.string(),
-  source: v.string(),
-  target: v.string(),
-  type: v.optional(v.string()),
-  animated: v.optional(v.boolean()),
-});
+import { AppEdge, AppNode } from "./schema";
 
 // --- Create a new whiteboard ---
 export const createWhiteboard = mutation({
@@ -54,7 +30,7 @@ export const editWhiteboard = mutation({
     id: v.id("whiteboards"),
     title: v.optional(v.string()),
     nodes: v.optional(v.array(AppNode)),
-    edges: v.optional(v.array(AppEdge)), // Fix edges type
+    edges: v.optional(v.array(AppEdge)),
   },
   handler: async (ctx, { id, title, nodes, edges }) => {
     const identity = await ctx.auth.getUserIdentity();
