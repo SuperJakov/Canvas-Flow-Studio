@@ -1,6 +1,11 @@
 import type { Setter } from "jotai";
 import type { Getter } from "jotai";
-import type { AppNode, AppEdge } from "~/Types/nodes";
+import type {
+  AppNode,
+  AppEdge,
+  TextEditorNodeType,
+  ImageNodeType,
+} from "~/Types/nodes";
 import {
   edgesAtom,
   isExecutingNodeAtom,
@@ -16,7 +21,7 @@ async function delay(ms: number) {
 function executeTextNode(
   get: Getter,
   set: Setter,
-  thisNode: AppNode,
+  thisNode: TextEditorNodeType,
   nextNode: AppNode,
 ) {
   switch (nextNode.type) {
@@ -29,12 +34,55 @@ function executeTextNode(
       });
       break;
     }
+    case "image": {
+      // text->image: no need to update data, image node will get text from sourceNodes
+      break;
+    }
     default: {
       throw new Error(
         "Unhandled node type in executeTextNode: " + nextNode.type,
       );
     }
   }
+}
+
+async function executeImageNode(
+  get: Getter,
+  set: Setter,
+  currentNode: ImageNodeType,
+  _targetNode: AppNode, // Prefixed with _ to indicate intentionally unused parameter
+) {
+  console.log("Running an image node...");
+  // Get all edges that connect to this image node
+  const incomingConnections = get(edgesAtom).filter(
+    (edge) => edge.target === currentNode.id,
+  );
+
+  // Find all source nodes that are connected to this image node
+  const allNodes = get(nodesAtom);
+  const connectedSourceNodes = allNodes.filter((node) =>
+    incomingConnections.some((connection) => connection.source === node.id),
+  );
+
+  // Filter and transform nodes into the required format
+  const sourceNodes = connectedSourceNodes
+    .filter(
+      (node): node is TextEditorNodeType | ImageNodeType =>
+        node.type === "image" || node.type === "textEditor",
+    )
+    .map((node) => ({
+      type: node.type,
+      id: node.id,
+      data: node.data,
+    }));
+  if (!currentNode.data.internal?.generateAndStoreImageAction) {
+    throw new Error("generateAndStoreImageAction not defined.");
+  }
+  console.log("Running generateAndStoreImageAction");
+  await currentNode.data.internal.generateAndStoreImageAction({
+    nodeId: currentNode.id,
+    sourceNodes,
+  });
 }
 
 function calculateTotalNodesToExecute(
@@ -53,7 +101,12 @@ function calculateTotalNodesToExecute(
   let totalNodes = 1; // Count current node
 
   for (const edge of outgoingEdges) {
-    totalNodes += calculateTotalNodesToExecute(nodes, edges, edge.target, visited);
+    totalNodes += calculateTotalNodesToExecute(
+      nodes,
+      edges,
+      edge.target,
+      visited,
+    );
   }
 
   return totalNodes;
@@ -93,34 +146,75 @@ export async function executeNodeLogic(
       updatedData: { isRunning: true },
       nodeType: thisNode.type,
     });
-    set(isExecutingNodeAtom, true);
-
-    const outgoingEdges = allEdges.filter((edge) => edge.source === nodeId);
-    console.log("Outgoing edges:", outgoingEdges);
-
-    // Update progress after processing this node
+    set(isExecutingNodeAtom, true); // Update progress after processing this node
     const progress = get(executionProgressAtom);
     set(executionProgressAtom, {
       ...progress,
       executedNodesCount: progress.executedNodesCount + 1,
     });
 
-    // The execution logic for the node
-    for (const edge of outgoingEdges) {
-      const nextNode = allNodes.find((n) => n.id === edge.target);
-      if (!nextNode || nextNode.data.isLocked) continue;
+    // If this is an image node, execute it first regardless of outgoing edges
+    if (thisNode.type === "image") {
+      console.log(
+        "Detected image node. Waiting 1 second before executing image node logic.",
+      );
+      await delay(1000);
+      await executeImageNode(get, set, thisNode, {} as AppNode);
+    }
 
+    // Get outgoing edges for further node execution
+    const outgoingEdges = allEdges.filter((edge) => edge.source === nodeId);
+    console.log("Outgoing edges:", outgoingEdges);
+
+    // The execution logic for non-image nodes or subsequent connections
+    for (const edge of outgoingEdges) {
+      console.log("Processing edge from node", nodeId, "to", edge.target);
+      const nextNode = allNodes.find((n) => n.id === edge.target);
+      if (!nextNode) {
+        console.warn("Next node not found for edge:", edge);
+        continue;
+      }
+      if (nextNode.data.isLocked) {
+        console.warn("Next node is locked:", nextNode);
+        continue;
+      }
+
+      console.log(
+        "Executing node logic for current node type:",
+        thisNode.type,
+        "with next node:",
+        nextNode.id,
+      ); // Only handle non-image nodes here since image nodes are handled above
       switch (thisNode.type) {
         case "textEditor": {
+          console.log(
+            "Detected textEditor node. Waiting 1 second before executing text node logic.",
+          );
           await delay(1000);
+          console.log(
+            "Executing text node logic: passing text from",
+            thisNode.id,
+            "to",
+            nextNode.id,
+          );
           executeTextNode(get, set, thisNode, nextNode);
           break;
         }
         default: {
+          console.error(
+            "Unhandled node type in executeNodeLogic:",
+            thisNode.type,
+          );
           throw new Error("Unhandled node type in executeNodeLogic");
         }
       }
+
+      console.log(
+        "Recursively executing node logic for next node:",
+        nextNode.id,
+      );
       await executeNodeLogic(get, set, nextNode.id, visited);
+      console.log("Finished executing node logic for node:", nextNode.id);
     }
   } finally {
     // Always set isRunning back to false when this node is done

@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as imageNodes from "../imageNodes.js";
 import type * as whiteboards from "../whiteboards.js";
 
 /**
@@ -24,6 +25,7 @@ import type * as whiteboards from "../whiteboards.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  imageNodes: typeof imageNodes;
   whiteboards: typeof whiteboards;
 }>;
 export declare const api: FilterApi<

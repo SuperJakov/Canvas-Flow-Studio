@@ -1,4 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
+import type { api } from "convex/_generated/api";
+import type { ReactAction } from "convex/react";
 
 export type TextEditorNodeData = {
   text: string;
@@ -7,9 +9,14 @@ export type TextEditorNodeData = {
 };
 
 export type ImageNodeData = {
-  imageUrl: string | null; // Allow null for no image
+  imageUrl: string | null;
   isLocked: boolean;
   isRunning: boolean;
+  internal?: {
+    generateAndStoreImageAction?: ReactAction<
+      typeof api.imageNodes.generateAndStoreImage
+    >;
+  };
 };
 
 export type TextEditorNodeType = Node<TextEditorNodeData, "textEditor">;

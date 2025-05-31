@@ -14,37 +14,17 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { nodeTypes } from "./config";
-import type { AppEdge, AppNode } from "~/Types/nodes"; // Ensure this path is correct
-import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms"; // Ensure this path is correct
+import type { AppEdge, AppNode } from "~/Types/nodes";
+import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms";
 import { useAtom } from "jotai";
-import { useDnD } from "./DnDContext"; // Ensure this path is correct
+import { useDnD } from "./DnDContext";
 import { v4 as uuidv4 } from "uuid";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
-// Simple debounce utility
-function debounce<Args extends unknown[]>(
-  func: (...args: Args) => unknown, // The function to debounce. Its return type isn't used by the debounced wrapper.
-  waitFor: number,
-): (...args: Args) => void {
-  // The debounced function will always return void.
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-
-  const debounced = (...args: Args): void => {
-    if (timeout !== null) {
-      clearTimeout(timeout);
-      timeout = null; // Optional: Reset timeout variable after clearing
-    }
-    timeout = setTimeout(() => {
-      func(...args); // Call the original function. Its actual return value is effectively ignored here.
-    }, waitFor);
-  };
-
-  return debounced;
-}
+import { debounce } from "lodash";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -58,96 +38,92 @@ export default function Whiteboard({ id }: Props) {
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const [isExecuting] = useAtom(isExecutingNodeAtom);
-  const [dndType] = useDnD(); // Renamed to avoid conflict with node 'type'
+  const [dndType] = useDnD();
   const { screenToFlowPosition } = useReactFlow();
 
   const updateContentMutation = useMutation(api.whiteboards.editWhiteboard);
-
-  const initialLoadDone = useRef(false); // To prevent saving before initial load
+  const initialLoadDone = useRef(false);
 
   // Load whiteboard data from Convex into Jotai atoms
   useEffect(() => {
     if (whiteboardData && !initialLoadDone.current) {
       console.log("Loading whiteboard data into atoms:", whiteboardData);
-      // Ensure the fetched data structure matches AppNode[] and AppEdge[]
-      // You might need to cast or transform if types differ subtly
       setNodes(whiteboardData.nodes as AppNode[]);
       setEdges(whiteboardData.edges as AppEdge[]);
       initialLoadDone.current = true;
     } else if (whiteboardData === null && id && !initialLoadDone.current) {
-      // Whiteboard not found or not authorized, clear local state
       console.warn(
         `Whiteboard ${id} not found or access denied. Clearing local state.`,
       );
       setNodes([]);
       setEdges([]);
-      initialLoadDone.current = true; // Mark as loaded to prevent further attempts
-      // Consider redirecting or showing an error message here
+      initialLoadDone.current = true;
     }
   }, [whiteboardData, setNodes, setEdges, id]);
-  // Memoize the debounced save function
-  const debouncedSave = useCallback(
-    (currentNodes: AppNode[], currentEdges: AppEdge[]) => {
-      const save = debounce(async () => {
-        if (!id || !initialLoadDone.current) {
-          console.log("Skipping save: not initialized or no id");
-          return;
-        }
-        if (isExecuting) {
-          console.warn("Skipping save: a node is currently executing");
-          return;
-        }
 
-        console.log("Starting save process...");
-        console.log(
-          `Preparing to save ${currentNodes.length} nodes and ${currentEdges.length} edges`,
-        );
+  // Persist the debounced save function so it isn't re-created on every render.
+  const debouncedSaveRef = useRef(
+    debounce(async (currentNodes: AppNode[], currentEdges: AppEdge[]) => {
+      if (!id || !initialLoadDone.current) {
+        console.log("Skipping save: not initialized or no id");
+        return;
+      }
+      if (isExecuting) {
+        console.warn("Skipping save: a node is currently executing");
+        return;
+      }
 
-        const nodesToSave = currentNodes
-          .filter(
-            (n): n is AppNode & { type: string } => typeof n.type === "string",
-          )
-          .map((n) => ({
+      console.log("Starting save process...");
+      console.log(
+        `Preparing to save ${currentNodes.length} nodes and ${currentEdges.length} edges`,
+      );
+
+      const nodesToSave = currentNodes
+        .filter(
+          (n): n is AppNode & { type: string } => typeof n.type === "string",
+        )
+        .map((n) => {
+          if (n.type === "image") {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { internal, ...nodeDataWithoutInternal } = n.data;
+            return {
+              id: n.id,
+              type: n.type,
+              position: n.position,
+              data: nodeDataWithoutInternal,
+            };
+          }
+          return {
             id: n.id,
             type: n.type,
             position: n.position,
             data: n.data,
-          }));
+          };
+        });
 
-        const edgesToSave = currentEdges.map((e) => ({
-          id: e.id,
-          source: e.source,
-          target: e.target,
-          animated: e.animated,
-        }));
+      const edgesToSave = currentEdges.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        animated: e.animated,
+      }));
 
-        console.log(
-          "Filtered nodes:",
-          nodesToSave.length,
-          "Filtered edges:",
-          edgesToSave.length,
-        );
-
-        try {
-          console.time("Save operation");
-          await updateContentMutation({
-            id,
-            nodes: nodesToSave,
-            edges: edgesToSave,
-          });
-          console.timeEnd("Save operation");
-          console.log("✅ Save completed successfully");
-        } catch (error) {
-          console.error("❌ Failed to save whiteboard content:", error);
-        }
-      }, 500);
-
-      save();
-    },
-    [id, updateContentMutation, isExecuting],
+      try {
+        console.log("Calling updateContentMutation...");
+        console.time("Save operation");
+        await updateContentMutation({
+          id,
+          nodes: nodesToSave,
+          edges: edgesToSave,
+        });
+        console.timeEnd("Save operation");
+      } catch (error) {
+        console.error("❌ Failed to save whiteboard content:", error);
+      }
+    }, 500),
   );
 
-  // Keep track of the last saved state
+  // Keep track of the last saved state for nodes and edges
   const lastSavedRef = useRef<{ nodes: AppNode[]; edges: AppEdge[] } | null>(
     null,
   );
@@ -155,41 +131,22 @@ export default function Whiteboard({ id }: Props) {
   // Effect to save changes when nodes or edges atoms are updated
   useEffect(() => {
     if (!initialLoadDone.current || !whiteboardData) {
-      console.log(
-        "Skipping save effect: initial load not done or no whiteboard data",
-      );
       return;
     }
 
-    // Initialize lastSavedRef if it hasn't been set yet
-    if (lastSavedRef.current === null) {
-      console.log("Initializing lastSavedRef with current data");
-      lastSavedRef.current = {
-        nodes: nodes,
-        edges: edges,
-      };
-      // Don't return here - we want to save the initial state
-    }
+    // Initialize lastSavedRef if not set yet.
+    lastSavedRef.current ??= { nodes, edges };
 
-    // Check if nodes or edges have actually changed from what's saved
     const hasNodesChanged =
       JSON.stringify(nodes) !== JSON.stringify(lastSavedRef.current?.nodes);
     const hasEdgesChanged =
       JSON.stringify(edges) !== JSON.stringify(lastSavedRef.current?.edges);
 
-    console.log("Checking for changes:", { hasNodesChanged, hasEdgesChanged });
-
     if (hasNodesChanged || hasEdgesChanged) {
-      console.log(
-        "Detected changes in nodes or edges, triggering debouncedSave",
-      );
-      debouncedSave(nodes, edges);
-      // Update last saved state
+      void debouncedSaveRef.current(nodes, edges);
       lastSavedRef.current = { nodes, edges };
-    } else {
-      console.log("No changes detected, not saving");
     }
-  }, [nodes, edges, debouncedSave, whiteboardData]);
+  }, [nodes, edges, whiteboardData]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<AppNode>[]) => {
@@ -207,7 +164,7 @@ export default function Whiteboard({ id }: Props) {
 
   const onConnect = useCallback(
     (connection: Connection) => {
-      setEdges((eds) => addEdge({ ...connection, id: uuidv4() }, eds)); // Ensure new edges get unique IDs
+      setEdges((eds) => addEdge({ ...connection, id: uuidv4() }, eds));
     },
     [setEdges],
   );
@@ -229,7 +186,7 @@ export default function Whiteboard({ id }: Props) {
         case "textEditor":
           newNode = {
             id: newNodeId,
-            type: dndType, // Use dndType consistently
+            type: dndType,
             position,
             data: { text: "", isLocked: false, isRunning: false },
           };
@@ -237,12 +194,12 @@ export default function Whiteboard({ id }: Props) {
         case "image":
           newNode = {
             id: newNodeId,
-            type: dndType, // Use dndType consistently
+            type: dndType,
             position,
             data: {
-              imageUrl: null,
               isLocked: false,
               isRunning: false,
+              imageUrl: null,
             },
           };
           break;
@@ -262,7 +219,6 @@ export default function Whiteboard({ id }: Props) {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  // Handle loading state for whiteboardData
   if (id && whiteboardData === undefined) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-800 text-white">

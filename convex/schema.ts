@@ -2,7 +2,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
-const TextEditorNodeData = v.object({
+export const TextEditorNodeData = v.object({
   text: v.string(),
   isLocked: v.boolean(),
   isRunning: v.boolean(),
@@ -22,7 +22,7 @@ const ImageNodeSchema = v.object({
   id: v.string(),
   type: v.literal("image"),
   data: v.object({
-    imageUrl: v.union(v.string(), v.null()), // Allow null for no image
+    imageUrl: v.union(v.string(), v.null()),
     isLocked: v.boolean(),
     isRunning: v.boolean(),
   }),
@@ -32,7 +32,8 @@ const ImageNodeSchema = v.object({
   }),
 });
 
-const UndefinedTypeNode = v.object({
+export const UndefinedTypeNode = v.object({
+  // ! Used for typesafety when sending
   id: v.string(),
   type: v.optional(v.string()),
 });
@@ -60,9 +61,15 @@ const whiteboards = defineTable({
   edges: v.array(AppEdge),
 }).index("by_ownerId", ["ownerId"]);
 
+const imageNodes = defineTable({
+  nodeId: v.string(),
+  imageUrl: v.union(v.string(), v.null()),
+}).index("by_nodeId", ["nodeId"]);
+
 const schema = defineSchema({
   ...authTables,
   whiteboards,
+  imageNodes,
 });
 
 export default schema;

@@ -61,6 +61,7 @@ export const updateNodeDataAtom = atom(
         ? { ...node, data: { ...node.data, ...updatedData } }
         : node,
     );
+    // ! TODO: Ignore for now, we will fix later
     set(nodesAtom, updatedNodes);
   },
 );

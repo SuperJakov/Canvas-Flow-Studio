@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
@@ -16,15 +16,42 @@ import {
 } from "lucide-react";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
+import { useAction, useQuery } from "convex/react";
+import { api } from "convex/_generated/api";
 
 export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
-  const url = data.imageUrl;
+  const generateAndStoreImageAction = useAction(
+    api.imageNodes.generateAndStoreImage,
+  );
+  const url = useQuery(api.imageNodes.getImageNodeUrl, {
+    nodeId: id,
+  });
   const isLocked = data.isLocked ?? false;
   const isRunning = data.isRunning ?? false;
   const edges = useEdges();
 
+  useEffect(() => {
+    updateNodeData({
+      nodeId: id,
+      nodeType: "image",
+      updatedData: {
+        imageUrl: url ?? null,
+      },
+    });
+  }, [url, id, updateNodeData]);
+  useEffect(() => {
+    updateNodeData({
+      nodeId: id,
+      nodeType: "image",
+      updatedData: {
+        internal: {
+          generateAndStoreImageAction,
+        },
+      },
+    });
+  }, [generateAndStoreImageAction, id, updateNodeData]);
   // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
