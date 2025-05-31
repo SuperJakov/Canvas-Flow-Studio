@@ -3,7 +3,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { DnDProvider } from "./DnDContext";
 import Sidebar from "./Sidebar";
 import Whiteboard from "./Whiteboard";
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "../../../convex/_generated/dataModel";
 import WhiteboardHeader from "./WhiteboardHeader";
 import TitleChanger from "./TitleChanger";
 

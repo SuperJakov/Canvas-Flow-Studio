@@ -17,7 +17,7 @@ import {
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
 import { useAction, useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 
 export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
@@ -129,6 +129,8 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
                 alt="Generated"
                 fill
                 className="object-contain"
+                quality={75}
+                loading="eager"
               />
             </div>
           ) : (

@@ -25,6 +25,13 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <ConvexAuthNextjsServerProvider>
         <Providers>
+          {process.env.REACT_SCAN === "true" && (
+            <script
+              async
+              crossOrigin="anonymous"
+              src="//unpkg.com/react-scan/dist/auto.global.js"
+            />
+          )}
           <body>
             <Header />
             {children}

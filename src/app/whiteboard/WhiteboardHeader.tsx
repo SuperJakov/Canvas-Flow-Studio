@@ -5,8 +5,8 @@ import Link from "next/link";
 import { UserButton, SignedIn } from "@clerk/nextjs";
 import { ChevronsLeft } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
+import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 type Props = {
   id: string;

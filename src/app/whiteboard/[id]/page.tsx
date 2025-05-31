@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
 import WhiteboardPage from "../WhiteboardPage";
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 type Props = {
   params: Promise<{

@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import type { api } from "convex/_generated/api";
+import type { api } from "../../convex/_generated/api";
 import type { ReactAction } from "convex/react";
 
 export type TextEditorNodeData = {
