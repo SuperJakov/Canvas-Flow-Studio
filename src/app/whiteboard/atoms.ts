@@ -62,6 +62,6 @@ export const updateNodeDataAtom = atom(
         : node,
     );
     // ! TODO: Ignore for now, we will fix later
-    set(nodesAtom, updatedNodes);
+    set(nodesAtom, updatedNodes as AppNode[]);
   },
 );
