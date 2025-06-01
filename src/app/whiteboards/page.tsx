@@ -20,7 +20,7 @@ export default function WhiteboardsClient() {
 
   const handleCreateWhiteboard = async () => {
     setErrorMessage(null);
-    const title = newWhiteboardName.trim() || "Untitled Whiteboard";
+    const title = newWhiteboardName.trim();
     try {
       const newWhiteboardId = await convexCreateWhiteboard({ title });
       setNewWhiteboardName("");

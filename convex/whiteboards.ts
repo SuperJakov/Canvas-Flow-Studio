@@ -15,7 +15,7 @@ export const createWhiteboard = mutation({
 
     const now = BigInt(Date.now());
     return await ctx.db.insert("whiteboards", {
-      title: title.trim() === "" ? title : "Untitled Whiteboard",
+      title: title.trim() === "" ? "Untitled Whiteboard" : title,
       createdAt: now,
       updatedAt: now,
       ownerId: identity.subject,
