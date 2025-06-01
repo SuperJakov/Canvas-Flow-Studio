@@ -4,6 +4,7 @@ import { executeNodeLogic } from "./execution";
 
 export const nodesAtom = atom<AppNode[]>([]);
 export const edgesAtom = atom<AppEdge[]>([]); // Edges can be added later if needed
+export const currentWhiteboardIdAtom = atom<string | null>(null);
 
 export const isExecutingNodeAtom = atom(false); // Global flag to indicate if a node is being executed
 

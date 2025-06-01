@@ -1,8 +1,10 @@
 "use client";
+import { useAtom } from "jotai";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useEffect } from "react";
+import { currentWhiteboardIdAtom } from "./atoms";
 
 type Props = {
   id: string;
@@ -20,5 +22,11 @@ export default function TitleChanger({ id }: Props) {
     }
     document.title = "AI Flow Studio";
   }, [title]);
+  const [, setCurrentWhiteboardId] = useAtom(currentWhiteboardIdAtom);
+
+  useEffect(() => {
+    setCurrentWhiteboardId(id);
+  }, [id, setCurrentWhiteboardId]);
+
   return null;
 }

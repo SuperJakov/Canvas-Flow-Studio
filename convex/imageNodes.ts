@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { action, internalMutation, query } from "./_generated/server";
+import { action, query } from "./_generated/server";
+import { internalMutation } from "./functions";
 import { TextEditorNodeData, UndefinedTypeNode } from "./schema";
 import OpenAI from "openai";
 import { internal } from "./_generated/api";
@@ -90,8 +91,9 @@ export const generateAndStoreImage = action({
       ),
     ),
     nodeId: v.string(),
+    whiteboardId: v.id("whiteboards"),
   },
-  handler: async (ctx, { sourceNodes, nodeId }) => {
+  handler: async (ctx, { sourceNodes, nodeId, whiteboardId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
@@ -116,6 +118,7 @@ export const generateAndStoreImage = action({
     await ctx.runMutation(internal.imageNodes.storeResult, {
       storageId,
       nodeId,
+      whiteboardId,
     });
   },
 });
@@ -124,6 +127,7 @@ export const storeResult = internalMutation({
   args: {
     storageId: v.id("_storage"),
     nodeId: v.string(),
+    whiteboardId: v.id("whiteboards"),
   },
   handler: async (ctx, args) => {
     // Find the node in the imageNodes table by nodeId
@@ -143,6 +147,8 @@ export const storeResult = internalMutation({
       await ctx.db.insert("imageNodes", {
         nodeId: args.nodeId,
         imageUrl,
+        storageId: args.storageId,
+        whiteboardId: args.whiteboardId,
       });
     }
   },

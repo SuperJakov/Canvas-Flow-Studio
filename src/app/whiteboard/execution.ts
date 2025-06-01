@@ -12,7 +12,9 @@ import {
   nodesAtom,
   updateNodeDataAtom,
   executionProgressAtom,
+  currentWhiteboardIdAtom,
 } from "./atoms";
+import type { Id } from "convex/_generated/dataModel";
 
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -52,6 +54,10 @@ async function executeImageNode(
   currentNode: ImageNodeType,
   _targetNode: AppNode, // Prefixed with _ to indicate intentionally unused parameter
 ) {
+  const whiteboardId = get(currentWhiteboardIdAtom);
+  if (!whiteboardId) {
+    throw new Error("whiteboardId not set");
+  }
   console.log("Running an image node...");
   // Get all edges that connect to this image node
   const incomingConnections = get(edgesAtom).filter(
@@ -82,6 +88,7 @@ async function executeImageNode(
   await currentNode.data.internal.generateAndStoreImageAction({
     nodeId: currentNode.id,
     sourceNodes,
+    whiteboardId: whiteboardId as Id<"whiteboards">,
   });
 }
 

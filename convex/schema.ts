@@ -1,5 +1,4 @@
 import { defineSchema, defineTable } from "convex/server";
-import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 export const TextEditorNodeData = v.object({
@@ -64,10 +63,21 @@ const whiteboards = defineTable({
 const imageNodes = defineTable({
   nodeId: v.string(),
   imageUrl: v.union(v.string(), v.null()),
-}).index("by_nodeId", ["nodeId"]);
+  storageId: v.id("_storage"),
+  whiteboardId: v.id("whiteboards"),
+})
+  .index("by_nodeId", ["nodeId"])
+  .index("by_whiteboardId", ["whiteboardId"]);
+
+const users = defineTable({
+  firstName: v.union(v.null(), v.string()),
+  lastName: v.union(v.null(), v.string()),
+
+  externalId: v.string(),
+}).index("byExternalId", ["externalId"]);
 
 const schema = defineSchema({
-  ...authTables,
+  users,
   whiteboards,
   imageNodes,
 });

@@ -50,6 +50,9 @@ export default function TextEditorNode({
 
   const onChange = useCallback(
     (evt: ChangeEvent<HTMLTextAreaElement>) => {
+      if (evt.target.value.length > 10000) {
+        return;
+      }
       updateNodeData({
         nodeId: id,
         nodeType: "textEditor",
@@ -100,6 +103,7 @@ export default function TextEditorNode({
           className={`nodrag field-sizing-content max-h-[130px] min-h-[130px] w-full max-w-[290px] min-w-[290px] resize-none rounded border-none px-2 py-1 text-xl font-bold text-white focus:border-blue-500 focus:outline-none`}
           value={data.text}
           placeholder="Type..."
+          maxLength={10000}
         />
       </div>
       <Handle type="source" position={Position.Bottom} id="a" />

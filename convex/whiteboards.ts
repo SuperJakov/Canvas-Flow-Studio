@@ -1,5 +1,6 @@
 import { initialEdges, initialNodes } from "~/app/whiteboard/initial";
-import { mutation, query } from "./_generated/server";
+import { query } from "./_generated/server";
+import { mutation } from "./functions";
 import { v } from "convex/values";
 import { AppEdge, AppNode } from "./schema";
 
@@ -11,7 +12,7 @@ export const createWhiteboard = mutation({
   handler: async (ctx, { title }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-    console.log("title: ", title);
+
     const now = BigInt(Date.now());
     return await ctx.db.insert("whiteboards", {
       title: title.trim() === "" ? title : "Untitled Whiteboard",
