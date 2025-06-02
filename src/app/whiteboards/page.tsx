@@ -16,12 +16,18 @@ export default function WhiteboardsClient() {
   const [newWhiteboardName, setNewWhiteboardName] = useState("");
   const [deletingId, setDeletingId] = useState<Id<"whiteboards"> | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isCreatingWhiteboard, setIsCreatingWhiteboard] =
+    useState<boolean>(false);
   const router = useRouter();
 
   const handleCreateWhiteboard = async () => {
+    if (isCreatingWhiteboard) {
+      return;
+    }
     setErrorMessage(null);
     const title = newWhiteboardName.trim();
     try {
+      setIsCreatingWhiteboard(true);
       const newWhiteboardId = await convexCreateWhiteboard({ title });
       setNewWhiteboardName("");
       if (!newWhiteboardId) {
@@ -38,6 +44,7 @@ export default function WhiteboardsClient() {
           ? error.message
           : "An unknown error occurred while creating the whiteboard.",
       );
+      setIsCreatingWhiteboard(false);
     }
   };
 
