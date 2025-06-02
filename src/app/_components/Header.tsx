@@ -2,13 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  SignInButton,
-  SignUpButton,
-  UserButton,
-  SignedIn,
-  SignedOut,
-} from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { Authenticated, Unauthenticated } from "convex/react";
+
 export function Header() {
   const pathname = usePathname();
 
@@ -42,18 +38,18 @@ export function Header() {
             >
               Pricing
             </Link>
-            <SignedIn>
+            <Authenticated>
               <Link
-                href="/whiteboard"
+                href="/whiteboards"
                 className="text-gray-300 transition hover:text-white"
               >
                 Whiteboard
               </Link>
-            </SignedIn>
+            </Authenticated>
           </nav>
 
-          <div className="flex items-center space-x-4">
-            <SignedOut>
+          <div className="flex min-h-[40px] min-w-[155px] items-center space-x-4">
+            <Unauthenticated>
               <div className="hidden md:block">
                 <SignInButton mode="modal">
                   <button className="text-gray-300 transition hover:text-white">
@@ -66,10 +62,10 @@ export function Header() {
                   Sign Up
                 </button>
               </SignUpButton>
-            </SignedOut>
-            <SignedIn>
+            </Unauthenticated>
+            <Authenticated>
               <UserButton />
-            </SignedIn>
+            </Authenticated>
           </div>
         </div>
       </div>

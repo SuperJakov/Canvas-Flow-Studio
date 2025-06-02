@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserButton, SignedIn } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { ChevronsLeft } from "lucide-react";
-import { useMutation, useQuery } from "convex/react";
+import { Authenticated, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 
@@ -85,9 +85,9 @@ export default function WhiteboardHeader({ id }: Props) {
               Publish
             </button>
             <div className="flex items-center space-x-4">
-              <SignedIn>
+              <Authenticated>
                 <UserButton />
-              </SignedIn>
+              </Authenticated>
             </div>
           </div>
         </div>
