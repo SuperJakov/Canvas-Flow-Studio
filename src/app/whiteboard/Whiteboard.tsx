@@ -25,6 +25,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { debounce } from "lodash";
+import Loading from "../loading";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -220,11 +221,7 @@ export default function Whiteboard({ id }: Props) {
   }, []);
 
   if (id && whiteboardData === undefined) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-800 text-white">
-        <Loader2 className="mr-2 animate-spin" size={40} />
-      </div>
-    );
+    return <Loading />;
   }
   if (id && whiteboardData === null) {
     return (

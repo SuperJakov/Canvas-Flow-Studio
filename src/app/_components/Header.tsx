@@ -14,7 +14,10 @@ export function Header() {
   }
 
   return (
-    <header className="fixed z-50 w-full bg-gray-900/80 backdrop-blur-sm">
+    <header
+      className="fixed z-50 w-full bg-gray-900/80 backdrop-blur-sm"
+      suppressHydrationWarning
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           <div className="flex items-center">
