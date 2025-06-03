@@ -22,7 +22,6 @@ import { v4 as uuidv4 } from "uuid";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { debounce } from "lodash";
 import Loading from "../loading";
