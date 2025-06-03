@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Image as ImageIcon,
   Loader2,
+  Download,
 } from "lucide-react";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
@@ -30,6 +31,7 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
   });
   const isLocked = data.isLocked ?? false;
   const isRunning = data.isRunning ?? false;
+  const [isDownloading, setIsDownloading] = useState(false);
   const edges = useEdges();
 
   useEffect(() => {
@@ -77,6 +79,30 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
     }
   }, [id, isRunning, hasIncomingConnections, updateNodeData, executeNode]);
 
+  const handleDownload = useCallback(async () => {
+    if (!url || isDownloading) return;
+
+    setIsDownloading(true);
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `image-${id}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Failed to download image:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [url, id, isDownloading]);
+
   return (
     <div className="overflow-hidden rounded border-2 border-white bg-purple-200 shadow-md">
       {/* Header */}
@@ -116,23 +142,38 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
       {/* Content */}
       <div className="bg-gray-700 p-2">
         <Handle type="target" position={Position.Top} />
-        <div className="flex h-[300px] w-[300px] items-center justify-center bg-gray-800">
+        <div className="group relative flex h-[300px] w-[300px] items-center justify-center bg-gray-800">
           {isRunning ? (
             <div className="flex flex-col items-center text-gray-400">
               <Loader2 size={48} className="animate-spin" />
               <p className="mt-2">Generating image...</p>
             </div>
           ) : url ? (
-            <div className="relative h-full w-full">
-              <Image
-                src={url}
-                alt="Generated"
-                fill
-                className="object-contain"
-                quality={75}
-                loading="eager"
-              />
-            </div>
+            <>
+              <div className="relative h-full w-full">
+                <Image
+                  src={url}
+                  alt="Generated"
+                  fill
+                  className="object-contain"
+                  quality={75}
+                  loading="eager"
+                />
+              </div>
+              {/* Download button - appears on hover */}
+              <button
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                title={isDownloading ? "Downloading..." : "Download image"}
+              >
+                {isDownloading ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Download size={18} />
+                )}
+              </button>
+            </>
           ) : (
             <div className="flex flex-col items-center text-gray-400">
               <ImageIcon size={24} />
