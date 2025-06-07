@@ -20,6 +20,9 @@ importers:
       '@convex-dev/auth':
         specifier: ^0.0.86
         version: 0.0.86(@auth/core@0.37.4)(convex@1.24.6(@clerk/clerk-react@5.31.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react@19.1.0)
+      '@convex-dev/rate-limiter':
+        specifier: ^0.2.7
+        version: 0.2.7(convex@1.24.6(@clerk/clerk-react@5.31.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))
       '@t3-oss/env-nextjs':
         specifier: ^0.13.6
         version: 0.13.6(arktype@2.1.20)(typescript@5.8.3)(zod@3.25.46)
@@ -205,6 +208,11 @@ packages:
     peerDependenciesMeta:
       react:
         optional: true
+
+  '@convex-dev/rate-limiter@0.2.7':
+    resolution: {integrity: sha512-aMF/ggCd88Sw6UaqnSS4DjGXTkIOIpyG0d/CrcwMxEIzlDkwanREfF6idtLiL11S7Ra0GJmxkbb23jRuhLL9mA==}
+    peerDependencies:
+      convex: ~1.16.5 || >=1.17.0 <1.35.0
 
   '@emnapi/core@0.45.0':
     resolution: {integrity: sha512-DPWjcUDQkCeEM4VnljEOEcXdAD7pp8zSZsgOujk/LGIwCXWbXJngin+MO4zbH429lzeC3WbYLGjE2MaUOwzpyw==}
@@ -2815,6 +2823,10 @@ snapshots:
       server-only: 0.0.1
     optionalDependencies:
       react: 19.1.0
+
+  '@convex-dev/rate-limiter@0.2.7(convex@1.24.6(@clerk/clerk-react@5.31.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))':
+    dependencies:
+      convex: 1.24.6(@clerk/clerk-react@5.31.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
 
   '@emnapi/core@0.45.0':
     dependencies:

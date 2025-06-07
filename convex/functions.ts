@@ -24,7 +24,11 @@ export const internalMutation = customMutation(
 
 triggers.register("imageNodes", async (ctx, change) => {
   if (change.operation === "update") {
-    if (change.oldDoc?.storageId) {
+    if (
+      change.oldDoc?.storageId &&
+      // ! Don't delete if changes dont affect storage
+      change.newDoc.storageId !== change.oldDoc.storageId
+    ) {
       console.log(
         "Image node updated! Deleting image with storageId:",
         change.oldDoc.storageId,

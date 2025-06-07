@@ -3,8 +3,26 @@ import { action, query } from "./_generated/server";
 import { internalMutation } from "./functions";
 import { TextEditorNodeData, UndefinedTypeNode } from "./schema";
 import OpenAI from "openai";
-import { internal } from "./_generated/api";
+import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
+import { components, internal } from "./_generated/api";
 import type { UserIdentity } from "convex/server";
+
+const DAY = 24 * HOUR;
+const rateLimiter = new RateLimiter(components.rateLimiter, {
+  imageGeneration: { kind: "fixed window", period: DAY, rate: 10 },
+});
+
+export const getImageGenerationRateLimit = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const status = await rateLimiter.check(ctx, "imageGeneration", {
+      key: identity.subject,
+    });
+
+    return status;
+  },
+});
 
 export const getImageNodeUrl = query({
   args: {
@@ -96,7 +114,12 @@ export const generateAndStoreImage = action({
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
+    const { ok, retryAfter } = await rateLimiter.limit(ctx, "imageGeneration", {
+      key: identity.subject,
+    });
+    if (!ok) {
+      throw new Error(`Rate limit reached. Try after: ${retryAfter}`);
+    }
     // Get all text contents from the text nodes, filtering out non-text nodes
     const textContents = sourceNodes
       .filter((node) => node.type === "textEditor" && "data" in node)
