@@ -11,7 +11,20 @@ import Link from "next/link";
 export default function WhiteboardsClient() {
   const whiteboards = useQuery(api.whiteboards.listWhiteboards);
   const convexCreateWhiteboard = useMutation(api.whiteboards.createWhiteboard);
-  const convexDeleteWhiteboard = useMutation(api.whiteboards.deleteWhiteboard);
+  const convexDeleteWhiteboard = useMutation(
+    api.whiteboards.deleteWhiteboard,
+  ).withOptimisticUpdate((localStore, args) => {
+    const { id } = args;
+    const currentWhiteboards = localStore.getQuery(
+      api.whiteboards.listWhiteboards,
+    );
+    if (!currentWhiteboards) return;
+    localStore.setQuery(
+      api.whiteboards.listWhiteboards,
+      {},
+      currentWhiteboards.filter((whiteboard) => whiteboard._id !== id),
+    );
+  });
 
   const [newWhiteboardName, setNewWhiteboardName] = useState("");
   const [deletingId, setDeletingId] = useState<Id<"whiteboards"> | null>(null);
