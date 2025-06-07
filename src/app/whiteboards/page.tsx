@@ -83,7 +83,7 @@ export default function WhiteboardsClient() {
     return new Date(Number(timestamp)).toLocaleString();
   };
 
-  if (whiteboards === undefined) {
+  if (whiteboards === undefined || isCreatingWhiteboard) {
     return <Loading />;
   }
 
