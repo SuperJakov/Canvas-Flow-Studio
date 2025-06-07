@@ -26,11 +26,39 @@ export default function WhiteboardsClient() {
     );
   });
 
+  // Add optimistic update for editing the title
+  const convexEditWhiteboard = useMutation(
+    api.whiteboards.editWhiteboard,
+  ).withOptimisticUpdate((localStore, args) => {
+    const { id, title } = args;
+    // Only apply optimistic update if title is being changed
+    if (typeof title !== "string") return;
+
+    const currentWhiteboards = localStore.getQuery(
+      api.whiteboards.listWhiteboards,
+      {},
+    );
+    if (!currentWhiteboards) return;
+
+    localStore.setQuery(
+      api.whiteboards.listWhiteboards,
+      {},
+      currentWhiteboards.map((w) =>
+        w._id === id ? { ...w, title: title } : w,
+      ),
+    );
+  });
+
   const [newWhiteboardName, setNewWhiteboardName] = useState("");
   const [deletingId, setDeletingId] = useState<Id<"whiteboards"> | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreatingWhiteboard, setIsCreatingWhiteboard] =
     useState<boolean>(false);
+
+  // State for in-place title editing
+  const [editingId, setEditingId] = useState<Id<"whiteboards"> | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+
   const router = useRouter();
 
   const handleCreateWhiteboard = async () => {
@@ -75,6 +103,33 @@ export default function WhiteboardsClient() {
       );
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleStartEditing = (id: Id<"whiteboards">, currentTitle: string) => {
+    setEditingId(id);
+    setEditingTitle(currentTitle);
+  };
+
+  const handleSaveTitle = async (id: Id<"whiteboards">) => {
+    const trimmedTitle = editingTitle.trim();
+    const originalWhiteboard = whiteboards?.find((w) => w._id === id);
+
+    // Don't save if title is empty or unchanged
+    if (!trimmedTitle || trimmedTitle === originalWhiteboard?.title) {
+      setEditingId(null);
+      return;
+    }
+
+    try {
+      void convexEditWhiteboard({ id, title: trimmedTitle });
+    } catch (error) {
+      console.error("Failed to edit whiteboard title:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to update title.",
+      );
+    } finally {
+      setEditingId(null);
     }
   };
 
@@ -157,10 +212,52 @@ export default function WhiteboardsClient() {
                   className="flex flex-col justify-between rounded-lg bg-gray-700 p-4 shadow-lg"
                 >
                   <div>
-                    {" "}
-                    <h3 className="text-lg font-medium">
-                      {whiteboard.title ?? "Untitled"}
-                    </h3>
+                    {editingId === whiteboard._id ? (
+                      <input
+                        type="text"
+                        value={editingTitle}
+                        onChange={(e) => setEditingTitle(e.target.value)}
+                        onBlur={() => handleSaveTitle(whiteboard._id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            void handleSaveTitle(whiteboard._id);
+                          }
+                          if (e.key === "Escape") {
+                            setEditingId(null);
+                          }
+                        }}
+                        className="mb-1 w-full rounded bg-gray-600 px-2 py-1 text-lg font-medium text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        autoFocus
+                      />
+                    ) : (
+                      <div
+                        className="group flex cursor-pointer items-center"
+                        onClick={() =>
+                          handleStartEditing(
+                            whiteboard._id,
+                            whiteboard.title ?? "Untitled",
+                          )
+                        }
+                      >
+                        <h3 className="text-lg font-medium">
+                          {whiteboard.title ?? "Untitled"}
+                        </h3>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="ml-2 hidden h-4 w-4 text-gray-400 group-hover:block"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z"
+                          />
+                        </svg>
+                      </div>
+                    )}
                     <p className="text-sm text-gray-400">
                       Last updated: {formatDate(whiteboard.updatedAt)}
                     </p>
