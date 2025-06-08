@@ -22,7 +22,11 @@ import type { ImageNodeType } from "~/Types/nodes";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
-export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
+export default function ImageNode({
+  id,
+  data,
+  selected,
+}: NodeProps<ImageNodeType>) {
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
   const generateAndStoreImageAction = useAction(
@@ -127,10 +131,12 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
   }, [url, id, isDownloading]);
 
   return (
-    <div className="relative">
+    <div className={`relative`}>
       <div
-        className={`overflow-hidden rounded border-4 bg-purple-200 shadow-md ${
-          isRateLimited ? "border-red-500" : "border-white"
+        className={`overflow-hidden rounded border-2 bg-purple-200 shadow-md ${
+          isRateLimited
+            ? "border-red-500"
+            : `${selected ? "border-blue-500" : "border-white"}`
         }`}
       >
         {/* Rate limit warning - compact header bar */}
@@ -215,16 +221,18 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
               <div className="flex flex-col items-center text-gray-400">
                 <Loader2 size={48} className="animate-spin" />
                 <p className="mt-2">Generating image...</p>
+                {/* Show upgrade message during generation - non-intrusive */}
                 <Link
                   href="/pricing"
-                  className="group flex items-center gap-1 text-xs font-medium text-white hover:underline"
+                  className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
                 >
-                  <span>Upgrade for streaming images.</span>
+                  <span>Upgrade for streaming images</span>
                   <ExternalLink size={10} />
                 </Link>
               </div>
             ) : url ? (
               <>
+                {/* Image is generated - no upgrade message here to avoid interrupting */}
                 <div className="relative h-full w-full">
                   <Image
                     src={url}
@@ -254,11 +262,17 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
             ) : (
               <div className="flex flex-col items-center text-gray-400">
                 <ImageIcon size={24} />
-                <p className="mt-1 text-sm">
-                  {isRateLimited
-                    ? "Rate limit reached"
-                    : "No image generated yet"}
-                </p>
+                <p className="mt-1 text-sm">No image generated yet</p>
+                {/* Show upgrade message when idle and not rate limited - helpful context */}
+                {!isRateLimited && (
+                  <Link
+                    href="/pricing"
+                    className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
+                  >
+                    <span>Upgrade for higher quality</span>
+                    <ExternalLink size={10} />
+                  </Link>
+                )}
               </div>
             )}
           </div>

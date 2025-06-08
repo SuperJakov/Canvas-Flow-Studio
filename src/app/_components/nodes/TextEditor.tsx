@@ -20,6 +20,7 @@ import {
 export default function TextEditorNode({
   data,
   id,
+  selected, // The `selected` prop is provided by @xyflow/react
 }: NodeProps<TextEditorNodeType>) {
   const { isLocked, isRunning } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
@@ -62,8 +63,14 @@ export default function TextEditorNode({
     [id, updateNodeData],
   );
 
+  // We use a template literal to conditionally apply the outline color
+  // based on the `selected` prop.
+  const containerClasses = `overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2 ${
+    selected ? "outline-blue-600" : "outline-gray-200"
+  }`;
+
   return (
-    <div className="overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2 outline-gray-200">
+    <div className={containerClasses}>
       <Handle type="target" position={Position.Top} />
       <div className="flex items-center justify-between px-1 py-2">
         <div className="flex items-center">
@@ -78,7 +85,11 @@ export default function TextEditorNode({
             {isLocked ? <Lock size={18} /> : <LockOpen size={18} />}
           </button>
           <button
-            className={`cursor-pointer rounded p-1 ${hasOutgoingConnections ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900" : "cursor-not-allowed text-gray-400"} nodrag`}
+            className={`cursor-pointer rounded p-1 ${
+              hasOutgoingConnections
+                ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
+                : "cursor-not-allowed text-gray-400"
+            } nodrag`}
             onClick={toggleRunning}
             title={
               hasOutgoingConnections ? "Run node" : "Cannot run: no connections"
