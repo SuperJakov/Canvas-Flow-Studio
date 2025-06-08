@@ -31,14 +31,12 @@ export const getImageNodeUrl = query({
   handler: async (ctx, { nodeId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-    const imageUrls = await ctx.db
+    const imageNode = await ctx.db
       .query("imageNodes")
       .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
-      .collect();
-    if (imageUrls.length !== 1) {
-      return null;
-    }
-    return imageUrls[0]!.imageUrl;
+      .first();
+
+    return imageNode?.imageUrl ?? null;
   },
 });
 
