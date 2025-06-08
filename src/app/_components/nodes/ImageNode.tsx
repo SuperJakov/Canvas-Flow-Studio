@@ -34,7 +34,7 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
   const imageGenRateLimit = useQuery(
     api.imageNodes.getImageGenerationRateLimit,
   );
-  const isRateLimited = !imageGenRateLimit?.ok;
+  const isRateLimited = imageGenRateLimit ? !imageGenRateLimit.ok : false;
   const retryAfterSeconds = imageGenRateLimit?.retryAfter;
   const isLocked = data.isLocked ?? false;
   const isRunning = data.isRunning ?? false;
@@ -215,6 +215,13 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
               <div className="flex flex-col items-center text-gray-400">
                 <Loader2 size={48} className="animate-spin" />
                 <p className="mt-2">Generating image...</p>
+                <Link
+                  href="/pricing"
+                  className="group flex items-center gap-1 text-xs font-medium text-white hover:underline"
+                >
+                  <span>Upgrade for streaming images.</span>
+                  <ExternalLink size={10} />
+                </Link>
               </div>
             ) : url ? (
               <>
