@@ -244,7 +244,13 @@ export default function Whiteboard({ id }: Props) {
       onConnect={onConnect}
       nodeTypes={nodeTypes}
       fitView
+      fitViewOptions={{
+        padding: 0.9, // leave 90% margin -> zooms out further
+      }}
       colorMode="dark"
+      proOptions={{
+        hideAttribution: true, // Remove "React flow" watermark
+      }}
     >
       <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
     </ReactFlow>
