@@ -13,6 +13,10 @@ export const createWhiteboard = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    if (title && title.length > 30) {
+      throw new Error("Title must be at most 30 characters long");
+    }
+
     const now = BigInt(Date.now());
     return await ctx.db.insert("whiteboards", {
       title: title.trim() === "" ? "Untitled Whiteboard" : title,
@@ -42,6 +46,10 @@ export const editWhiteboard = mutation({
 
     if (whiteboard.ownerId !== identity.subject) {
       throw new Error("Unauthorized");
+    }
+
+    if (title && title.length > 30) {
+      throw new Error("Title must be at most 30 characters long");
     }
 
     await ctx.db.patch(id, {

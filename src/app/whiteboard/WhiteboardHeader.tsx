@@ -70,13 +70,14 @@ export default function WhiteboardHeader({ id }: Props) {
                 onKeyDown={handleKeyDown}
                 onClick={startEditing}
                 onFocus={startEditing}
-                className={`field-sizing-content min-w-40 rounded bg-transparent px-2 text-center text-white ${
+                className={`field-sizing-content max-w-[30vw] min-w-40 rounded bg-transparent px-2 text-center text-white ${
                   isEditing
                     ? "ring-2 ring-blue-500 outline-none"
                     : "cursor-pointer hover:text-white/80 hover:ring-2 hover:ring-gray-500"
                 }`}
                 readOnly={!isEditing}
                 autoFocus={isEditing}
+                maxLength={30}
               />
             ) : null}
           </div>

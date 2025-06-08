@@ -165,6 +165,7 @@ export default function WhiteboardsClient() {
               }}
               placeholder="Whiteboard Name"
               className="mr-2 flex-grow rounded bg-gray-700 px-4 py-2 text-white"
+              maxLength={30}
             />
             <button
               onClick={handleCreateWhiteboard}
