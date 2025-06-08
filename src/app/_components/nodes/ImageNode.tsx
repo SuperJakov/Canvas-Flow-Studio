@@ -230,9 +230,11 @@ export default function ImageNode({ id, data }: NodeProps<ImageNodeType>) {
                     src={url}
                     alt="Generated"
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-contain"
                     quality={75}
                     loading="eager"
+                    priority
                   />
                 </div>
                 {/* Download button - appears on hover */}
