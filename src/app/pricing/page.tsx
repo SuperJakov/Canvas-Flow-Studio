@@ -135,25 +135,35 @@ export default function PricingPage() {
   const getCustomerBillingPortalUrl = useAction(
     api.stripe.getCustomerBillingPortalUrl,
   );
+  const cancelSubscription = useAction(api.stripe.cancelSubscription);
   const currentTier = useQuery(api.users.getCurrentUserPlan);
 
   if (auth.isLoading || !currentTier) {
     return <Loading />;
   }
 
-  const handleUpgrade = async (tier: "Plus" | "Pro") => {
+  const handlePlanChange = async (planName: string) => {
     if (!auth.isAuthenticated) return;
-    setLoadingTier(tier);
+
+    setLoadingTier(planName);
     try {
-      const url = await getCheckoutSessionUrl({ tier });
-      if (url) {
-        window.location.href = url;
+      // If downgrading to Free, cancel the subscription
+      if (planName === "Free") {
+        await cancelSubscription();
       } else {
-        console.error("Failed to get checkout session URL.");
-        alert("Could not initiate upgrade. Please try again later.");
+        // For upgrades or paid plan changes, use Stripe checkout
+        const url = await getCheckoutSessionUrl({
+          tier: planName as "Plus" | "Pro",
+        });
+        if (url) {
+          window.location.href = url;
+        } else {
+          console.error("Failed to get checkout session URL.");
+          alert("Could not initiate plan change. Please try again later.");
+        }
       }
     } catch (error) {
-      console.error("Error during upgrade process:", error);
+      console.error("Error during plan change process:", error);
       alert(
         `An error occurred: ${
           error instanceof Error ? error.message : "Please try again."
@@ -162,6 +172,107 @@ export default function PricingPage() {
     } finally {
       setLoadingTier(null);
     }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const url = await getCustomerBillingPortalUrl({
+        returnUrl: window.location.href,
+      });
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Error getting billing portal URL:", error);
+      alert("Could not access billing portal. Please try again later.");
+    }
+  };
+
+  const getButtonConfig = (plan: (typeof plans)[0]) => {
+    const currentRank = tierRanks[currentTier] ?? 0;
+    const planRank = tierRanks[plan.name] ?? 0;
+
+    // Current plan
+    if (plan.name === currentTier) {
+      if (plan.name === "Free") {
+        return {
+          text: "Current Plan",
+          disabled: true,
+          onClick: null,
+          className:
+            "flex w-full cursor-default items-center justify-center rounded-xl bg-gray-600 px-6 py-3.5 font-medium text-white shadow-lg",
+        };
+      } else {
+        return {
+          text: "Manage",
+          disabled: false,
+          onClick: handleManageSubscription,
+          className: `flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`,
+        };
+      }
+    }
+
+    // Different plan
+    if (planRank > currentRank) {
+      // Upgrade
+      return {
+        text: `Upgrade to ${plan.name}`,
+        disabled: false,
+        onClick: () => handlePlanChange(plan.name),
+        className: `flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70`,
+      };
+    } else {
+      // Downgrade
+      return {
+        text: `Downgrade to ${plan.name}`,
+        disabled: false,
+        onClick: () => handlePlanChange(plan.name),
+        className: `flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70`,
+      };
+    }
+  };
+
+  const renderButton = (plan: (typeof plans)[0]) => {
+    const buttonConfig = getButtonConfig(plan);
+    const isLoading = loadingTier === plan.name;
+
+    // For unauthenticated users
+    if (!auth.isAuthenticated) {
+      if (plan.name === "Free") {
+        return (
+          <Link
+            href="/whiteboard"
+            className={`flex w-full items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
+          >
+            Get Started Free
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        );
+      } else {
+        return (
+          <SignUpButton mode="modal">
+            <span className={buttonConfig.className}>
+              Sign Up to Upgrade
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </span>
+          </SignUpButton>
+        );
+      }
+    }
+
+    // For authenticated users
+    return (
+      <button
+        onClick={buttonConfig.onClick ?? undefined}
+        disabled={buttonConfig.disabled || isLoading}
+        className={buttonConfig.className}
+      >
+        {isLoading ? "Processing..." : buttonConfig.text}
+        {!buttonConfig.disabled && !isLoading && (
+          <ArrowRight className="ml-2 h-4 w-4" />
+        )}
+      </button>
+    );
   };
 
   return (
@@ -184,179 +295,94 @@ export default function PricingPage() {
       {/* Pricing Cards */}
       <section className="container mx-auto px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => {
-            const isUpgrade =
-              tierRanks[plan.name] ?? 0 > (tierRanks[currentTier] ?? 0);
-
-            return (
-              <div
-                key={plan.name}
-                className={`group relative flex h-full flex-col rounded-3xl border border-gray-700/50 bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-8 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl ${
-                  plan.popular
-                    ? "ring-2 ring-blue-500/30 hover:ring-blue-500/50"
-                    : "hover:ring-1 hover:ring-purple-500/30"
-                }`}
-              >
-                {/* Popular Badge */}
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                    <div className="flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Most Popular
-                    </div>
-                  </div>
-                )}
-
-                {/* Card Header - Simplified without icon */}
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                  <p className="mt-2 text-sm text-gray-400">
-                    {plan.description}
-                  </p>
-                </div>
-
-                {/* Pricing */}
-                <div className="mb-8 border-b border-gray-700/50 pb-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <span className="text-5xl font-bold text-white">
-                        {plan.currency}
-                        {plan.price}
-                      </span>
-                      <span className="ml-2 text-gray-400">/{plan.period}</span>
-                    </div>
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={`group relative flex h-full flex-col rounded-3xl border border-gray-700/50 bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-8 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl ${
+                plan.popular
+                  ? "ring-2 ring-blue-500/30 hover:ring-blue-500/50"
+                  : "hover:ring-1 hover:ring-purple-500/30"
+              }`}
+            >
+              {/* Popular Badge */}
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
+                  <div className="flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Most Popular
                   </div>
                 </div>
+              )}
 
-                {/* Features - Consistent Heights */}
-                <div className="mb-8 grid flex-1 grid-cols-1 gap-5">
-                  <FeatureSection
-                    title="Account & Whiteboards"
-                    features={plan.features.account}
-                    color="blue"
-                  />
+              {/* Card Header */}
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                <p className="mt-2 text-sm text-gray-400">{plan.description}</p>
+              </div>
 
-                  <FeatureSection
-                    title="Content Generation"
-                    features={plan.features.content}
-                    color="green"
-                  />
-
-                  <FeatureSection
-                    title="Integrations"
-                    features={plan.features.integrations}
-                    color="yellow"
-                  />
-
-                  <div className="flex flex-col">
-                    <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
-                      <span className="mr-2 h-0.5 w-5 bg-purple-500"></span>
-                      Premium Features
-                    </h4>
-                    <ul className="flex-1 space-y-3">
-                      {plan.features.premium.map((feature, idx) => (
-                        <li key={idx} className="flex items-center">
-                          {feature.included ? (
-                            <Check className="mr-3 h-5 w-5 rounded-full bg-green-500/20 p-1 text-green-400" />
-                          ) : (
-                            <X className="mr-3 h-5 w-5 rounded-full bg-red-500/20 p-1 text-red-400" />
-                          )}
-                          <span
-                            className={
-                              feature.included ? "text-white" : "text-gray-500"
-                            }
-                          >
-                            {feature.name}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+              {/* Pricing */}
+              <div className="mb-8 border-b border-gray-700/50 pb-6">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <span className="text-5xl font-bold text-white">
+                      {plan.currency}
+                      {plan.price}
+                    </span>
+                    <span className="ml-2 text-gray-400">/{plan.period}</span>
                   </div>
-                </div>
-
-                {/* CTA Button */}
-                <div className="mt-auto">
-                  {plan.name === currentTier ? (
-                    auth.isAuthenticated ? (
-                      <button
-                        onClick={async () => {
-                          try {
-                            const url = await getCustomerBillingPortalUrl({
-                              returnUrl: window.location.href,
-                            });
-                            if (url) {
-                              window.location.href = url;
-                            }
-                          } catch (error) {
-                            console.error(
-                              "Error getting billing portal URL:",
-                              error,
-                            );
-                            alert(
-                              "Could not access billing portal. Please try again later.",
-                            );
-                          }
-                        }}
-                        className={`flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
-                          plan.buttonStyle
-                        } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
-                      >
-                        Manage Subscription
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </button>
-                    ) : (
-                      <Link
-                        href="/whiteboard"
-                        className={`flex w-full items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
-                          plan.buttonStyle
-                        } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
-                      >
-                        Get Started Free
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    )
-                  ) : isUpgrade ? (
-                    auth.isAuthenticated ? (
-                      <button
-                        onClick={() =>
-                          handleUpgrade(plan.name as "Plus" | "Pro")
-                        }
-                        disabled={loadingTier === plan.name}
-                        className={`flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
-                          plan.buttonStyle
-                        } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70`}
-                      >
-                        {loadingTier === plan.name
-                          ? "Redirecting..."
-                          : `Upgrade to ${plan.name}`}
-                        {loadingTier !== plan.name && (
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                    ) : (
-                      <SignUpButton mode="modal">
-                        <span
-                          className={`flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
-                            plan.buttonStyle
-                          } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
-                        >
-                          Sign Up to Upgrade
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </span>
-                      </SignUpButton>
-                    )
-                  ) : (
-                    <button
-                      disabled
-                      className="flex w-full cursor-default items-center justify-center rounded-xl bg-gray-600 px-6 py-3.5 font-medium text-white shadow-lg"
-                    >
-                      Current Plan
-                    </button>
-                  )}
                 </div>
               </div>
-            );
-          })}
+
+              {/* Features */}
+              <div className="mb-8 grid flex-1 grid-cols-1 gap-5">
+                <FeatureSection
+                  title="Account & Whiteboards"
+                  features={plan.features.account}
+                  color="blue"
+                />
+
+                <FeatureSection
+                  title="Content Generation"
+                  features={plan.features.content}
+                  color="green"
+                />
+
+                <FeatureSection
+                  title="Integrations"
+                  features={plan.features.integrations}
+                  color="yellow"
+                />
+
+                <div className="flex flex-col">
+                  <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
+                    <span className="mr-2 h-0.5 w-5 bg-purple-500"></span>
+                    Premium Features
+                  </h4>
+                  <ul className="flex-1 space-y-3">
+                    {plan.features.premium.map((feature, idx) => (
+                      <li key={idx} className="flex items-center">
+                        {feature.included ? (
+                          <Check className="mr-3 h-5 w-5 rounded-full bg-green-500/20 p-1 text-green-400" />
+                        ) : (
+                          <X className="mr-3 h-5 w-5 rounded-full bg-red-500/20 p-1 text-red-400" />
+                        )}
+                        <span
+                          className={
+                            feature.included ? "text-white" : "text-gray-500"
+                          }
+                        >
+                          {feature.name}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-auto">{renderButton(plan)}</div>
+            </div>
+          ))}
         </div>
       </section>
 

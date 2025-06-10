@@ -183,6 +183,58 @@ export const getCheckoutSessionUrl = action({
   },
 });
 
+export const cancelSubscription = action({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const clerkUserId = identity.subject;
+
+    // Get user from database
+    const user = await ctx.runQuery(internal.users.getUserByExternalId, {
+      externalId: clerkUserId,
+    });
+
+    if (!user) {
+      throw new Error("User not found in database");
+    }
+
+    if (!user.stripeCustomerId) {
+      throw new Error("No Stripe customer found for this user");
+    }
+
+    try {
+      // Get active subscriptions for the customer
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: "active",
+        limit: 1,
+      });
+
+      if (subscriptions.data.length === 0) {
+        throw new Error("No active subscription found");
+      }
+      const subscription = subscriptions.data[0];
+      if (!subscription) throw new Error("No subscription found");
+      // Cancel the subscription at period end
+      await stripe.subscriptions.update(subscription.id, {
+        cancel_at_period_end: true,
+      });
+
+      // Note: The subscription status will be updated via webhook when it actually ends
+      return {
+        success: true,
+        message:
+          "Subscription will be canceled at the end of the billing period",
+      };
+    } catch (error) {
+      console.error("Error canceling subscription:", error);
+      throw new Error("Failed to cancel subscription");
+    }
+  },
+});
+
 /**
  * Creates a Stripe Billing Portal Session to allow users to manage their subscription.
  */
