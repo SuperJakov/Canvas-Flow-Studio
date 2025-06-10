@@ -3,6 +3,11 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-05-28.basil",
+});
 
 const http = httpRouter();
 
@@ -50,5 +55,48 @@ async function validateRequest(req: Request): Promise<WebhookEvent | null> {
     return null;
   }
 }
+
+// This is the public-facing endpoint that Stripe will call.
+const handleStripeWebhook = httpAction(async (ctx, request) => {
+  console.log("Received http actions /stripe");
+  const signature = request.headers.get("stripe-signature")!;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    console.error(
+      "STRIPE_WEBHOOK_SECRET is not set in Convex environment variables.",
+    );
+    return new Response("Webhook secret not configured.", { status: 500 });
+  }
+
+  try {
+    const event = await stripe.webhooks.constructEventAsync(
+      await request.text(), // Raw request body
+      signature,
+      webhookSecret,
+    );
+
+    await ctx.scheduler.runAfter(0, internal.stripe.handleEvent, { event });
+
+    // Acknowledge receipt of the event
+    return new Response(null, { status: 200 });
+  } catch (err: unknown) {
+    console.error(
+      "Error verifying Stripe webhook signature:",
+      err instanceof Error ? err.message : String(err),
+    );
+    // Stripe expects a 400 response for signature-related errors.
+    return new Response(
+      `Webhook Error: ${err instanceof Error ? err.message : String(err)}`,
+      { status: 400 },
+    );
+  }
+});
+
+http.route({
+  path: "/stripe",
+  method: "POST",
+  handler: handleStripeWebhook,
+});
 
 export default http;

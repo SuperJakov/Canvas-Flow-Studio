@@ -72,9 +72,18 @@ const imageNodes = defineTable({
 const users = defineTable({
   firstName: v.union(v.null(), v.string()),
   lastName: v.union(v.null(), v.string()),
+  externalId: v.string(), // This is the Clerk user ID (subject)
 
-  externalId: v.string(),
-}).index("byExternalId", ["externalId"]);
+  // Stripe-related fields
+  stripeCustomerId: v.optional(v.string()),
+  plan: v.optional(
+    v.union(v.literal("Free"), v.literal("Plus"), v.literal("Pro")),
+  ),
+  endsOn: v.optional(v.number()), // Subscription end date as a timestamp
+})
+  .index("byExternalId", ["externalId"])
+  // Index for finding users via Stripe customer ID (useful for webhooks)
+  .index("by_stripeCustomerId", ["stripeCustomerId"]);
 
 const schema = defineSchema({
   users,

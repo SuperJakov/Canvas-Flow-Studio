@@ -1,4 +1,4 @@
-import { query, type QueryCtx } from "./_generated/server";
+import { internalQuery, query, type QueryCtx } from "./_generated/server";
 import { internalMutation } from "./functions";
 import type { UserJSON } from "@clerk/backend";
 import { v, type Validator } from "convex/values";
@@ -63,3 +63,58 @@ async function userByExternalId(ctx: QueryCtx, externalId: string) {
     .withIndex("byExternalId", (q) => q.eq("externalId", externalId))
     .unique();
 }
+
+export const getUserByExternalId = internalQuery({
+  args: { externalId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", args.externalId))
+      .unique();
+  },
+});
+
+/**
+ * Internal mutation to set the Stripe customer ID for a user.
+ */
+export const setStripeCustomerId = internalMutation({
+  args: {
+    userId: v.id("users"),
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, { userId, stripeCustomerId }) => {
+    await ctx.db.patch(userId, { stripeCustomerId });
+  },
+});
+
+export const updateUserSubscription = internalMutation({
+  args: {
+    externalId: v.string(),
+    plan: v.union(v.literal("Free"), v.literal("Plus"), v.literal("Pro")),
+  },
+  handler: async (ctx, { externalId, plan }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", externalId))
+      .unique();
+
+    if (!user) {
+      throw new Error(
+        `[Webhook] User with externalId ${externalId} not found.`,
+      );
+    }
+
+    await ctx.db.patch(user._id, {
+      plan,
+    });
+  },
+});
+
+export const getCurrentUserPlan = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return null;
+    return user.plan ?? "Free"; // Default to "Free" if plan is not set
+  },
+});
