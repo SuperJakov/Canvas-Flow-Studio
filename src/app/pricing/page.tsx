@@ -297,7 +297,7 @@ export default function PricingPage() {
                             );
                           }
                         }}
-                        className={`flex w-full items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
+                        className={`flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
                           plan.buttonStyle
                         } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
                       >
@@ -322,7 +322,7 @@ export default function PricingPage() {
                           handleUpgrade(plan.name as "Plus" | "Pro")
                         }
                         disabled={loadingTier === plan.name}
-                        className={`flex w-full items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
+                        className={`flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${
                           plan.buttonStyle
                         } ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70`}
                       >
@@ -392,7 +392,7 @@ export default function PricingPage() {
               {
                 question: "How do rate limits work?",
                 answer:
-                  "Each subscription tier has monthly limits for operations like image generation, text analysis, and API integrations. Unused operations don't carry over to the next month.",
+                  "Each subscription tier has monthly limits for operations like image generation, text analysis, and API integrations. Unused operations don't carry over to the next month. ",
               },
               {
                 question: "Can I upgrade or downgrade my plan?",

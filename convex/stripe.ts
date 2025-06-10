@@ -18,8 +18,14 @@ const priceIds: Record<Tier, string> = {
   Pro: process.env.PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID!,
 };
 
+const priceIdToTier: Record<string, Tier> = {
+  [process.env.PLUS_MONTHLY_SUBSCRIPTION_PRODUCT_ID!]: "Plus",
+  [process.env.PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID!]: "Pro",
+};
+
 /**
  * Creates a Stripe Checkout Session for a given tier and returns the URL.
+ * Handles both new subscriptions and upgrades from existing subscriptions.
  */
 export const getCheckoutSessionUrl = action({
   args: {
@@ -35,8 +41,9 @@ export const getCheckoutSessionUrl = action({
     if (!identity) {
       throw new Error("User not authenticated.");
     }
-    const clerkUserId = identity.subject; // This is the externalId
+    const clerkUserId = identity.subject;
     console.log(clerkUserId);
+
     const user = await ctx.runQuery(internal.users.getUserByExternalId, {
       externalId: clerkUserId,
     });
@@ -47,7 +54,7 @@ export const getCheckoutSessionUrl = action({
 
     let stripeCustomerId = user.stripeCustomerId;
 
-    // 3. Create a new Stripe customer if one doesn't exist
+    // Create a new Stripe customer if one doesn't exist
     if (!stripeCustomerId) {
       const email = identity.email;
       if (!email) {
@@ -69,12 +76,79 @@ export const getCheckoutSessionUrl = action({
       });
     }
 
+    // Check if user has an existing subscription and needs to upgrade
+    const currentPlan = user.plan ?? "Free";
+    const tierHierarchy = { Free: 0, Plus: 1, Pro: 2 };
+    const isUpgrade = tierHierarchy[currentPlan] < tierHierarchy[tier];
+
+    // If user has an active subscription and is trying to upgrade
+    if (isUpgrade && currentPlan !== "Free") {
+      try {
+        // Get all subscriptions for the customer
+        const subscriptions = await stripe.subscriptions.list({
+          customer: stripeCustomerId,
+          status: "active",
+          limit: 1,
+        });
+
+        if (subscriptions.data.length > 0) {
+          const currentSubscription = subscriptions.data[0];
+          if (!currentSubscription) {
+            throw new Error(
+              "Active subscription not found despite subscription list indicating existence.",
+            );
+          }
+          const newPriceId = priceIds[tier];
+
+          if (!newPriceId) {
+            throw new Error(`Price ID for tier "${tier}" is not configured.`);
+          }
+
+          // Create a checkout session for subscription upgrade
+          // This will handle the payment for the upgrade and update the subscription
+          const session = await stripe.checkout.sessions.create({
+            customer: stripeCustomerId,
+            mode: "subscription",
+            payment_method_types: ["card"],
+            line_items: [{ price: newPriceId, quantity: 1 }],
+            subscription_data: {
+              metadata: {
+                clerkUserId: clerkUserId,
+                tier: tier,
+                previousPlan: currentPlan,
+                isUpgrade: "true",
+              },
+              // This will replace the existing subscription
+              proration_behavior: "create_prorations",
+            },
+            metadata: {
+              tier: tier,
+              clerkUserId: clerkUserId,
+              isUpgrade: "true",
+              previousPlan: currentPlan,
+              existingSubscriptionId: currentSubscription.id,
+            },
+            success_url: `${hostingUrl}/success?session_id={CHECKOUT_SESSION_ID}&upgraded=true`,
+            cancel_url: `${hostingUrl}/pricing`,
+          });
+
+          console.log(
+            `Creating upgrade checkout session from ${currentPlan} to ${tier} for user ${clerkUserId}`,
+          );
+          return session.url;
+        }
+      } catch (error) {
+        console.error("Error creating upgrade checkout session:", error);
+        // Fall through to create a new checkout session if upgrade fails
+      }
+    }
+
+    // Create new checkout session for new subscriptions or if upgrade failed
     const priceId = priceIds[tier];
     if (!priceId) {
       throw new Error(`Price ID for tier "${tier}" is not configured.`);
     }
 
-    // 5. Create the Stripe Checkout Session
     try {
       const session = await stripe.checkout.sessions.create({
         customer: stripeCustomerId,
@@ -83,11 +157,22 @@ export const getCheckoutSessionUrl = action({
         line_items: [{ price: priceId, quantity: 1 }],
         metadata: {
           tier: tier,
-          // Storing the Clerk User ID is preferred for webhook lookups
           clerkUserId: clerkUserId,
+          isUpgrade: isUpgrade.toString(),
+          previousPlan: currentPlan,
         },
         success_url: `${hostingUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${hostingUrl}/pricing`,
+        // If user has an existing subscription, allow them to replace it
+        ...(currentPlan !== "Free" && {
+          subscription_data: {
+            metadata: {
+              clerkUserId: clerkUserId,
+              tier: tier,
+              previousPlan: currentPlan,
+            },
+          },
+        }),
       });
 
       return session.url;
@@ -199,21 +284,27 @@ export const handleEvent = internalAction({
           }
 
           async function updateSubscription(id: string) {
-            // The price object contains the tier info. Using nickname is a good practice.
-            const planNickname = subscription.items.data[0]?.price.nickname;
-            if (
-              !planNickname ||
-              (planNickname !== "Plus" && planNickname !== "Pro")
-            ) {
-              throw new Error(`Invalid plan nickname: ${planNickname}`);
+            // Get the price ID from the subscription item
+            const priceId = subscription.items.data[0]?.price.id;
+            if (!priceId) {
+              throw new Error("No price ID found in subscription items.");
+            }
+
+            // Map price ID to tier
+            const tier = priceIdToTier[priceId];
+            if (!tier) {
+              // Log all available price IDs for debugging
+              console.error("Available price IDs:", Object.keys(priceIdToTier));
+              console.error("Received price ID:", priceId);
+              throw new Error(`Price ID ${priceId} not mapped to any tier.`);
             }
 
             await ctx.runMutation(internal.users.updateUserSubscription, {
               externalId: id,
-              plan: planNickname,
+              plan: tier,
             });
             console.log(
-              `[Webhook] User ${id}'s subscription updated to ${planNickname}.`,
+              `[Webhook] User ${id}'s subscription updated to ${tier} (price: ${priceId}).`,
             );
           }
           break;
