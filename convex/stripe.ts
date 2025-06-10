@@ -6,7 +6,6 @@ import { action, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // Define the Plan type for type safety
-type Plan = "Free" | "Plus" | "Pro";
 type Tier = "Plus" | "Pro";
 
 // Initialize Stripe with the secret key from environment variables
@@ -170,11 +169,6 @@ export const handleEvent = internalAction({
           if (tier !== "Plus" && tier !== "Pro") {
             throw new Error(`Invalid tier: ${tier}`);
           }
-
-          // Retrieve the full subscription to get the end date
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription as string,
-          );
 
           await ctx.runMutation(internal.users.updateUserSubscription, {
             externalId: clerkUserId,
