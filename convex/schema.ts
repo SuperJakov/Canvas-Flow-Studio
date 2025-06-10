@@ -84,8 +84,29 @@ const users = defineTable({
   // Index for finding users via Stripe customer ID (useful for webhooks)
   .index("by_stripeCustomerId", ["stripeCustomerId"]);
 
+const subscriptions = defineTable({
+  userExternalId: v.string(),
+  subscriptionId: v.string(),
+  status: v.union(
+    v.literal("incomplete"),
+    v.literal("incomplete_expired"),
+    v.literal("trialing"),
+    v.literal("active"),
+    v.literal("past_due"),
+    v.literal("canceled"),
+    v.literal("unpaid"),
+  ),
+  cancel_at_period_end: v.boolean(),
+  current_period_start: v.int64(),
+  current_period_end: v.union(v.int64(), v.null()),
+  canceled_at: v.int64(),
+  price_id: v.string(),
+  last_status_sync_at: v.int64(),
+});
+
 const schema = defineSchema({
   users,
+  subscriptions,
   whiteboards,
   imageNodes,
 });

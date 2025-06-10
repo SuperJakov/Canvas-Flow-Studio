@@ -280,6 +280,69 @@ export const getCustomerBillingPortalUrl = action({
   },
 });
 
+export const syncStripeDataToDb = internalAction({
+  args: {
+    subject: v.string(),
+  },
+  handler: async (ctx, { subject }) => {
+    const user = await ctx.runQuery(internal.users.getUserByExternalId, {
+      externalId: subject,
+    });
+
+    if (!user) throw new Error("User not found");
+    const { stripeCustomerId } = user;
+    if (!stripeCustomerId) throw new Error("User does not have customer id");
+
+    const subscription = (
+      await stripe.subscriptions.list({
+        customer: stripeCustomerId,
+        limit: 1,
+        status: "active",
+      })
+    ).data[0];
+    if (!subscription) throw new Error("Subscription not found");
+
+    // Map Stripe status to our schema status
+    const statusMap: Record<
+      string,
+      | "incomplete"
+      | "incomplete_expired"
+      | "trialing"
+      | "active"
+      | "past_due"
+      | "canceled"
+      | "unpaid"
+    > = {
+      incomplete: "incomplete",
+      incomplete_expired: "incomplete_expired",
+      trialing: "trialing",
+      active: "active",
+      past_due: "past_due",
+      canceled: "canceled",
+      unpaid: "unpaid",
+    };
+
+    const status = statusMap[subscription.status] ?? "incomplete";
+
+    // Now save all data we need
+    await ctx.runMutation(internal.subscriptions.upsertSubscription, {
+      userExternalId: user.externalId,
+      subscriptionId: subscription.id,
+      status,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      current_period_start: BigInt(subscription.start_date * 1000), // Convert to milliseconds
+      current_period_end: subscription.cancel_at
+        ? BigInt(subscription.cancel_at)
+        : null,
+      canceled_at: subscription.canceled_at
+        ? BigInt(subscription.canceled_at * 1000)
+        : BigInt(0), // Convert to milliseconds
+      price_id: subscription.items.data[0]?.price.id ?? "",
+      last_status_sync_at: BigInt(Date.now()),
+    });
+  },
+});
+
 export const handleEvent = internalAction({
   args: { event: v.any() }, // The validated Stripe.Event object
   handler: async (ctx, { event }) => {
@@ -311,6 +374,11 @@ export const handleEvent = internalAction({
             externalId: clerkUserId,
             plan: tier,
           });
+
+          await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
+            subject: clerkUserId,
+          });
+
           console.log(`[Webhook] User ${clerkUserId} subscribed to ${tier}.`);
           break;
         }
@@ -355,6 +423,15 @@ export const handleEvent = internalAction({
               externalId: id,
               plan: tier,
             });
+
+            await ctx.scheduler.runAfter(
+              0,
+              internal.stripe.syncStripeDataToDb,
+              {
+                subject: id,
+              },
+            );
+
             console.log(
               `[Webhook] User ${id}'s subscription updated to ${tier} (price: ${priceId}).`,
             );
@@ -382,6 +459,11 @@ export const handleEvent = internalAction({
             externalId: clerkUserId,
             plan: "Free",
           });
+
+          await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
+            subject: clerkUserId,
+          });
+
           console.log(
             `[Webhook] User ${clerkUserId}'s subscription deleted. Reset to Free.`,
           );
