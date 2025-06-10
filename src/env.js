@@ -10,7 +10,6 @@ export const env = createEnv({
     STRIPE_PUBLISHABLE_KEY: z.string(),
     PLUS_MONTHLY_SUBSCRIPTION_PRODUCT_ID: z.string(),
     PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID: z.string(),
-    REDIS_URL: z.string(),
   },
 
   client: {
@@ -34,7 +33,6 @@ export const env = createEnv({
       process.env.PLUS_MONTHLY_SUBSCRIPTION_PRODUCT_ID,
     PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID:
       process.env.PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID,
-    REDIS_URL: process.env.REDIS_URL,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,
