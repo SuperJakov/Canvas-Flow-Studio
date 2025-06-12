@@ -43,7 +43,7 @@ export default function CommentNode({
         selected ? "outline-blue-600" : "outline-gray-200"
       }`}
     >
-      {/* NodeResizer is added here. It's only visible when the node is selected and not locked. */}
+      {/* It's only visible when the node is selected and not locked. */}
       <NodeResizer
         isVisible={selected && !isLocked}
         minWidth={200}
@@ -67,9 +67,7 @@ export default function CommentNode({
         </button>
       </div>
 
-      {/* Content wrapper now grows to fill available space */}
       <div className="flex-grow bg-orange-200 p-2">
-        {/* Textarea now fills its parent container, instead of auto-sizing */}
         <textarea
           className="nodrag custom-scrollbar h-full w-full resize-none rounded bg-transparent p-2 text-lg font-bold text-black outline-none"
           value={text}

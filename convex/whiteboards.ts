@@ -51,17 +51,19 @@ export const editWhiteboard = mutation({
     if (title && title.length > 30) {
       throw new Error("Title must be at most 30 characters long");
     }
-    for (const node of whiteboard.nodes) {
-      if (
-        node &&
-        (node.type === "textEditor" || node.type === "comment") &&
-        "data" in node
-      ) {
-        // TODO: Remove undefined node, then this will be simple.
-        if (node.data.text && node.data.text.length > 10000) {
-          throw new Error(
-            "Text content exceeds maximum length of 10000 characters",
-          );
+    if (nodes) {
+      for (const node of nodes) {
+        if (
+          node &&
+          (node.type === "textEditor" || node.type === "comment") &&
+          "data" in node
+        ) {
+          // TODO: Remove undefined node, then this will be simple.
+          if (node.data.text && node.data.text.length > 10000) {
+            throw new Error(
+              "Text content exceeds maximum length of 10000 characters",
+            );
+          }
         }
       }
     }
