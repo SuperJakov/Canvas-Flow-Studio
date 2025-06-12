@@ -93,6 +93,16 @@ export default function Whiteboard({ id }: Props) {
               data: nodeDataWithoutInternal,
             };
           }
+          if (n.type === "comment") {
+            return {
+              id: n.id,
+              type: n.type,
+              position: n.position,
+              data: n.data,
+              width: n.width,
+              height: n.height,
+            };
+          }
           return {
             id: n.id,
             type: n.type,
@@ -200,6 +210,17 @@ export default function Whiteboard({ id }: Props) {
               isLocked: false,
               isRunning: false,
               imageUrl: null,
+            },
+          };
+          break;
+        case "comment":
+          newNode = {
+            id: newNodeId,
+            type: dndType,
+            position,
+            data: {
+              isLocked: false,
+              text: "",
             },
           };
           break;

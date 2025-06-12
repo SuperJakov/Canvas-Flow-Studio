@@ -31,6 +31,21 @@ const ImageNodeSchema = v.object({
   }),
 });
 
+const CommentNodeSchema = v.object({
+  id: v.string(),
+  type: v.literal("comment"),
+  data: v.object({
+    isLocked: v.boolean(),
+    text: v.string(),
+  }),
+  position: v.object({
+    x: v.number(),
+    y: v.number(),
+  }),
+  width: v.optional(v.union(v.number(), v.null())),
+  height: v.optional(v.union(v.number(), v.null())),
+});
+
 export const UndefinedTypeNode = v.object({
   // ! Used for typesafety when sending
   id: v.string(),
@@ -41,6 +56,7 @@ export const AppNode = v.union(
   TextEditorSchema,
   ImageNodeSchema,
   UndefinedTypeNode,
+  CommentNodeSchema,
 );
 
 export const AppEdge = v.object({

@@ -2,6 +2,11 @@ import type { Edge, Node } from "@xyflow/react";
 import type { api } from "../../convex/_generated/api";
 import type { ReactAction } from "convex/react";
 
+export type CommentNodeData = {
+  text: string;
+  isLocked: boolean;
+};
+
 export type TextEditorNodeData = {
   text: string;
   isLocked: boolean;
@@ -21,8 +26,9 @@ export type ImageNodeData = {
 
 export type TextEditorNodeType = Node<TextEditorNodeData, "textEditor">;
 export type ImageNodeType = Node<ImageNodeData, "image">;
+export type CommentNodeType = Node<CommentNodeData, "comment">;
 
-export type AppNode = TextEditorNodeType | ImageNodeType;
+export type AppNode = TextEditorNodeType | ImageNodeType | CommentNodeType;
 
 // This is unnecessary, but it is kept for the future if more edge types are added
 export type AppEdge = Edge;
