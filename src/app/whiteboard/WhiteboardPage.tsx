@@ -6,21 +6,28 @@ import Whiteboard from "./Whiteboard";
 import type { Id } from "../../../convex/_generated/dataModel";
 import WhiteboardHeader from "./WhiteboardHeader";
 import TitleChanger from "./TitleChanger";
+import { Authenticated } from "convex/react";
+import { Suspense } from "react";
+import Loading from "../loading";
 
 type Props = {
   id: Id<"whiteboards">;
 };
 export default function WhiteboardPage({ id }: Props) {
   return (
-    <DnDProvider>
-      <ReactFlowProvider>
-        <div className="h-screen w-full">
-          <TitleChanger id={id} />
-          <WhiteboardHeader id={id} />
-          <Sidebar />
-          <Whiteboard id={id} />
-        </div>
-      </ReactFlowProvider>
-    </DnDProvider>
+    <Suspense fallback={<Loading />}>
+      <Authenticated>
+        <DnDProvider>
+          <ReactFlowProvider>
+            <div className="h-screen w-full">
+              <TitleChanger id={id} />
+              <WhiteboardHeader id={id} />
+              <Sidebar />
+              <Whiteboard id={id} />
+            </div>
+          </ReactFlowProvider>
+        </DnDProvider>
+      </Authenticated>
+    </Suspense>
   );
 }
