@@ -39,7 +39,9 @@ export default function CommentNode({
   return (
     // The main container now uses flexbox to manage the layout and must have h-full
     <div
-      className={`flex h-full flex-col overflow-hidden rounded border-2 border-orange-300 bg-orange-100 shadow-md ${selected ? "outline outline-blue-500" : ""} ${isLocked ? "nodrag" : ""}`}
+      className={`flex h-full flex-col overflow-hidden rounded border-2 border-orange-300 bg-orange-100 shadow-md outline-2 ${
+        selected ? "outline-blue-600" : "outline-gray-200"
+      }`}
     >
       {/* NodeResizer is added here. It's only visible when the node is selected and not locked. */}
       <NodeResizer
@@ -74,6 +76,7 @@ export default function CommentNode({
           onChange={onChange}
           placeholder="Add a comment..."
           readOnly={isLocked}
+          maxLength={10000}
         />
       </div>
     </div>
