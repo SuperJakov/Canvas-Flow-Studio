@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { ChevronsLeft } from "lucide-react";
@@ -85,11 +85,19 @@ export default function WhiteboardHeader({ id }: Props) {
             <button className="h-8 cursor-pointer rounded bg-blue-500 px-4 text-white">
               Publish
             </button>
-            <div className="flex items-center space-x-4">
+
+            <Suspense
+              fallback={
+                <div
+                  className="h-7 w-7 animate-pulse rounded-full bg-gray-400"
+                  style={{ animationDuration: "0.5s" }}
+                />
+              }
+            >
               <Authenticated>
                 <UserButton />
               </Authenticated>
-            </div>
+            </Suspense>
           </div>
         </div>
       </div>
