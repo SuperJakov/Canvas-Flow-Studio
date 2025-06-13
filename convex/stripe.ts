@@ -484,3 +484,47 @@ export const handleEvent = internalAction({
     }
   },
 });
+
+export const reactivateSubscription = action({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("User not authenticated.");
+    }
+
+    // Initialize Stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2025-05-28.basil",
+    });
+
+    // Get the user's Stripe customer ID from your database
+    const userRecord = await ctx.runQuery(internal.users.getUserByExternalId, {
+      externalId: identity.subject,
+    });
+
+    if (!userRecord?.stripeCustomerId) {
+      throw new Error("No active subscription found to reactivate.");
+    }
+
+    // Get active subscriptions for the customer
+    const subscriptions = await stripe.subscriptions.list({
+      customer: userRecord.stripeCustomerId,
+      status: "active",
+      limit: 1,
+    });
+
+    if (subscriptions.data.length === 0) {
+      throw new Error("No active subscription found");
+    }
+    const subscription = subscriptions.data[0];
+    if (!subscription) throw new Error("No subscription found");
+
+    // Webhook updates the subscription status to active
+    await stripe.subscriptions.update(subscription.id, {
+      cancel_at_period_end: false,
+    });
+
+    return { success: true };
+  },
+});
