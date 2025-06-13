@@ -76,74 +76,74 @@ export const getCheckoutSessionUrl = action({
       });
     }
 
-    // Check if user has an existing subscription and needs to upgrade
+    // Check if user has an existing subscription and determine if it's an upgrade or downgrade
     const currentPlan = user.plan ?? "Free";
     const tierHierarchy = { Free: 0, Plus: 1, Pro: 2 };
     const isUpgrade = tierHierarchy[currentPlan] < tierHierarchy[tier];
+    const isDowngrade = tierHierarchy[currentPlan] > tierHierarchy[tier];
 
-    // If user has an active subscription and is trying to upgrade
-    if (isUpgrade && currentPlan !== "Free") {
+    // If user has an active subscription
+    if (currentPlan !== "Free") {
       try {
-        // Get all subscriptions for the customer
-        const subscriptions = await stripe.subscriptions.list({
-          customer: stripeCustomerId,
-          status: "active",
-          limit: 1,
-        });
-
-        if (subscriptions.data.length > 0) {
-          const currentSubscription = subscriptions.data[0];
-          if (!currentSubscription) {
-            throw new Error(
-              "Active subscription not found despite subscription list indicating existence.",
-            );
-          }
-          const newPriceId = priceIds[tier];
-
-          if (!newPriceId) {
-            throw new Error(`Price ID for tier "${tier}" is not configured.`);
-          }
-
-          // Create a checkout session for subscription upgrade
-          // This will handle the payment for the upgrade and update the subscription
-          const session = await stripe.checkout.sessions.create({
+        // For upgrades, redirect to billing portal
+        if (isUpgrade) {
+          const portalSession = await stripe.billingPortal.sessions.create({
             customer: stripeCustomerId,
-            mode: "subscription",
-            payment_method_types: ["card"],
-            line_items: [{ price: newPriceId, quantity: 1 }],
-            subscription_data: {
-              metadata: {
-                clerkUserId: clerkUserId,
-                tier: tier,
-                previousPlan: currentPlan,
-                isUpgrade: "true",
-              },
-              // This will replace the existing subscription
-              proration_behavior: "create_prorations",
-            },
-            metadata: {
-              tier: tier,
-              clerkUserId: clerkUserId,
-              isUpgrade: "true",
-              previousPlan: currentPlan,
-              existingSubscriptionId: currentSubscription.id,
-            },
-            success_url: `${hostingUrl}/success?session_id={CHECKOUT_SESSION_ID}&upgraded=true`,
-            cancel_url: `${hostingUrl}/pricing`,
+            return_url: `${hostingUrl}/pricing`,
+          });
+          return portalSession.url;
+        }
+
+        // For downgrades, directly update the subscription
+        if (isDowngrade) {
+          const subscriptions = await stripe.subscriptions.list({
+            customer: stripeCustomerId,
+            status: "active",
+            limit: 1,
           });
 
-          console.log(
-            `Creating upgrade checkout session from ${currentPlan} to ${tier} for user ${clerkUserId}`,
-          );
-          return session.url;
+          if (subscriptions.data.length === 0) {
+            throw new Error("No active subscription found");
+          }
+
+          const subscription = subscriptions.data[0];
+          if (!subscription?.items.data[0]) {
+            throw new Error("Invalid subscription data");
+          }
+
+          const priceId = priceIds[tier];
+
+          // Update the subscription with the new price
+          await stripe.subscriptions.update(subscription.id, {
+            items: [
+              {
+                id: subscription.items.data[0].id,
+                price: priceId,
+              },
+            ],
+            proration_behavior: "none",
+          });
+
+          // Update user's plan in our database
+          await ctx.runMutation(internal.users.updateUserSubscription, {
+            externalId: clerkUserId,
+            plan: tier,
+          });
+
+          // Sync the updated subscription data
+          await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
+            subject: clerkUserId,
+          });
+
+          return `${hostingUrl}/pricing?downgrade=success`;
         }
       } catch (error) {
-        console.error("Error creating upgrade checkout session:", error);
-        // Fall through to create a new checkout session if upgrade fails
+        console.error("Error handling subscription change:", error);
+        // Fallback to a Checkout session if the portal/update fails
       }
     }
 
-    // Create new checkout session for new subscriptions or if upgrade failed
+    // Create new checkout session for new subscriptions or if other methods failed
     const priceId = priceIds[tier];
     if (!priceId) {
       throw new Error(`Price ID for tier "${tier}" is not configured.`);
