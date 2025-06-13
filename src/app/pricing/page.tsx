@@ -106,7 +106,7 @@ const plans = [
     popular: false,
     features: {
       account: [
-        { name: "Whiteboards", value: "Unlimited" },
+        { name: "Whiteboards", value: "Unlimited*" },
         { name: "Nodes per whiteboard", value: "100" },
       ],
       content: [
@@ -294,7 +294,7 @@ export default function PricingPage() {
 
       {/* Pricing Cards */}
       <section className="container mx-auto px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -384,6 +384,9 @@ export default function PricingPage() {
             </div>
           ))}
         </div>
+        <div className="mt-8 text-center text-sm text-gray-400">
+          *Unlimited access is subject to abuse guardrails.
+        </div>
       </section>
 
       {/* FAQ Section */}
@@ -408,7 +411,7 @@ export default function PricingPage() {
               {
                 question: "How do Plus and Pro tiers differ from Free?",
                 answer:
-                  "Plus and Pro offer increased limits on whiteboards, nodes, and AI operations. Plus includes priority support and beta features, while Pro adds workflow history, versioning, and unlimited whiteboards.",
+                  "Plus and Pro offer increased limits on whiteboards, nodes, and AI operations. Plus includes priority support and beta features, while Pro adds workflow history, versioning, and unlimited* whiteboards.",
               },
               {
                 question: "What AI models are available?",
@@ -428,7 +431,7 @@ export default function PricingPage() {
               {
                 question: "How is billing handled?",
                 answer:
-                  "We use Stripe for secure payment processing. All paid plans are subscription-based with automatic monthly billing. You can cancel anytime.",
+                  "We use Stripe for secure payment processing. All paid plans are subscription-based with automatic monthly billing. You can cancel anytime on this page.",
               },
             ].map((faq, idx) => (
               <div

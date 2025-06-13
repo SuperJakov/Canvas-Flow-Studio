@@ -111,7 +111,7 @@ const subscriptions = defineTable({
   canceled_at: v.int64(),
   price_id: v.string(),
   last_status_sync_at: v.int64(),
-});
+}).index("by_userExternalId", ["userExternalId"]);
 
 const schema = defineSchema({
   users,

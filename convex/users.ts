@@ -110,6 +110,32 @@ export const updateUserSubscription = internalMutation({
   },
 });
 
+export const getCurrentUserPlanInfo = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return null;
+    const plan = user.plan;
+    if (!plan || plan === "Free") {
+      return {
+        plan: "Free",
+      };
+    }
+    const userSubscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_userExternalId", (q) =>
+        q.eq("userExternalId", user.externalId),
+      )
+      .first(); // Only 1 should be
+    if (!userSubscription) {
+      throw new Error(
+        `User ${user._id} has plan '${user.plan}' but no subscription record was found.`,
+      );
+    }
+    return { ...userSubscription, plan };
+  },
+});
+
 export const getCurrentUserPlan = query({
   args: {},
   handler: async (ctx) => {
