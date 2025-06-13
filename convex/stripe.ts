@@ -2,7 +2,7 @@
 
 import Stripe from "stripe";
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
+import { action, internalAction, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // Define the Plan type for type safety
@@ -122,12 +122,6 @@ export const getCheckoutSessionUrl = action({
               },
             ],
             proration_behavior: "none",
-          });
-
-          // Update user's plan in our database
-          await ctx.runMutation(internal.users.updateUserSubscription, {
-            externalId: clerkUserId,
-            plan: tier,
           });
 
           // Sync the updated subscription data
@@ -300,7 +294,15 @@ export const syncStripeDataToDb = internalAction({
         status: "active",
       })
     ).data[0];
-    if (!subscription) throw new Error("Subscription not found");
+
+    // If no active subscription found, set plan to Free
+    if (!subscription) {
+      await ctx.runMutation(internal.users.updateUserSubscription, {
+        externalId: subject,
+        plan: "Free",
+      });
+      return;
+    }
 
     // Map Stripe status to our schema status
     const statusMap: Record<
@@ -324,7 +326,34 @@ export const syncStripeDataToDb = internalAction({
 
     const status = statusMap[subscription.status] ?? "incomplete";
 
-    // Now save all data we need
+    // Get the price ID and determine the plan
+    const priceId = subscription.items.data[0]?.price.id;
+    if (!priceId) {
+      throw new Error("No price ID found in subscription items");
+    }
+
+    // Map price ID to tier
+    const tier = priceIdToTier[priceId];
+    if (!tier) {
+      console.error("Available price IDs:", Object.keys(priceIdToTier));
+      console.error("Received price ID:", priceId);
+      throw new Error(`Price ID ${priceId} not mapped to any tier`);
+    }
+
+    // Update user's plan based on subscription status
+    if (status === "active" || status === "trialing") {
+      await ctx.runMutation(internal.users.updateUserSubscription, {
+        externalId: subject,
+        plan: tier,
+      });
+    } else {
+      await ctx.runMutation(internal.users.updateUserSubscription, {
+        externalId: subject,
+        plan: "Free",
+      });
+    }
+
+    // Now save all subscription data
     await ctx.runMutation(internal.subscriptions.upsertSubscription, {
       userExternalId: user.externalId,
       subscriptionId: subscription.id,
@@ -337,11 +366,69 @@ export const syncStripeDataToDb = internalAction({
       canceled_at: subscription.canceled_at
         ? BigInt(subscription.canceled_at * 1000)
         : BigInt(0), // Convert to milliseconds
-      price_id: subscription.items.data[0]?.price.id ?? "",
+      price_id: priceId,
       last_status_sync_at: BigInt(Date.now()),
     });
   },
 });
+
+// Helper function to extract Clerk User ID and schedule a database sync.
+// This centralizes the logic for finding the user associated with a Stripe event.
+const scheduleSyncForUser = async (
+  ctx: ActionCtx,
+  eventObject: {
+    customer?: string | Stripe.Customer | Stripe.DeletedCustomer | null;
+    metadata?: { clerkUserId?: string | null } | null;
+  },
+  eventType: string,
+) => {
+  let clerkUserId: string | undefined | null;
+
+  // Attempt to get clerkUserId directly from the event object's metadata.
+  // This is common for Checkout Sessions and Subscriptions.
+  clerkUserId = eventObject.metadata?.clerkUserId;
+
+  // If not found, and a customer ID is available, fetch the customer
+  // to get the ID from their metadata. This is the fallback for most objects
+  // like Invoices and Payment Intents.
+  if (
+    !clerkUserId &&
+    eventObject.customer &&
+    typeof eventObject.customer === "string"
+  ) {
+    try {
+      const customer = (await stripe.customers.retrieve(
+        eventObject.customer,
+      )) as Stripe.Customer;
+      clerkUserId = customer.metadata.clerkUserId;
+    } catch (error) {
+      console.error(
+        `[Webhook] Error retrieving customer ${eventObject.customer} for event ${eventType}:`,
+        error,
+      );
+      // We can't proceed without the customer object, so we stop here.
+      return;
+    }
+  }
+
+  if (!clerkUserId) {
+    const customerId =
+      typeof eventObject.customer === "string" ? eventObject.customer : "N/A";
+    console.error(
+      `[Webhook] Could not find clerkUserId for event ${eventType} (Customer ID: ${customerId}). Skipping sync.`,
+    );
+    return;
+  }
+
+  // Schedule the sync task to run immediately.
+  await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
+    subject: clerkUserId,
+  });
+
+  console.log(
+    `[Webhook] Scheduled sync for event ${eventType} for user ${clerkUserId}.`,
+  );
+};
 
 export const handleEvent = internalAction({
   args: { event: v.any() }, // The validated Stripe.Event object
@@ -349,9 +436,12 @@ export const handleEvent = internalAction({
     const stripeEvent = event as Stripe.Event;
 
     try {
+      // Log every event received for auditing and debugging purposes.
+      console.log(`[Webhook] Received Stripe event: ${stripeEvent.type}`);
+
       switch (stripeEvent.type) {
-        // This event occurs when a checkout session is successfully completed.
-        // It's the primary way to start a new subscription.
+        // This event is critical for starting a subscription.
+        // We handle it separately for more specific logging.
         case "checkout.session.completed": {
           const session = stripeEvent.data.object;
           const { clerkUserId, tier } = session.metadata ?? {};
@@ -361,114 +451,49 @@ export const handleEvent = internalAction({
               "Missing metadata: clerkUserId or tier from checkout session.",
             );
           }
-          if (!session.subscription) {
-            throw new Error("Checkout session did not create a subscription.");
-          }
 
-          // Validate tier is a valid Plan
-          if (tier !== "Plus" && tier !== "Pro") {
-            throw new Error(`Invalid tier: ${tier}`);
-          }
-
-          await ctx.runMutation(internal.users.updateUserSubscription, {
-            externalId: clerkUserId,
-            plan: tier,
-          });
-
-          await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
-            subject: clerkUserId,
-          });
-
-          console.log(`[Webhook] User ${clerkUserId} subscribed to ${tier}.`);
-          break;
-        }
-
-        // This event occurs when a subscription is updated, e.g.,
-        // when a user upgrades or downgrades their plan.
-        case "customer.subscription.updated": {
-          const subscription = stripeEvent.data.object;
-          const { clerkUserId } = subscription.metadata;
-
-          if (!clerkUserId) {
-            // Fallback: If metadata is missing on the subscription, get it from the customer
-            const customer = (await stripe.customers.retrieve(
-              subscription.customer as string,
-            )) as Stripe.Customer;
-            const customerClerkId = customer.metadata.clerkUserId;
-            if (!customerClerkId)
-              throw new Error("Clerk User ID not found in customer metadata.");
-
-            await updateSubscription(customerClerkId);
-          } else {
-            await updateSubscription(clerkUserId);
-          }
-
-          async function updateSubscription(id: string) {
-            // Get the price ID from the subscription item
-            const priceId = subscription.items.data[0]?.price.id;
-            if (!priceId) {
-              throw new Error("No price ID found in subscription items.");
-            }
-
-            // Map price ID to tier
-            const tier = priceIdToTier[priceId];
-            if (!tier) {
-              // Log all available price IDs for debugging
-              console.error("Available price IDs:", Object.keys(priceIdToTier));
-              console.error("Received price ID:", priceId);
-              throw new Error(`Price ID ${priceId} not mapped to any tier.`);
-            }
-
-            await ctx.runMutation(internal.users.updateUserSubscription, {
-              externalId: id,
-              plan: tier,
-            });
-
-            await ctx.scheduler.runAfter(
-              0,
-              internal.stripe.syncStripeDataToDb,
-              {
-                subject: id,
-              },
-            );
-
-            console.log(
-              `[Webhook] User ${id}'s subscription updated to ${tier} (price: ${priceId}).`,
-            );
-          }
-          break;
-        }
-
-        // This event occurs when a subscription is canceled by the user or
-        // due to payment failure after all retries.
-        case "customer.subscription.deleted": {
-          const subscription = stripeEvent.data.object;
-          const customer = (await stripe.customers.retrieve(
-            subscription.customer as string,
-          )) as Stripe.Customer;
-          const clerkUserId = customer.metadata.clerkUserId;
-
-          if (!clerkUserId) {
-            throw new Error(
-              "Clerk User ID not found in customer metadata for subscription deletion.",
-            );
-          }
-
-          // Revert the user to the "Free" plan
-          await ctx.runMutation(internal.users.updateUserSubscription, {
-            externalId: clerkUserId,
-            plan: "Free",
-          });
-
-          await ctx.scheduler.runAfter(0, internal.stripe.syncStripeDataToDb, {
-            subject: clerkUserId,
-          });
+          // Sync the user's subscription state.
+          await scheduleSyncForUser(ctx, session, stripeEvent.type);
 
           console.log(
-            `[Webhook] User ${clerkUserId}'s subscription deleted. Reset to Free.`,
+            `[Webhook] User ${clerkUserId} successfully subscribed to ${tier}.`,
           );
           break;
         }
+
+        // --- Subscription Lifecycle Events ---
+        // These events indicate a direct change to the subscription status.
+        // Syncing ensures our database reflects the new state.
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        case "customer.subscription.deleted":
+        case "customer.subscription.paused":
+        case "customer.subscription.resumed":
+        case "customer.subscription.pending_update_applied":
+        case "customer.subscription.pending_update_expired":
+        case "customer.subscription.trial_will_end":
+
+        // --- Invoice & Payment Events ---
+        // These events are crucial for managing access based on payment status.
+        // A failed payment might lead to a 'past_due' status, which our sync function handles.
+        case "invoice.paid":
+        case "invoice.payment_failed":
+        case "invoice.payment_action_required":
+        case "invoice.upcoming":
+        case "invoice.marked_uncollectible":
+        case "invoice.payment_succeeded":
+
+        // --- Payment Intent Events ---
+        // Lower-level events that also signal payment status changes.
+        case "payment_intent.succeeded":
+        case "payment_intent.payment_failed":
+        case "payment_intent.canceled":
+          await scheduleSyncForUser(
+            ctx,
+            stripeEvent.data.object,
+            stripeEvent.type,
+          );
+          break;
 
         default: {
           console.log(`[Webhook] Unhandled event type: ${stripeEvent.type}`);
