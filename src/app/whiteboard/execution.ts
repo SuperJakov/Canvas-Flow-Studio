@@ -70,17 +70,18 @@ async function executeImageNode(
     incomingConnections.some((connection) => connection.source === node.id),
   );
 
-  // Filter and transform nodes into the required format
   const sourceNodes = connectedSourceNodes
     .filter(
       (node): node is TextEditorNodeType | ImageNodeType =>
         node.type === "image" || node.type === "textEditor",
     )
-    .map((node) => ({
-      type: node.type,
-      id: node.id,
-      data: node.data,
-    }));
+    .map((node) => {
+      // destructure only the bits you need…
+      const { type, id, data } = node;
+      // and then tell TS "this shape is exactly the same as the incoming node"
+      return { type, id, data } as typeof node;
+    });
+
   if (!currentNode.data.internal?.generateAndStoreImageAction) {
     throw new Error("generateAndStoreImageAction not defined.");
   }
@@ -142,7 +143,12 @@ export async function executeNodeLogic(
   const allNodes = get(nodesAtom);
   const allEdges = get(edgesAtom);
   const thisNode = allNodes.find((n) => n.id === nodeId);
-  if (!thisNode || thisNode.data.isLocked || thisNode.data.isRunning) {
+
+  if (
+    !thisNode ||
+    thisNode.data.isLocked ||
+    ("isRunning" in thisNode.data && thisNode.data.isRunning)
+  ) {
     console.warn("Node is either locked or already running:", thisNode);
     return;
   }

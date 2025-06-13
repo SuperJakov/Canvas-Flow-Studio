@@ -16,4 +16,16 @@ export const initialNodes: AppNode[] = [
     },
     position: { x: 400, y: 125 },
   },
+  {
+    type: "comment",
+    data: {
+      isLocked: false,
+      text: "hii",
+    },
+    id: "1",
+    position: {
+      x: 200,
+      y: 300,
+    },
+  },
 ];

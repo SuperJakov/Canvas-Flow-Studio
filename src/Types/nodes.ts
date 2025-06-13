@@ -24,11 +24,19 @@ export type ImageNodeData = {
   };
 };
 
-export type TextEditorNodeType = Node<TextEditorNodeData, "textEditor">;
-export type ImageNodeType = Node<ImageNodeData, "image">;
-export type CommentNodeType = Node<CommentNodeData, "comment">;
+/**
+ * Force `type: T` to be required, while preserving all other keys from Node<D,T>.
+ * Note the `D extends Record<string, unknown>` constraint to match Node's signature.
+ */
+export type StrictNode<
+  D extends Record<string, unknown>,
+  T extends string,
+> = Omit<Node<D, T>, "type"> & { type: T };
+
+export type TextEditorNodeType = StrictNode<TextEditorNodeData, "textEditor">;
+export type ImageNodeType = StrictNode<ImageNodeData, "image">;
+export type CommentNodeType = StrictNode<CommentNodeData, "comment">;
 
 export type AppNode = TextEditorNodeType | ImageNodeType | CommentNodeType;
 
-// This is unnecessary, but it is kept for the future if more edge types are added
 export type AppEdge = Edge;

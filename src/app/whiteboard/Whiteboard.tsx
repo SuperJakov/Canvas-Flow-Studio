@@ -78,38 +78,34 @@ export default function Whiteboard({ id }: Props) {
         `Preparing to save ${currentNodes.length} nodes and ${currentEdges.length} edges`,
       );
 
-      const nodesToSave = currentNodes
-        .filter(
-          (n): n is AppNode & { type: string } => typeof n.type === "string",
-        )
-        .map((n) => {
-          if (n.type === "image") {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { internal, ...nodeDataWithoutInternal } = n.data;
-            return {
-              id: n.id,
-              type: n.type,
-              position: n.position,
-              data: nodeDataWithoutInternal,
-            };
-          }
-          if (n.type === "comment") {
-            return {
-              id: n.id,
-              type: n.type,
-              position: n.position,
-              data: n.data,
-              width: n.width,
-              height: n.height,
-            };
-          }
+      const nodesToSave = currentNodes.map((n) => {
+        if (n.type === "image") {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { internal, ...nodeDataWithoutInternal } = n.data;
+          return {
+            id: n.id,
+            type: n.type,
+            position: n.position,
+            data: nodeDataWithoutInternal,
+          };
+        }
+        if (n.type === "comment") {
           return {
             id: n.id,
             type: n.type,
             position: n.position,
             data: n.data,
+            width: n.width,
+            height: n.height,
           };
-        });
+        }
+        return {
+          id: n.id,
+          type: n.type,
+          position: n.position,
+          data: n.data,
+        };
+      });
 
       const edgesToSave = currentEdges.map((e) => ({
         id: e.id,

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { action, query } from "./_generated/server";
 import { internalMutation } from "./functions";
-import { TextEditorNodeData, UndefinedTypeNode } from "./schema";
+import { TextEditorNodeData } from "./schema";
 import OpenAI from "openai";
 import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
 import { components, internal } from "./_generated/api";
@@ -100,11 +100,7 @@ async function generateAIImage(identity: UserIdentity, textContents: string[]) {
 export const generateAndStoreImage = action({
   args: {
     sourceNodes: v.array(
-      v.union(
-        TextEditorExecutionSchema,
-        ImageNodeExecutionSchema,
-        UndefinedTypeNode,
-      ),
+      v.union(TextEditorExecutionSchema, ImageNodeExecutionSchema),
     ),
     nodeId: v.string(),
     whiteboardId: v.id("whiteboards"),

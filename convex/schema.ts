@@ -46,17 +46,9 @@ const CommentNodeSchema = v.object({
   height: v.optional(v.union(v.number(), v.null())),
 });
 
-export const UndefinedTypeNode = v.object({
-  // ! Used for typesafety when sending
-  // TODO: Remove this node and use stricter types on client
-  id: v.string(),
-  type: v.optional(v.string()),
-});
-
 export const AppNode = v.union(
   TextEditorSchema,
   ImageNodeSchema,
-  UndefinedTypeNode,
   CommentNodeSchema,
 );
 
