@@ -24,7 +24,7 @@ export default function CommentNode({
 
   const onChange = useCallback(
     (evt: ChangeEvent<HTMLTextAreaElement>) => {
-      if (evt.target.value.length > 10000) {
+      if (evt.target.value.length > 10000 || isLocked) {
         return;
       }
       updateNodeData({
@@ -33,7 +33,7 @@ export default function CommentNode({
         updatedData: { text: evt.target.value },
       });
     },
-    [id, updateNodeData],
+    [id, updateNodeData, isLocked],
   );
 
   return (

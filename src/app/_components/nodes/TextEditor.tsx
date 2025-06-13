@@ -22,7 +22,7 @@ export default function TextEditorNode({
   id,
   selected, // The `selected` prop is provided by @xyflow/react
 }: NodeProps<TextEditorNodeType>) {
-  const { isLocked, isRunning } = data;
+  const { isLocked, isRunning, text } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
   const [edges] = useAtom(edgesAtom);
@@ -51,7 +51,7 @@ export default function TextEditorNode({
 
   const onChange = useCallback(
     (evt: ChangeEvent<HTMLTextAreaElement>) => {
-      if (evt.target.value.length > 10000) {
+      if (evt.target.value.length > 10000 || isLocked) {
         return;
       }
       updateNodeData({
@@ -60,7 +60,7 @@ export default function TextEditorNode({
         updatedData: { text: evt.target.value },
       });
     },
-    [id, updateNodeData],
+    [id, updateNodeData, isLocked],
   );
 
   // We use a template literal to conditionally apply the outline color
@@ -112,8 +112,9 @@ export default function TextEditorNode({
           name="text"
           onChange={onChange}
           className={`nodrag field-sizing-content max-h-[130px] min-h-[130px] w-full max-w-[290px] min-w-[290px] resize-none rounded border-none px-2 py-1 text-xl font-bold text-white focus:border-blue-500 focus:outline-none`}
-          value={data.text}
+          value={text}
           placeholder="Type..."
+          readOnly={isLocked}
           maxLength={10000}
         />
       </div>
