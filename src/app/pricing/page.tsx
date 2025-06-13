@@ -671,8 +671,7 @@ export default function PricingPage() {
               },
               {
                 question: "What AI models are available?",
-                answer:
-                  "We support Gemini 2.0 Flash for text, image generation models including Gemini 2.0 Flash Image Gen, and Google Cloud TTS for speech. More models are being added regularly.",
+                answer: "To know more about this, read docs.",
               },
               {
                 question: "How do rate limits work?",
