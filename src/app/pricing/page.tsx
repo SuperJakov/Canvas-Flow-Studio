@@ -671,7 +671,7 @@ export default function PricingPage() {
               },
               {
                 question: "What AI models are available?",
-                answer: "To know more about this, read docs.",
+                answer: "To know more about this, read the docs.",
               },
               {
                 question: "How do rate limits work?",
