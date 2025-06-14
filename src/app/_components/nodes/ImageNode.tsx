@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   GripVertical,
   Lock,
@@ -21,6 +20,8 @@ import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
+import Portal from "../Portal";
 
 export default function ImageNode({
   id,
@@ -44,6 +45,19 @@ export default function ImageNode({
   const isRunning = data.isRunning ?? false;
   const [isDownloading, setIsDownloading] = useState(false);
   const edges = useEdges();
+
+  // State for controlling the upgrade banner
+  const [isBannerOpen, setIsBannerOpen] = useState(false);
+  const [bannerFeature, setBannerFeature] = useState("");
+
+  const openBanner = useCallback((feature: string) => {
+    setBannerFeature(feature);
+    setIsBannerOpen(true);
+  }, []);
+
+  const closeBanner = useCallback(() => {
+    setIsBannerOpen(false);
+  }, []);
 
   // Calculate hours until reset from retryAfter (in milliseconds)
   const hoursUntilReset = retryAfterSeconds
@@ -94,6 +108,7 @@ export default function ImageNode({
       void executeNode({ nodeId: id });
     } else if (isRateLimited) {
       console.log("Node cannot run: rate limit reached");
+      openBanner("Higher Rate Limits");
     } else {
       console.log("Node cannot run: no incoming connections");
     }
@@ -104,6 +119,7 @@ export default function ImageNode({
     isRateLimited,
     updateNodeData,
     executeNode,
+    openBanner,
   ]);
 
   const handleDownload = useCallback(async () => {
@@ -132,6 +148,13 @@ export default function ImageNode({
 
   return (
     <div className={`relative`}>
+      <Portal>
+        <UpgradeBanner
+          isOpen={isBannerOpen}
+          onCloseAction={closeBanner}
+          featureName={bannerFeature}
+        />
+      </Portal>
       <div
         className={`overflow-hidden rounded border-2 bg-purple-200 shadow-md ${
           isRateLimited
@@ -158,8 +181,9 @@ export default function ImageNode({
                 </div>
               </div>
 
-              <Link
-                href="/pricing"
+              <button
+                type="button"
+                onClick={() => openBanner("Higher Rate Limits")}
                 className="group flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-red-600 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-white hover:shadow-xl"
               >
                 <span>Upgrade</span>
@@ -167,7 +191,7 @@ export default function ImageNode({
                   size={10}
                   className="transition-transform group-hover:translate-x-0.5"
                 />
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -222,13 +246,14 @@ export default function ImageNode({
                 <Loader2 size={48} className="animate-spin" />
                 <p className="mt-2">Generating image...</p>
                 {/* Show upgrade message during generation - non-intrusive */}
-                <Link
-                  href="/pricing"
+                <button
+                  type="button"
+                  onClick={() => openBanner("Streaming Images")}
                   className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
                 >
                   <span>Upgrade for streaming images</span>
                   <ExternalLink size={10} />
-                </Link>
+                </button>
               </div>
             ) : url ? (
               <>
@@ -265,13 +290,14 @@ export default function ImageNode({
                 <p className="mt-1 text-sm">No image generated yet</p>
                 {/* Show upgrade message when idle and not rate limited - helpful context */}
                 {!isRateLimited && (
-                  <Link
-                    href="/pricing"
+                  <button
+                    type="button"
+                    onClick={() => openBanner("Higher Quality Images")}
                     className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
                   >
                     <span>Upgrade for higher quality</span>
                     <ExternalLink size={10} />
-                  </Link>
+                  </button>
                 )}
               </div>
             )}

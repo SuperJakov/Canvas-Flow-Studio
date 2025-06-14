@@ -77,6 +77,7 @@ const plans = [
       content: [
         { name: "Text Generation from Image", value: "10/month" },
         { name: "Image Generation", value: "10/month" },
+        { name: "Image Quality", value: "Low" },
         { name: "Instruction Use", value: "20/month" },
         { name: "Speech Generation", value: "3/month" },
       ],
@@ -110,6 +111,7 @@ const plans = [
       content: [
         { name: "Text Generation from Image", value: "100/month" },
         { name: "Image Generation", value: "100/month" },
+        { name: "Image Quality", value: "Enhanced" },
         { name: "Instruction Use", value: "200/month" },
         { name: "Speech Generation", value: "35/month" },
       ],
@@ -143,6 +145,7 @@ const plans = [
       content: [
         { name: "Text Generation from Image", value: "250/month" },
         { name: "Image Generation", value: "250/month" },
+        { name: "Image Quality", value: "Premium" },
         { name: "Instruction Use", value: "500/month" },
         { name: "Speech Generation", value: "100/month" },
       ],

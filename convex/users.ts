@@ -119,7 +119,7 @@ export const getCurrentUserPlanInfo = query({
     if (!plan || plan === "Free") {
       return {
         plan: "Free",
-      };
+      } as const;
     }
     const userSubscription = await ctx.db
       .query("subscriptions")
