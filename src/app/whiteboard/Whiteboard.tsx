@@ -25,6 +25,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import Link from "next/link";
 import { debounce } from "lodash";
 import Loading from "../loading";
+import SharingPopup from "./SharingPopup";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -35,6 +36,7 @@ export default function Whiteboard({ id }: Props) {
     api.whiteboards.getWhiteboard,
     id ? { id } : "skip",
   );
+  const user = useQuery(api.users.current);
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const [isExecuting] = useAtom(isExecutingNodeAtom);
@@ -44,8 +46,13 @@ export default function Whiteboard({ id }: Props) {
   const updateContentMutation = useMutation(api.whiteboards.editWhiteboard);
   const initialLoadDone = useRef(false);
 
+  // Check if this is a shared whiteboard
+  const isSharedWhiteboard =
+    whiteboardData?.isPublic && whiteboardData?.ownerId !== user?.externalId;
+
   // Load whiteboard data from Convex into Jotai atoms
   useEffect(() => {
+    // If whiteboardData.isPublic && whiteboardData.ownerId !== user.externalId; then this is a shared whiteboard
     if (whiteboardData && !initialLoadDone.current) {
       console.log("Loading whiteboard data into atoms:", whiteboardData);
       setNodes(whiteboardData.nodes as AppNode[]);
@@ -136,7 +143,7 @@ export default function Whiteboard({ id }: Props) {
 
   // Effect to save changes when nodes or edges atoms are updated
   useEffect(() => {
-    if (!initialLoadDone.current || !whiteboardData) {
+    if (!initialLoadDone.current || !whiteboardData || isSharedWhiteboard) {
       return;
     }
 
@@ -152,31 +159,35 @@ export default function Whiteboard({ id }: Props) {
       void debouncedSaveRef.current(nodes, edges);
       lastSavedRef.current = { nodes, edges };
     }
-  }, [nodes, edges, whiteboardData]);
+  }, [nodes, edges, whiteboardData, isSharedWhiteboard]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<AppNode>[]) => {
+      if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard
       setNodes((nds) => applyNodeChanges(changes, nds));
     },
-    [setNodes],
+    [setNodes, isSharedWhiteboard],
   );
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
+      if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
       setEdges((eds) => applyEdgeChanges(changes, eds));
     },
-    [setEdges],
+    [setEdges, isSharedWhiteboard],
   );
 
   const onConnect = useCallback(
     (connection: Connection) => {
+      if (isSharedWhiteboard) return; // Disable connections for shared whiteboard
       setEdges((eds) => addEdge({ ...connection, id: uuidv4() }, eds));
     },
-    [setEdges],
+    [setEdges, isSharedWhiteboard],
   );
 
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
+      if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
       event.preventDefault();
       if (!dndType) return;
 
@@ -228,13 +239,17 @@ export default function Whiteboard({ id }: Props) {
         setNodes((prevNodes) => prevNodes.concat(newNode));
       }
     },
-    [screenToFlowPosition, dndType, setNodes],
+    [screenToFlowPosition, dndType, setNodes, isSharedWhiteboard],
   );
 
-  const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
+  const onDragOver = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      if (isSharedWhiteboard) return; // Disable drag over for shared whiteboard
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    },
+    [isSharedWhiteboard],
+  );
 
   if (id && whiteboardData === undefined) {
     return <Loading />;
@@ -270,6 +285,7 @@ export default function Whiteboard({ id }: Props) {
       }}
     >
       <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+      <SharingPopup id={id} />
     </ReactFlow>
   );
 }

@@ -9,11 +9,14 @@ import TitleChanger from "./TitleChanger";
 import { Authenticated } from "convex/react";
 import { Suspense } from "react";
 import Loading from "../loading";
+import { useCopyWhiteboard } from "./utils";
 
 type Props = {
   id: Id<"whiteboards">;
 };
 export default function WhiteboardPage({ id }: Props) {
+  const { isCopying } = useCopyWhiteboard();
+
   return (
     <Suspense fallback={<Loading />}>
       <Authenticated>
@@ -21,8 +24,8 @@ export default function WhiteboardPage({ id }: Props) {
           <ReactFlowProvider>
             <div className="h-screen w-full">
               <TitleChanger id={id} />
-              <WhiteboardHeader id={id} />
-              <Sidebar />
+              {!isCopying && <WhiteboardHeader id={id} />}
+              {!isCopying && <Sidebar />}
               <Whiteboard id={id} />
             </div>
           </ReactFlowProvider>

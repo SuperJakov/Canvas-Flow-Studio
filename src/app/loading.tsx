@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="fixed inset-0 z-50 flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="fixed inset-0 z-[9999] flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <div className="relative flex items-center justify-center">
         {/* Outer spinning ring */}
         <div className="absolute h-32 w-32 animate-spin rounded-full border-t-2 border-b-2 border-blue-400"></div>

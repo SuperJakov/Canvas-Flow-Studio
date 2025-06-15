@@ -28,7 +28,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-1/2 left-0 z-50 flex h-[80vh] w-16 -translate-y-1/2 flex-col rounded-r-lg bg-gray-900 p-2 shadow-[2px_0_15px_rgba(255,255,255,0.05)]">
+    <aside className="fixed top-1/2 left-0 z-40 flex h-[80vh] w-16 -translate-y-1/2 flex-col rounded-r-lg bg-gray-900 p-2 shadow-[2px_0_15px_rgba(255,255,255,0.05)]">
       <div className="flex flex-1 flex-col items-center justify-center space-y-3">
         {/* Text Node */}
         <div className="group relative">
