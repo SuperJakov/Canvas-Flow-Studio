@@ -67,6 +67,7 @@ const whiteboards = defineTable({
   ownerId: v.string(),
   nodes: v.array(AppNode),
   edges: v.array(AppEdge),
+  isPublic: v.boolean(),
 }).index("by_ownerId", ["ownerId"]);
 
 const imageNodes = defineTable({
