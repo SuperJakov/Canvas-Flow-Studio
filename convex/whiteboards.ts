@@ -3,6 +3,7 @@ import { query } from "./_generated/server";
 import { mutation } from "./functions";
 import { v } from "convex/values";
 import { AppEdge, AppNode } from "./schema";
+import { v4 as uuidv4 } from "uuid";
 
 // --- Create a new whiteboard ---
 export const createWhiteboard = mutation({
@@ -174,15 +175,79 @@ export const copyPublicWhiteboard = mutation({
       throw new Error("Can only copy public whiteboards");
     }
 
+    // --- Step 1: Prepare new node data and gather image mappings ---
+
+    const newNodes = [];
+    const imageNodeMappings = []; // To store { newId, storageId }
+    const nodeIdMap = new Map<string, string>(); // Map old node IDs to new node IDs
+
+    for (const node of sourceWhiteboard.nodes) {
+      const newId = uuidv4(); // Generate a new, unique ID for the copied node
+      nodeIdMap.set(node.id, newId); // Store the mapping
+
+      if (node.type === "image") {
+        // This is an image node, we need to find its storageId
+        const originalImageRecord = await ctx.db
+          .query("imageNodes")
+          .withIndex("by_nodeId", (q) => q.eq("nodeId", node.id))
+          // We also filter by whiteboardId to be certain we get the correct one
+          .filter((q) => q.eq(q.field("whiteboardId"), sourceId))
+          .first();
+
+        if (originalImageRecord) {
+          // If we found the record, save the mapping. We will use this
+          // to create a new imageNodes record for our new whiteboard.
+          imageNodeMappings.push({
+            newId: newId,
+            storageId: originalImageRecord.storageId,
+            imageUrl: originalImageRecord.imageUrl, // Keep the URL consistent
+          });
+        } else {
+          // This indicates a data integrity problem, the image might already be broken.
+          // We'll skip copying the link to prevent errors.
+          console.warn(`Could not find image record for nodeId: ${node.id}`);
+          // We still push the node, but its imageUrl will be whatever was in the source.
+          // It might appear broken, which is accurate.
+        }
+      }
+
+      // Add the copied node with its new ID to our array.
+      newNodes.push({ ...node, id: newId });
+    }
+
+    // --- Step 2: Remap edges to use new node IDs ---
+    const newEdges = sourceWhiteboard.edges.map((edge) => ({
+      ...edge,
+      id: uuidv4(), // Generate new ID for the edge
+      source: nodeIdMap.get(edge.source) ?? edge.source, // Map source to new ID
+      target: nodeIdMap.get(edge.target) ?? edge.target, // Map target to new ID
+    }));
+
+    // --- Step 3: Insert the new whiteboard to get its ID ---
+
     const now = BigInt(Date.now());
-    return await ctx.db.insert("whiteboards", {
+    const newWhiteboardId = await ctx.db.insert("whiteboards", {
       title: `${sourceWhiteboard.title} (Copy)`,
       createdAt: now,
       updatedAt: now,
       ownerId: identity.subject,
-      nodes: sourceWhiteboard.nodes,
-      edges: sourceWhiteboard.edges,
+      nodes: newNodes,
+      edges: newEdges,
       isPublic: false,
     });
+
+    // --- Step 4: Create the new imageNodes records ---
+
+    for (const mapping of imageNodeMappings) {
+      await ctx.db.insert("imageNodes", {
+        nodeId: mapping.newId,
+        storageId: mapping.storageId,
+        imageUrl: mapping.imageUrl,
+        whiteboardId: newWhiteboardId, // Link to the NEW whiteboard
+      });
+    }
+
+    // Return the ID of the newly created whiteboard
+    return newWhiteboardId;
   },
 });

@@ -65,27 +65,20 @@ export default function ImageNode({
     : 0;
 
   useEffect(() => {
+    console.log("generateAndStoreImageAction", generateAndStoreImageAction);
     updateNodeData({
       nodeId: id,
       nodeType: "image",
       updatedData: {
         imageUrl: url ?? null,
-      },
-    });
-  }, [url, id, updateNodeData]);
 
-  useEffect(() => {
-    updateNodeData({
-      nodeId: id,
-      nodeType: "image",
-      updatedData: {
         internal: {
           generateAndStoreImageAction,
           isRateLimited,
         },
       },
     });
-  }, [generateAndStoreImageAction, id, updateNodeData, isRateLimited]);
+  }, [generateAndStoreImageAction, id, updateNodeData, isRateLimited, url]);
 
   // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);

@@ -80,7 +80,8 @@ const imageNodes = defineTable({
   whiteboardId: v.id("whiteboards"),
 })
   .index("by_nodeId", ["nodeId"])
-  .index("by_whiteboardId", ["whiteboardId"]);
+  .index("by_whiteboardId", ["whiteboardId"])
+  .index("by_storageId", ["storageId"]);
 
 const users = defineTable({
   firstName: v.union(v.null(), v.string()),

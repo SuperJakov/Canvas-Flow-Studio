@@ -9,7 +9,7 @@ import type { UserIdentity } from "convex/server";
 
 const DAY = 24 * HOUR;
 const rateLimiter = new RateLimiter(components.rateLimiter, {
-  imageGeneration: { kind: "fixed window", period: DAY, rate: 10 },
+  imageGeneration: { kind: "fixed window", period: DAY, rate: 5000 },
 });
 
 export const getImageGenerationRateLimit = query({

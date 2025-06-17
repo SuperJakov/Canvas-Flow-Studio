@@ -89,6 +89,7 @@ async function executeImageNode(
       return { type, id, data } as typeof node;
     });
 
+  console.log("currentNode.data.internal", currentNode.data.internal);
   if (!currentNode.data.internal?.generateAndStoreImageAction) {
     throw new Error("generateAndStoreImageAction not defined.");
   }
