@@ -9,34 +9,17 @@ import {
   AlertTriangle,
   Calendar,
   CreditCard,
-  Clock,
 } from "lucide-react";
 import Link from "next/link";
 import Loading from "../loading";
 import { SignUpButton } from "@clerk/nextjs";
 import { api } from "../../../convex/_generated/api";
 import { useAction } from "convex/react";
-
-// Define types for FeatureSection props
-interface FeatureItem {
-  name: string;
-  value: string;
-}
-
-interface FeatureSectionProps {
-  title: string;
-  features: FeatureItem[];
-  color: "blue" | "green" | "yellow" | "purple";
-}
-
-// Define a type for the subscription properties
-interface SubscriptionProperties {
-  plan: "Plus" | "Pro";
-  status: string;
-  cancel_at_period_end?: boolean;
-  current_period_end?: number;
-  canceled_at?: number;
-}
+import FAQ from "./FAQ";
+import { FeatureSection } from "./components/FeatureSection";
+import { SubscriptionStatus } from "./components/SubscriptionStatus";
+import { plans, tierRanks } from "./data/plans";
+import type { SubscriptionProperties } from "./types";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -50,117 +33,6 @@ function hasSubscriptionProperties(
     (planInfo.plan === "Plus" || planInfo.plan === "Pro")
   );
 }
-
-// Define tier ranks for comparison logic
-const tierRanks: Record<string, number> = {
-  Free: 0,
-  Plus: 1,
-  Pro: 2,
-};
-
-const plans = [
-  {
-    name: "Free",
-    price: "0",
-    currency: "€",
-    period: "forever",
-    description: "Perfect for learning and experimenting with AI workflows",
-    gradient: "from-gray-500 to-gray-600",
-    borderGradient: "from-gray-600 to-gray-700",
-    buttonStyle: "bg-gray-700 hover:bg-gray-600 text-white",
-    popular: false,
-    features: {
-      account: [
-        { name: "Whiteboards", value: "5" },
-        { name: "Nodes per whiteboard", value: "10" },
-      ],
-      content: [
-        { name: "Text Generation from Image", value: "10/month" },
-        { name: "Image Generation", value: "10/month" },
-        { name: "Image Quality", value: "Low" },
-        { name: "Instruction Use", value: "20/month" },
-        { name: "Speech Generation", value: "3/month" },
-      ],
-      integrations: [
-        { name: "Weather Use", value: "1/month" },
-        { name: "Website Generation", value: "1/month" },
-      ],
-      premium: [
-        { name: "Workflow History & Versioning", included: false },
-        { name: "Priority Support", included: false },
-        { name: "Beta Features", included: false },
-      ],
-    },
-  },
-  {
-    name: "Plus",
-    price: "4",
-    currency: "€",
-    period: "month",
-    description: "Increased limits and additional features for regular users",
-    gradient: "from-blue-500 to-purple-600",
-    borderGradient: "from-blue-500 to-purple-600",
-    buttonStyle:
-      "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white",
-    popular: true,
-    features: {
-      account: [
-        { name: "Whiteboards", value: "50" },
-        { name: "Nodes per whiteboard", value: "50" },
-      ],
-      content: [
-        { name: "Text Generation from Image", value: "100/month" },
-        { name: "Image Generation", value: "100/month" },
-        { name: "Image Quality", value: "Enhanced" },
-        { name: "Instruction Use", value: "200/month" },
-        { name: "Speech Generation", value: "35/month" },
-      ],
-      integrations: [
-        { name: "Weather Use", value: "30/month" },
-        { name: "Website Generation", value: "10/month" },
-      ],
-      premium: [
-        { name: "Workflow History & Versioning", included: false },
-        { name: "Priority Support", included: true },
-        { name: "Beta Features", included: true },
-      ],
-    },
-  },
-  {
-    name: "Pro",
-    price: "10",
-    currency: "€",
-    period: "month",
-    description: "Highest limits and full access to all premium features",
-    gradient: "from-purple-500 to-pink-600",
-    borderGradient: "from-purple-500 to-pink-600",
-    buttonStyle:
-      "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white",
-    popular: false,
-    features: {
-      account: [
-        { name: "Whiteboards", value: "Unlimited*" },
-        { name: "Nodes per whiteboard", value: "100" },
-      ],
-      content: [
-        { name: "Text Generation from Image", value: "250/month" },
-        { name: "Image Generation", value: "250/month" },
-        { name: "Image Quality", value: "Premium" },
-        { name: "Instruction Use", value: "500/month" },
-        { name: "Speech Generation", value: "100/month" },
-      ],
-      integrations: [
-        { name: "Weather Use", value: "60/month" },
-        { name: "Website Generation", value: "40/month" },
-      ],
-      premium: [
-        { name: "Workflow History & Versioning", included: true },
-        { name: "Priority Support", included: true },
-        { name: "Beta Features", included: true },
-      ],
-    },
-  },
-];
 
 export default function PricingPage() {
   const auth = useConvexAuth();
@@ -188,65 +60,6 @@ export default function PricingPage() {
     });
   };
 
-  const getSubscriptionStatus = () => {
-    if (
-      !planInfo ||
-      planInfo.plan === "Free" ||
-      !hasSubscriptionProperties(planInfo)
-    ) {
-      return null;
-    }
-
-    const { status, cancel_at_period_end, current_period_end, canceled_at } =
-      planInfo;
-
-    const isActive = status === "active";
-    const isCanceled = cancel_at_period_end;
-    const periodEndDate = current_period_end
-      ? formatDate(current_period_end)
-      : null;
-    const canceledDate = canceled_at ? formatDate(canceled_at) : null;
-
-    if (isCanceled && isActive) {
-      return {
-        type: "warning",
-        message: `Your subscription is canceled and will end on ${periodEndDate}. You'll be downgraded to the Free plan.`,
-        icon: <AlertTriangle className="h-5 w-5" />,
-      };
-    }
-
-    if (status === "past_due") {
-      return {
-        type: "error",
-        message:
-          "Your subscription payment is past due. Please update your payment method.",
-        icon: <CreditCard className="h-5 w-5" />,
-      };
-    }
-
-    if (status === "canceled") {
-      return {
-        type: "info",
-        message: `Your subscription was canceled${canceledDate ? ` on ${canceledDate}` : ""}. You're now on the Free plan.`,
-        icon: <X className="h-5 w-5" />,
-      };
-    }
-
-    if (isActive) {
-      return {
-        type: "success",
-        message: `Your subscription is active${periodEndDate ? ` until ${periodEndDate}` : ""}.`,
-        icon: <Check className="h-5 w-5" />,
-      };
-    }
-
-    return {
-      type: "info",
-      message: `Subscription status: ${status}`,
-      icon: <Clock className="h-5 w-5" />,
-    };
-  };
-
   const handlePlanChange = async (planName: string) => {
     if (!auth.isAuthenticated) return;
     setLoadingTier(planName === "Reactivate" ? currentTier : planName);
@@ -254,11 +67,9 @@ export default function PricingPage() {
     try {
       if (planName === "Reactivate") {
         await reactivateSubscription();
-        // Optionally show a success message
       } else if (planName === "Free") {
         await cancelSubscription();
       } else {
-        // For upgrades or paid plan changes, use Stripe checkout
         const url = await getCheckoutSessionUrl({
           tier: planName as "Plus" | "Pro",
         });
@@ -299,14 +110,11 @@ export default function PricingPage() {
     const currentRank = tierRanks[currentTier] ?? 0;
     const planRank = tierRanks[plan.name] ?? 0;
 
-    // Check for pending cancellation state
     const isPendingCancellation =
       hasSubscriptionProperties(planInfo) && planInfo.cancel_at_period_end;
 
     if (isPendingCancellation) {
-      // Logic for users who have already canceled
       if (plan.name === currentTier) {
-        // Option to reverse the cancellation
         return {
           text: "Reactivate Plan",
           disabled: false,
@@ -315,7 +123,6 @@ export default function PricingPage() {
         };
       }
       if (planRank < currentRank) {
-        // Disable downgrade options
         return {
           text: `Downgrade to ${plan.name}`,
           disabled: true,
@@ -326,7 +133,6 @@ export default function PricingPage() {
       }
     }
 
-    // Current plan
     if (plan.name === currentTier) {
       if (plan.name === "Free") {
         return {
@@ -346,9 +152,7 @@ export default function PricingPage() {
       }
     }
 
-    // Different plan
     if (planRank > currentRank) {
-      // Upgrade
       return {
         text: `Upgrade to ${plan.name}`,
         disabled: false,
@@ -356,7 +160,6 @@ export default function PricingPage() {
         className: `flex w-full cursor-pointer items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70`,
       };
     } else {
-      // Downgrade
       return {
         text: `Downgrade to ${plan.name}`,
         disabled: false,
@@ -370,7 +173,6 @@ export default function PricingPage() {
     const buttonConfig = getButtonConfig(plan);
     const isLoading = loadingTier === plan.name;
 
-    // For unauthenticated users
     if (!auth.isAuthenticated) {
       if (plan.name === "Free") {
         return (
@@ -394,7 +196,6 @@ export default function PricingPage() {
       }
     }
 
-    // For authenticated users
     return (
       <button
         onClick={buttonConfig.onClick ?? undefined}
@@ -409,7 +210,9 @@ export default function PricingPage() {
     );
   };
 
-  const subscriptionStatus = getSubscriptionStatus();
+  const subscriptionStatus = hasSubscriptionProperties(planInfo)
+    ? SubscriptionStatus({ planInfo })
+    : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -649,63 +452,7 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-white">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Frequently Asked Questions
-              </span>
-            </h2>
-            <p className="mt-3 text-gray-400">Everything you need to know</p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {[
-              {
-                question: "What's included in the Free tier?",
-                answer:
-                  "The Free tier includes access to all core features with limits on whiteboards (5), nodes per whiteboard (10), and monthly AI operations. It's perfect for learning and experimenting.",
-              },
-              {
-                question: "How do Plus and Pro tiers differ from Free?",
-                answer:
-                  "Plus and Pro offer increased limits on whiteboards, nodes, and AI operations. Plus includes priority support and beta features, while Pro adds workflow history, versioning, and unlimited* whiteboards.",
-              },
-              {
-                question: "What AI models are available?",
-                answer: "To know more about this, read the docs.",
-              },
-              {
-                question: "How do rate limits work?",
-                answer:
-                  "Each subscription tier has monthly limits for operations like image generation, text analysis, and API integrations. Unused operations don't carry over to the next month. ",
-              },
-              {
-                question: "Can I upgrade or downgrade my plan?",
-                answer:
-                  "Yes, you can change plans at any time. Upgrades take effect immediately, while downgrades apply at your next billing cycle.",
-              },
-              {
-                question: "How is billing handled?",
-                answer:
-                  "We use Stripe for secure payment processing. All paid plans are subscription-based with automatic monthly billing. You can cancel anytime on this page.",
-              },
-            ].map((faq, idx) => (
-              <div
-                key={idx}
-                className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-6 transition-all hover:bg-gray-800/50"
-              >
-                <h3 className="mb-3 flex items-center text-lg font-semibold text-white">
-                  <span className="mr-3 h-2 w-2 rounded-full bg-purple-500"></span>
-                  {faq.question}
-                </h3>
-                <p className="text-gray-400">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FAQ />
 
       {/* CTA Section */}
       {!auth.isAuthenticated && (
@@ -734,33 +481,6 @@ export default function PricingPage() {
           </div>
         </section>
       )}
-    </div>
-  );
-}
-
-// Feature section component with consistent heights
-function FeatureSection({ title, features, color }: FeatureSectionProps) {
-  const colorClasses = {
-    blue: "bg-blue-500",
-    green: "bg-green-500",
-    yellow: "bg-yellow-500",
-    purple: "bg-purple-500",
-  };
-
-  return (
-    <div className="flex flex-col">
-      <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
-        <span className={`mr-2 h-0.5 w-5 ${colorClasses[color]}`}></span>
-        {title}
-      </h4>
-      <ul className="flex-1 space-y-2">
-        {features.map((feature, idx) => (
-          <li key={idx} className="flex items-center justify-between">
-            <span className="text-gray-300">{feature.name}</span>
-            <span className="font-medium text-white">{feature.value}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

@@ -1,0 +1,65 @@
+import React from "react";
+
+const faqItems = [
+  {
+    question: "What's included in the Free tier?",
+    answer:
+      "The Free tier includes access to all core features with limits on whiteboards (5), nodes per whiteboard (10), and monthly AI operations. It's perfect for learning and experimenting.",
+  },
+  {
+    question: "How do Plus and Pro tiers differ from Free?",
+    answer:
+      "Plus and Pro offer increased limits on whiteboards, nodes, and AI operations. Plus includes priority support and beta features, while Pro adds workflow history, versioning, and unlimited* whiteboards.",
+  },
+  {
+    question: "What AI models are available?",
+    answer: "To know more about this, read the docs.",
+  },
+  {
+    question: "How do rate limits work?",
+    answer:
+      "Each subscription tier has monthly limits for operations like image generation, text analysis, and API integrations. Unused operations don't carry over to the next month. ",
+  },
+  {
+    question: "Can I upgrade or downgrade my plan?",
+    answer:
+      "Yes, you can change plans at any time. Upgrades take effect immediately, while downgrades apply at your next billing cycle.",
+  },
+  {
+    question: "How is billing handled?",
+    answer:
+      "We use Stripe for secure payment processing. All paid plans are subscription-based with automatic monthly billing. You can cancel anytime on this page.",
+  },
+];
+
+export default function FAQ() {
+  return (
+    <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold text-white">
+            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Frequently Asked Questions
+            </span>
+          </h2>
+          <p className="mt-3 text-gray-400">Everything you need to know</p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {faqItems.map((faq, idx) => (
+            <div
+              key={idx}
+              className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-6 transition-all hover:bg-gray-800/50"
+            >
+              <h3 className="mb-3 flex items-center text-lg font-semibold text-white">
+                <span className="mr-3 h-2 w-2 rounded-full bg-purple-500"></span>
+                {faq.question}
+              </h3>
+              <p className="text-gray-400">{faq.answer}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
