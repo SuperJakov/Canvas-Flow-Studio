@@ -3,11 +3,12 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { ChevronsLeft } from "lucide-react";
+import { ChevronsLeft, Share2 } from "lucide-react";
 import { Authenticated, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
+import toast from "react-hot-toast";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -19,7 +20,24 @@ export default function WhiteboardHeader({ id }: Props) {
   const whiteboard = useQuery(api.whiteboards.getWhiteboard, { id });
   const user = useQuery(api.users.current);
   const editWhiteboardMutation = useMutation(api.whiteboards.editWhiteboard);
-  const setPublicStatusMutation = useMutation(api.whiteboards.setPublicStatus);
+  const setPublicStatusMutation = useMutation(
+    api.whiteboards.setPublicStatus,
+  ).withOptimisticUpdate((localStore, args) => {
+    const { id, isPublic } = args;
+    const currentWhiteboard = localStore.getQuery(
+      api.whiteboards.getWhiteboard,
+      { id },
+    );
+    if (!currentWhiteboard) return;
+    localStore.setQuery(
+      api.whiteboards.getWhiteboard,
+      { id },
+      {
+        ...currentWhiteboard,
+        isPublic,
+      },
+    );
+  });
   const { copyWhiteboard, isCopying, CopyingOverlay } = useCopyWhiteboard();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +76,23 @@ export default function WhiteboardHeader({ id }: Props) {
     });
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Copied to clipboard!", {
+        duration: 2000,
+        position: "top-center",
+        style: {
+          background: "#1f2937",
+          color: "#fff",
+        },
+      });
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
   return (
     <>
       <header className="fixed z-50 h-14 w-full bg-gray-900/80 text-white backdrop-blur-sm">
@@ -94,6 +129,17 @@ export default function WhiteboardHeader({ id }: Props) {
               ) : null}
             </div>
             <div className="flex items-center gap-4">
+              <div className="min-w-[32px]">
+                {whiteboard?.isPublic && (
+                  <button
+                    onClick={handleShare}
+                    className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded transition-colors hover:bg-gray-700"
+                    title="Share whiteboard"
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
               {whiteboard?.isPublic &&
               user &&
               whiteboard.ownerId !== user.externalId ? (
