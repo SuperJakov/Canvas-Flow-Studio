@@ -58,6 +58,13 @@ async function executeImageNode(
   if (!whiteboardId) {
     throw new Error("whiteboardId not set");
   }
+
+  // Check if the node is rate limited
+  if (currentNode.data.internal?.isRateLimited) {
+    console.log("Node cannot run: rate limit reached");
+    return;
+  }
+
   console.log("Running an image node...");
   // Get all edges that connect to this image node
   const incomingConnections = get(edgesAtom).filter(

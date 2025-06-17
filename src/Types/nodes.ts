@@ -21,6 +21,7 @@ export type ImageNodeData = {
     generateAndStoreImageAction?: ReactAction<
       typeof api.imageNodes.generateAndStoreImage
     >;
+    isRateLimited?: boolean;
   };
 };
 

@@ -81,10 +81,11 @@ export default function ImageNode({
       updatedData: {
         internal: {
           generateAndStoreImageAction,
+          isRateLimited,
         },
       },
     });
-  }, [generateAndStoreImageAction, id, updateNodeData]);
+  }, [generateAndStoreImageAction, id, updateNodeData, isRateLimited]);
 
   // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
@@ -184,7 +185,7 @@ export default function ImageNode({
               <button
                 type="button"
                 onClick={() => openBanner("Higher Rate Limits")}
-                className="group flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-red-600 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-white hover:shadow-xl"
+                className="group flex cursor-pointer items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-red-600 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-white hover:shadow-xl"
               >
                 <span>Upgrade</span>
                 <ExternalLink
@@ -249,7 +250,7 @@ export default function ImageNode({
                 <button
                   type="button"
                   onClick={() => openBanner("Streaming Images")}
-                  className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
+                  className="group mt-2 flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
                 >
                   <span>Upgrade for streaming images</span>
                   <ExternalLink size={10} />
@@ -293,7 +294,7 @@ export default function ImageNode({
                   <button
                     type="button"
                     onClick={() => openBanner("Higher Quality Images")}
-                    className="group mt-2 flex items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
+                    className="group mt-2 flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
                   >
                     <span>Upgrade for higher quality</span>
                     <ExternalLink size={10} />
