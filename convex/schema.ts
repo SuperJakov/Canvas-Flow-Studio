@@ -15,6 +15,7 @@ const TextEditorSchema = v.object({
     x: v.number(),
     y: v.number(),
   }),
+  zIndex: v.optional(v.number()),
 });
 
 const ImageNodeSchema = v.object({
@@ -29,6 +30,7 @@ const ImageNodeSchema = v.object({
     x: v.number(),
     y: v.number(),
   }),
+  zIndex: v.optional(v.number()),
 });
 
 const CommentNodeSchema = v.object({
@@ -44,6 +46,7 @@ const CommentNodeSchema = v.object({
   }),
   width: v.optional(v.union(v.number(), v.null())),
   height: v.optional(v.union(v.number(), v.null())),
+  zIndex: v.optional(v.number()),
 });
 
 export const AppNode = v.union(

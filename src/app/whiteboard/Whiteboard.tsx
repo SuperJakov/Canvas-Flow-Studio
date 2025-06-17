@@ -94,6 +94,7 @@ export default function Whiteboard({ id }: Props) {
             type: n.type,
             position: n.position,
             data: nodeDataWithoutInternal,
+            zIndex: n.zIndex,
           };
         }
         if (n.type === "comment") {
@@ -104,6 +105,7 @@ export default function Whiteboard({ id }: Props) {
             data: n.data,
             width: n.width,
             height: n.height,
+            zIndex: n.zIndex,
           };
         }
         return {
@@ -111,6 +113,7 @@ export default function Whiteboard({ id }: Props) {
           type: n.type,
           position: n.position,
           data: n.data,
+          zIndex: n.zIndex,
         };
       });
 
@@ -164,10 +167,68 @@ export default function Whiteboard({ id }: Props) {
   const onNodesChange = useCallback(
     (changes: NodeChange<AppNode>[]) => {
       if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard
-      setNodes((nds) => applyNodeChanges(changes, nds));
+
+      // Handle z-index changes
+      const updatedNodes = applyNodeChanges(changes, nodes);
+
+      // Update z-indices based on selection
+      const selectedNodes = updatedNodes.filter((node) => node.selected);
+      if (selectedNodes.length > 0) {
+        const maxZIndex = Math.max(
+          ...updatedNodes.map((node) => node.zIndex ?? 0),
+        );
+        const updatedNodesWithZIndex = updatedNodes.map((node) => {
+          if (node.selected) {
+            return { ...node, zIndex: maxZIndex + 1 };
+          }
+          return node;
+        });
+        setNodes(updatedNodesWithZIndex);
+      } else {
+        setNodes(updatedNodes);
+      }
     },
-    [setNodes, isSharedWhiteboard],
+    [setNodes, isSharedWhiteboard, nodes],
   );
+
+  // Add keyboard shortcut handler for z-index manipulation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isSharedWhiteboard) return; // Disable keyboard shortcuts for shared whiteboard
+
+      const selectedNodes = nodes.filter((node) => node.selected);
+      if (selectedNodes.length === 0) return;
+
+      if (event.key === "[" || event.key === "]") {
+        event.preventDefault();
+        const direction = event.key === "[" ? -1 : 1;
+
+        setNodes((prevNodes) => {
+          const maxZIndex = Math.max(
+            ...prevNodes.map((node) => node.zIndex ?? 0),
+          );
+          const minZIndex = Math.min(
+            ...prevNodes.map((node) => node.zIndex ?? 0),
+          );
+
+          return prevNodes.map((node) => {
+            if (node.selected) {
+              const newZIndex = (node.zIndex ?? 0) + direction;
+              // Keep z-index within bounds
+              return {
+                ...node,
+                zIndex: Math.max(minZIndex, Math.min(maxZIndex + 1, newZIndex)),
+              };
+            }
+            return node;
+          });
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, setNodes, isSharedWhiteboard]);
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {

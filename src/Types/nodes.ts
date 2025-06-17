@@ -5,12 +5,14 @@ import type { ReactAction } from "convex/react";
 export type CommentNodeData = {
   text: string;
   isLocked: boolean;
+  zIndex?: number;
 };
 
 export type TextEditorNodeData = {
   text: string;
   isLocked: boolean;
   isRunning: boolean;
+  zIndex?: number;
 };
 
 export type ImageNodeData = {
@@ -23,6 +25,7 @@ export type ImageNodeData = {
     >;
     isRateLimited?: boolean;
   };
+  zIndex?: number;
 };
 
 /**
@@ -32,7 +35,9 @@ export type ImageNodeData = {
 export type StrictNode<
   D extends Record<string, unknown>,
   T extends string,
-> = Omit<Node<D, T>, "type"> & { type: T };
+> = Omit<Node<D, T>, "type"> & {
+  type: T;
+};
 
 export type TextEditorNodeType = StrictNode<TextEditorNodeData, "textEditor">;
 export type ImageNodeType = StrictNode<ImageNodeData, "image">;
