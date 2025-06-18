@@ -25,7 +25,9 @@ export const upsertSubscription = internalMutation({
     // Check if subscription already exists
     const existingSubscription = await ctx.db
       .query("subscriptions")
-      .filter((q) => q.eq(q.field("subscriptionId"), args.subscriptionId))
+      .withIndex("by_subscriptionId", (q) =>
+        q.eq("subscriptionId", args.subscriptionId),
+      )
       .unique();
 
     if (existingSubscription) {
