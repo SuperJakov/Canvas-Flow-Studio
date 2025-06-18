@@ -189,9 +189,9 @@ export const copyPublicWhiteboard = mutation({
         // This is an image node, we need to find its storageId
         const originalImageRecord = await ctx.db
           .query("imageNodes")
-          .withIndex("by_nodeId", (q) => q.eq("nodeId", node.id))
-          // We also filter by whiteboardId to be certain we get the correct one
-          .filter((q) => q.eq(q.field("whiteboardId"), sourceId))
+          .withIndex("by_nodeId_and_whiteboardId", (q) =>
+            q.eq("nodeId", node.id).eq("whiteboardId", sourceId),
+          )
           .first();
 
         if (originalImageRecord) {
