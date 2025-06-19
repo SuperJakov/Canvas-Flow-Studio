@@ -115,7 +115,12 @@ export default function HomePage() {
               draggable={false}
               connectOnClick={false}
               unselectable="on"
-              preventScrolling={true}
+              preventScrolling={false}
+              // disable zooming and panning
+              zoomOnScroll={false}
+              zoomOnDoubleClick={false}
+              panOnDrag={false}
+              panOnScroll={false}
             >
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
             </ReactFlow>
