@@ -13,7 +13,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { nodeTypes } from "./config";
+import { edgeTypes, nodeTypes } from "./config";
 import type { AppEdge, AppNode } from "~/Types/nodes";
 import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms";
 import { useAtom } from "jotai";
@@ -122,6 +122,7 @@ export default function Whiteboard({ id }: Props) {
         source: e.source,
         target: e.target,
         animated: e.animated,
+        type: e.type,
       }));
 
       try {
@@ -233,7 +234,9 @@ export default function Whiteboard({ id }: Props) {
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
-      setEdges((eds) => applyEdgeChanges(changes, eds));
+      setEdges((eds) =>
+        applyEdgeChanges(changes, eds).map((e) => ({ ...e, type: "default" })),
+      );
     },
     [setEdges, isSharedWhiteboard],
   );
@@ -241,7 +244,9 @@ export default function Whiteboard({ id }: Props) {
   const onConnect = useCallback(
     (connection: Connection) => {
       if (isSharedWhiteboard) return; // Disable connections for shared whiteboard
-      setEdges((eds) => addEdge({ ...connection, id: uuidv4() }, eds));
+      setEdges((eds) =>
+        addEdge({ ...connection, id: uuidv4(), type: "default" }, eds),
+      );
     },
     [setEdges, isSharedWhiteboard],
   );
@@ -336,6 +341,7 @@ export default function Whiteboard({ id }: Props) {
       onDragOver={onDragOver}
       onConnect={onConnect}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       fitView
       fitViewOptions={{
         padding: 0.9, // leave 90% margin -> zooms out further

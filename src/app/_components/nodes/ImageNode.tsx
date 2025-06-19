@@ -81,7 +81,6 @@ export default function ImageNode({
     : 0;
 
   useEffect(() => {
-    console.log("generateAndStoreImageAction", generateAndStoreImageAction);
     updateNodeData({
       nodeId: id,
       nodeType: "image",

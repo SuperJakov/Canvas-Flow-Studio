@@ -59,7 +59,7 @@ export const AppEdge = v.object({
   id: v.string(),
   source: v.string(),
   target: v.string(),
-  type: v.optional(v.string()),
+  type: v.literal("default"),
   animated: v.optional(v.boolean()),
 });
 

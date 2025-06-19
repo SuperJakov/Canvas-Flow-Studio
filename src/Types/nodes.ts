@@ -76,4 +76,15 @@ export type WhiteboardNode =
  */
 export type PreviewNode = PreviewImageNodeType | PreviewTextNodeType;
 
-export type AppEdge = Edge;
+export type StrictEdge<
+  D extends Record<string, unknown>,
+  T extends string,
+> = Omit<Edge<D, T>, "type"> & {
+  type: T;
+};
+
+/**
+ * Edges for the app whiteboard. Only allows edges with type 'default'.
+ * Keeps all other props as a normal edge.
+ */
+export type AppEdge = StrictEdge<Record<string, unknown>, "default">;
