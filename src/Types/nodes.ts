@@ -61,11 +61,19 @@ export type PreviewTextNodeType = StrictNode<
   "previewText"
 >;
 
-export type AppNode =
+export type AppNode = TextEditorNodeType | ImageNodeType | CommentNodeType;
+
+/**
+ * Nodes for the main (normal) whiteboard. Only includes editable/interactive nodes.
+ */
+export type WhiteboardNode =
   | TextEditorNodeType
   | ImageNodeType
-  | CommentNodeType
-  | PreviewImageNodeType
-  | PreviewTextNodeType;
+  | CommentNodeType;
+
+/**
+ * Nodes for the preview whiteboard. Only includes preview nodes.
+ */
+export type PreviewNode = PreviewImageNodeType | PreviewTextNodeType;
 
 export type AppEdge = Edge;

@@ -74,18 +74,16 @@ export default function HomePage() {
               nodes={[
                 {
                   id: "1",
-                  type: "textEditor",
+                  type: "previewText",
                   position: { x: 500, y: 600 },
-                  data: { text: "A dog", isLocked: false, isRunning: false },
+                  data: { text: "A dog" },
                 },
                 {
                   id: "2",
-                  type: "textEditor",
+                  type: "previewText",
                   position: { x: 100, y: 600 },
                   data: {
                     text: "Swimming at the bottom of the ocean wearing goggles an playing with other fish",
-                    isLocked: false,
-                    isRunning: false,
                   },
                 },
                 {

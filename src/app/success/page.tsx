@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 type Props = {
   params: Promise<{
     sessionId: string;
@@ -5,6 +7,5 @@ type Props = {
 };
 export default async function SuccessPage({ params }: Props) {
   const { sessionId } = await params;
-
-  return <div>hi</div>;
+  redirect("/pricing");
 }
