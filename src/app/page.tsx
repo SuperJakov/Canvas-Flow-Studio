@@ -14,6 +14,11 @@ import {
   MessageSquare,
   PieChart,
 } from "lucide-react";
+import { ReactFlow, Background, BackgroundVariant } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import { previewNodeTypes } from "./preview-config";
+
+const previewImage1Url = "/preview1.png";
 
 function DiscordIcon() {
   return (
@@ -65,38 +70,55 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-xl border-2 border-gray-700 shadow-2xl shadow-purple-900/20">
           <div className="relative h-[500px] w-full overflow-hidden bg-gray-800">
-            {/* Simulated Flow Canvas */}
-            <div className="bg-dots-white/5 absolute inset-0"></div>
-
-            {/* Simulated Nodes */}
-            <div className="absolute top-1/4 left-1/4 h-32 w-64 rounded-lg border border-blue-700 bg-blue-900 p-4 shadow-lg">
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-blue-400"></div>
-                  <span className="font-medium text-white">Text Input</span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-300">
-                Create a futuristic cityscape with neon lights...
-              </p>
-            </div>
-
-            <div className="absolute top-2/4 left-2/4 h-48 w-64 rounded-lg border border-purple-700 bg-purple-900 p-4 shadow-lg">
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-purple-400"></div>
-                  <span className="font-medium text-white">
-                    AI Image Generator
-                  </span>
-                </div>
-              </div>
-              <div className="h-28 overflow-hidden rounded-md bg-gray-700">
-                <div className="relative h-full w-full overflow-hidden">
-                  <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500 opacity-40"></div>
-                  <div className="absolute inset-0 animate-pulse bg-gradient-to-t from-blue-600/20 to-transparent"></div>
-                </div>
-              </div>
-            </div>
+            <ReactFlow
+              nodes={[
+                {
+                  id: "1",
+                  type: "textEditor",
+                  position: { x: 500, y: 600 },
+                  data: { text: "A dog", isLocked: false, isRunning: false },
+                },
+                {
+                  id: "2",
+                  type: "textEditor",
+                  position: { x: 100, y: 600 },
+                  data: {
+                    text: "Swimming at the bottom of the ocean wearing goggles an playing with other fish",
+                    isLocked: false,
+                    isRunning: false,
+                  },
+                },
+                {
+                  id: "3",
+                  type: "previewImage",
+                  position: { x: 300, y: 1000 },
+                  data: { imageUrl: previewImage1Url },
+                },
+              ]}
+              edges={[
+                {
+                  id: "e1-3",
+                  source: "1",
+                  target: "3",
+                },
+                {
+                  id: "e2-3",
+                  source: "2",
+                  target: "3",
+                },
+              ]}
+              nodeTypes={previewNodeTypes}
+              fitView
+              fitViewOptions={{ padding: 0.9 }}
+              proOptions={{ hideAttribution: true }}
+              colorMode="dark"
+              draggable={false}
+              connectOnClick={false}
+              unselectable="on"
+              preventScrolling={true}
+            >
+              <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+            </ReactFlow>
           </div>
         </div>
       </section>

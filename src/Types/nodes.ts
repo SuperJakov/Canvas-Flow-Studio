@@ -28,6 +28,16 @@ export type ImageNodeData = {
   zIndex?: number;
 };
 
+export type PreviewImageNodeData = {
+  imageUrl: string | null;
+  zIndex?: number;
+};
+
+export type PreviewTextNodeData = {
+  text: string;
+  zIndex?: number;
+};
+
 /**
  * Force `type: T` to be required, while preserving all other keys from Node<D,T>.
  * Note the `D extends Record<string, unknown>` constraint to match Node's signature.
@@ -42,7 +52,20 @@ export type StrictNode<
 export type TextEditorNodeType = StrictNode<TextEditorNodeData, "textEditor">;
 export type ImageNodeType = StrictNode<ImageNodeData, "image">;
 export type CommentNodeType = StrictNode<CommentNodeData, "comment">;
+export type PreviewImageNodeType = StrictNode<
+  PreviewImageNodeData,
+  "previewImage"
+>;
+export type PreviewTextNodeType = StrictNode<
+  PreviewTextNodeData,
+  "previewText"
+>;
 
-export type AppNode = TextEditorNodeType | ImageNodeType | CommentNodeType;
+export type AppNode =
+  | TextEditorNodeType
+  | ImageNodeType
+  | CommentNodeType
+  | PreviewImageNodeType
+  | PreviewTextNodeType;
 
 export type AppEdge = Edge;
