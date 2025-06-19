@@ -203,7 +203,7 @@ export const storeResult = internalMutation({
 
     if (existing) {
       // Update the existing node with the new imageUrl
-      await ctx.db.patch(existing._id, { imageUrl });
+      await ctx.db.patch(existing._id, { imageUrl, storageId: args.storageId });
     } else {
       // Insert a new image node record if it doesn't exist
       await ctx.db.insert("imageNodes", {
