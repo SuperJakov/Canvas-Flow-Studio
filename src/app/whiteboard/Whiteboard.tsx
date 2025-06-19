@@ -244,6 +244,8 @@ export default function Whiteboard({ id }: Props) {
   const onConnect = useCallback(
     (connection: Connection) => {
       if (isSharedWhiteboard) return; // Disable connections for shared whiteboard
+      // Prevent connecting a node to itself
+      if (connection.source === connection.target) return;
       setEdges((eds) =>
         addEdge({ ...connection, id: uuidv4(), type: "default" }, eds),
       );
