@@ -215,3 +215,25 @@ export const storeResult = internalMutation({
     }
   },
 });
+
+export const uploadAndStoreImage = action({
+  args: {
+    file: v.bytes(),
+    nodeId: v.string(),
+    whiteboardId: v.id("whiteboards"),
+  },
+  handler: async (ctx, { file, nodeId, whiteboardId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    // Store the uploaded file to Convex storage
+    const storageId = await ctx.storage.store(new Blob([file]));
+
+    // Call storeResult to update or insert the image node record
+    await ctx.runMutation(internal.imageNodes.storeResult, {
+      storageId,
+      nodeId,
+      whiteboardId,
+    });
+  },
+});

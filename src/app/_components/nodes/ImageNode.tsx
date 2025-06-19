@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import {
   Loader2,
   Download,
   ExternalLink,
+  Upload,
 } from "lucide-react";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
@@ -22,6 +23,8 @@ import { useAction, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
+import { useParams } from "next/navigation";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export default function ImageNode({
   id,
@@ -32,6 +35,9 @@ export default function ImageNode({
   const [, executeNode] = useAtom(executeNodeAtom);
   const generateAndStoreImageAction = useAction(
     api.imageNodes.generateAndStoreImage,
+  );
+  const uploadAndStoreImageAction = useAction(
+    api.imageNodes.uploadAndStoreImage,
   );
   const url = useQuery(api.imageNodes.getImageNodeUrl, {
     nodeId: id,
@@ -49,6 +55,16 @@ export default function ImageNode({
   // State for controlling the upgrade banner
   const [isBannerOpen, setIsBannerOpen] = useState(false);
   const [bannerFeature, setBannerFeature] = useState("");
+
+  // Get whiteboardId from route params
+  const params = useParams();
+  const whiteboardId = params?.id as string | undefined;
+
+  // Ref for the hidden file input
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Add isUploading state
+  const [isUploading, setIsUploading] = useState(false);
 
   const openBanner = useCallback((feature: string) => {
     setBannerFeature(feature);
@@ -140,6 +156,44 @@ export default function ImageNode({
     }
   }, [url, id, isDownloading]);
 
+  const handleUpload = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Reset so same file can be picked again
+      fileInputRef.current.click();
+    }
+  }, []);
+
+  const handleFileChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (!whiteboardId) {
+        console.error("No whiteboardId found in route params");
+        return;
+      }
+      setIsUploading(true); // Start uploading
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        await uploadAndStoreImageAction({
+          file: arrayBuffer,
+          nodeId: id,
+          whiteboardId: whiteboardId as Id<"whiteboards">,
+        });
+      } catch (err) {
+        console.error("Failed to upload image:", err);
+      } finally {
+        setIsUploading(false); // End uploading
+      }
+    },
+    [id, uploadAndStoreImageAction, whiteboardId],
+  );
+
+  if (!whiteboardId) {
+    throw new Error(
+      "No whiteboardId found in route params when image node was rendered",
+    );
+  }
+
   return (
     <div className={`relative`}>
       <Portal>
@@ -149,6 +203,14 @@ export default function ImageNode({
           featureName={bannerFeature}
         />
       </Portal>
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
       <div
         className={`overflow-hidden rounded border-2 bg-purple-200 shadow-md ${
           isRateLimited
@@ -277,9 +339,35 @@ export default function ImageNode({
                     <Download size={18} />
                   )}
                 </button>
+                {/* Upload button - same size, appears on hover when image exists */}
+                <button
+                  onClick={handleUpload}
+                  className="absolute top-3 left-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700"
+                  title="Upload image"
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <Upload size={18} />
+                  )}
+                </button>
               </>
             ) : (
               <div className="flex flex-col items-center text-gray-400">
+                {/* Medium-sized circle with upload button when no image */}
+                <button
+                  onClick={handleUpload}
+                  className="mb-4 flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-gray-700 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-600"
+                  title="Upload image"
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 size={24} className="animate-spin" />
+                  ) : (
+                    <Upload size={24} />
+                  )}
+                </button>
                 <ImageIcon size={24} />
                 <p className="mt-1 text-sm">No image generated yet</p>
                 {/* Show upgrade message when idle and not rate limited - helpful context */}
