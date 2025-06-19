@@ -83,16 +83,16 @@ async function executeImageNode(
         node.type === "image" || node.type === "textEditor",
     )
     .map((node) => {
-      // destructure only the bits you need…
+      // We only need some data from the node, so we destructure it
       const { type, id, data } = node;
       // and then tell TS "this shape is exactly the same as the incoming node"
       return { type, id, data } as typeof node;
     });
 
-  console.log("currentNode.data.internal", currentNode.data.internal);
   if (!currentNode.data.internal?.generateAndStoreImageAction) {
     throw new Error("generateAndStoreImageAction not defined.");
   }
+
   console.log("Running generateAndStoreImageAction");
   await currentNode.data.internal.generateAndStoreImageAction({
     nodeId: currentNode.id,
