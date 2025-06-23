@@ -69,7 +69,7 @@ export default function HomePage() {
       {/* Canvas Preview Section */}
       <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-xl border-2 border-gray-700 shadow-2xl shadow-purple-900/20">
-          <div className="relative h-[500px] w-full overflow-hidden bg-gray-800">
+          <div className="pointer-events-none relative h-[500px] w-full overflow-hidden bg-gray-800">
             <ReactFlow
               nodes={[
                 {
@@ -114,11 +114,6 @@ export default function HomePage() {
               connectOnClick={false}
               unselectable="on"
               preventScrolling={false}
-              // disable zooming and panning
-              zoomOnScroll={false}
-              zoomOnDoubleClick={false}
-              panOnDrag={false}
-              panOnScroll={false}
             >
               <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
             </ReactFlow>
