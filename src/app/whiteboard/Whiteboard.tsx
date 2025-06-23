@@ -31,6 +31,10 @@ type Props = {
   id: Id<"whiteboards">;
 };
 
+function checkIfNodeExists(nodes: AppNode[], nodeId: string) {
+  return nodes.some((node) => node.id === nodeId);
+}
+
 export default function Whiteboard({ id }: Props) {
   const whiteboardData = useQuery(
     api.whiteboards.getWhiteboard,
@@ -71,12 +75,15 @@ export default function Whiteboard({ id }: Props) {
   // Persist the debounced save function so it isn't re-created on every render.
   const debouncedSaveRef = useRef(
     debounce(async (currentNodes: AppNode[], currentEdges: AppEdge[]) => {
+      console.groupCollapsed("Debounced Save");
       if (!id || !initialLoadDone.current) {
         console.log("Skipping save: not initialized or no id");
+        console.groupEnd();
         return;
       }
       if (isExecuting) {
         console.warn("Skipping save: a node is currently executing");
+        console.groupEnd();
         return;
       }
 
@@ -85,6 +92,7 @@ export default function Whiteboard({ id }: Props) {
         `Preparing to save ${currentNodes.length} nodes and ${currentEdges.length} edges`,
       );
 
+      console.time("Preparation time");
       const nodesToSave = currentNodes.map((n) => {
         if (n.type === "image") {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -124,6 +132,7 @@ export default function Whiteboard({ id }: Props) {
         animated: e.animated,
         type: e.type,
       }));
+      console.timeEnd("Preparation time");
 
       try {
         console.log("Calling updateContentMutation...");
@@ -136,6 +145,8 @@ export default function Whiteboard({ id }: Props) {
         console.timeEnd("Save operation");
       } catch (error) {
         console.error("❌ Failed to save whiteboard content:", error);
+      } finally {
+        console.groupEnd();
       }
     }, 500),
   );
@@ -164,6 +175,23 @@ export default function Whiteboard({ id }: Props) {
       lastSavedRef.current = { nodes, edges };
     }
   }, [nodes, edges, whiteboardData, isSharedWhiteboard]);
+
+  useEffect(() => {
+    console.groupCollapsed("Edge Check");
+    console.time("Edge Check");
+    for (const edge of edges) {
+      // Check if both source and target nodes exist, if not, remove the edge
+      const sourceNodeExists = checkIfNodeExists(nodes, edge.source);
+      const targetNodeExists = checkIfNodeExists(nodes, edge.target);
+
+      if (!sourceNodeExists || !targetNodeExists) {
+        console.log("Removing edge with id:", edge.id);
+        setEdges((prevEdges) => prevEdges.filter((e) => e.id !== edge.id));
+      }
+    }
+    console.timeEnd("Edge Check");
+    console.groupEnd();
+  }, [edges, setEdges, nodes]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<AppNode>[]) => {
