@@ -56,19 +56,24 @@ export default function Whiteboard({ id }: Props) {
 
   // Load whiteboard data from Convex into Jotai atoms
   useEffect(() => {
-    // If whiteboardData.isPublic && whiteboardData.ownerId !== user.externalId; then this is a shared whiteboard
     if (whiteboardData && !initialLoadDone.current) {
+      console.groupCollapsed("[Whiteboard] Loading whiteboard data into atoms");
       console.log("Loading whiteboard data into atoms:", whiteboardData);
       setNodes(whiteboardData.nodes as AppNode[]);
       setEdges(whiteboardData.edges as AppEdge[]);
       initialLoadDone.current = true;
+      console.groupEnd();
     } else if (whiteboardData === null && id && !initialLoadDone.current) {
+      console.groupCollapsed(
+        `[Whiteboard] Whiteboard ${id} not found or access denied. Clearing local state.`,
+      );
       console.warn(
         `Whiteboard ${id} not found or access denied. Clearing local state.`,
       );
       setNodes([]);
       setEdges([]);
       initialLoadDone.current = true;
+      console.groupEnd();
     }
   }, [whiteboardData, setNodes, setEdges, id]);
 
@@ -230,27 +235,69 @@ export default function Whiteboard({ id }: Props) {
 
       if (event.key === "[" || event.key === "]") {
         event.preventDefault();
-        const direction = event.key === "[" ? -1 : 1;
+        const moveUp = event.key === "]";
+
+        console.groupCollapsed(`Z-Index ${moveUp ? "Up" : "Down"} Operation`);
+        console.log(
+          "Before move:",
+          nodes.map((n) => ({
+            id: n.id,
+            zIndex: n.zIndex,
+            selected: n.selected,
+          })),
+        );
 
         setNodes((prevNodes) => {
-          const maxZIndex = Math.max(
-            ...prevNodes.map((node) => node.zIndex ?? 0),
+          // Sort nodes by zIndex ascending
+          const sorted = [...prevNodes].sort(
+            (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
           );
-          const minZIndex = Math.min(
-            ...prevNodes.map((node) => node.zIndex ?? 0),
-          );
+          // Get selected node ids
+          const selectedIds = new Set(selectedNodes.map((n) => n.id));
 
-          return prevNodes.map((node) => {
-            if (node.selected) {
-              const newZIndex = (node.zIndex ?? 0) + direction;
-              // Keep z-index within bounds
-              return {
-                ...node,
-                zIndex: Math.max(minZIndex, Math.min(maxZIndex + 1, newZIndex)),
-              };
-            }
-            return node;
-          });
+          // Find the indices of selected nodes in sorted order
+          const selectedIndices = sorted
+            .map((node, idx) => (selectedIds.has(node.id) ? idx : -1))
+            .filter((idx) => idx !== -1);
+
+          if (selectedIndices.length === 0) {
+            console.log("No selected nodes to move.");
+            console.groupEnd();
+            return prevNodes;
+          }
+
+          // If moving down ([), process from lowest to highest; if up (]), process from highest to lowest
+          const indicesToProcess = moveUp
+            ? [...selectedIndices].reverse()
+            : selectedIndices;
+
+          for (const idx of indicesToProcess) {
+            const node = sorted[idx];
+            const swapIdx = moveUp ? idx + 1 : idx - 1;
+            if (swapIdx < 0 || swapIdx >= sorted.length) continue; // Already at edge
+            const swapNode = sorted[swapIdx];
+            if (!node || !swapNode) continue;
+            // Don't swap with another selected node
+            if (selectedIds.has(swapNode.id)) continue;
+            // Swap z-indices
+            console.log(
+              `Swapping node ${node.id} (z: ${node.zIndex}) with node ${swapNode.id} (z: ${swapNode.zIndex})`,
+            );
+            const temp = swapNode.zIndex ?? 0;
+            swapNode.zIndex = node.zIndex ?? 0;
+            node.zIndex = temp;
+          }
+
+          // Return nodes in original order, but with updated z-indices
+          const idToZ = Object.fromEntries(sorted.map((n) => [n.id, n.zIndex]));
+          const afterMove = prevNodes.map((node) => ({
+            id: node.id,
+            zIndex: idToZ[node.id],
+            selected: node.selected,
+          }));
+          console.log("After move:", afterMove);
+          console.groupEnd();
+          return prevNodes.map((node) => ({ ...node, zIndex: idToZ[node.id] }));
         });
       }
     };
