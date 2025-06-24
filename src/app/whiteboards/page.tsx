@@ -58,6 +58,7 @@ export default function WhiteboardsClient() {
   // State for in-place title editing
   const [editingId, setEditingId] = useState<Id<"whiteboards"> | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const router = useRouter();
 
@@ -138,7 +139,7 @@ export default function WhiteboardsClient() {
     return new Date(Number(timestamp)).toLocaleString();
   };
 
-  if (whiteboards === undefined || isCreatingWhiteboard) {
+  if (whiteboards === undefined || isCreatingWhiteboard || isRedirecting) {
     return <Loading />;
   }
 
@@ -272,7 +273,10 @@ export default function WhiteboardsClient() {
                   </div>
                   <div className="mt-4 flex justify-between">
                     <Link href={`/whiteboard/${whiteboard._id}`}>
-                      <button className="cursor-pointer rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-500">
+                      <button
+                        className="cursor-pointer rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-500"
+                        onClick={() => setIsRedirecting(true)}
+                      >
                         Open
                       </button>
                     </Link>
