@@ -101,7 +101,7 @@ function WhiteboardCard({
         aria-label={`Open whiteboard: ${whiteboard.title ?? "Untitled"}`}
       >
         <div className="relative block">
-          <div className="relative h-40 w-full bg-gray-600">
+          <div className="relative aspect-[16/9] w-full bg-gray-600">
             {whiteboard.previewUrl ? (
               <Image
                 src={whiteboard.previewUrl}

@@ -1,9 +1,10 @@
 import { initialEdges, initialNodes } from "~/app/whiteboard/initial";
 import { query } from "./_generated/server";
-import { mutation } from "./functions";
+import { internalMutation, mutation } from "./functions";
 import { v } from "convex/values";
 import { AppEdge, AppNode } from "./schema";
 import { v4 as uuidv4 } from "uuid";
+import { internal } from "./_generated/api";
 
 // --- Create a new whiteboard ---
 export const createWhiteboard = mutation({
@@ -249,5 +250,88 @@ export const copyPublicWhiteboard = mutation({
 
     // Return the ID of the newly created whiteboard
     return newWhiteboardId;
+  },
+});
+
+export const generatePreviewUploadUrl = mutation({
+  args: {
+    whiteboardId: v.id("whiteboards"),
+  },
+  handler: async (ctx, { whiteboardId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const whiteboard = await ctx.db
+      .query("whiteboards")
+      .withIndex("by_id", (q) => q.eq("_id", whiteboardId))
+      .first();
+    if (!whiteboard) {
+      throw new Error("Whiteboard not found");
+    }
+    if (whiteboard.ownerId !== identity.subject) {
+      throw new Error(
+        "Unauthorized: Only the owner can generate a preview upload URL.",
+      );
+    }
+
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const uploadPreviewImage = mutation({
+  args: {
+    whiteboardId: v.id("whiteboards"),
+    previewImageStorageId: v.id("_storage"),
+  },
+  handler: async (ctx, { whiteboardId, previewImageStorageId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const whiteboard = await ctx.db
+      .query("whiteboards")
+      .withIndex("by_id", (q) => q.eq("_id", whiteboardId))
+      .first();
+    if (!whiteboard) {
+      throw new Error("Whiteboard not found");
+    }
+    if (whiteboard.ownerId !== identity.subject) {
+      throw new Error(
+        "Unauthorized: Only the owner can upload a preview image.",
+      );
+    }
+
+    const previewImageUrl = await ctx.storage.getUrl(previewImageStorageId);
+    if (!previewImageUrl) {
+      throw new Error("Failed to retrieve the preview image URL.");
+    }
+
+    const oldPreviewStorageId = whiteboard.previewStorageId;
+    if (oldPreviewStorageId) {
+      await ctx.scheduler.runAfter(0, internal.whiteboards.deletePreviewImage, {
+        storageId: oldPreviewStorageId,
+      });
+    }
+
+    // Update the whiteboard with the new preview image storage ID
+    await ctx.db.patch(whiteboardId, {
+      previewStorageId: previewImageStorageId,
+      updatedAt: BigInt(Date.now()),
+      previewUrl: previewImageUrl,
+    });
+
+    return { success: true };
+  },
+});
+
+export const deletePreviewImage = internalMutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, { storageId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    // Delete the storage object
+    await ctx.storage.delete(storageId);
   },
 });

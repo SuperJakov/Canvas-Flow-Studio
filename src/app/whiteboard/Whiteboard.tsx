@@ -26,6 +26,7 @@ import Link from "next/link";
 import { debounce } from "lodash";
 import Loading from "../loading";
 import SharingPopup from "./SharingPopup";
+import WhiteboardPreviewCreator from "./WhiteboardPreviewCreator";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -430,6 +431,7 @@ export default function Whiteboard({ id }: Props) {
     >
       <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
       <SharingPopup id={id} />
+      <WhiteboardPreviewCreator />
     </ReactFlow>
   );
 }
