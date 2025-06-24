@@ -1,14 +1,191 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
+import { usePopper } from "react-popper";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import Loading from "../loading";
 import Link from "next/link";
 import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import Image from "next/image";
+import { MoreVertical } from "lucide-react";
+import type { Doc } from "../../../convex/_generated/dataModel";
+
+const formatDate = (timestamp: bigint | undefined | null): string => {
+  if (!timestamp) return "N/A";
+  const date = new Date(Number(timestamp));
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+  return formatDistanceToNow(date, { addSuffix: true });
+};
+
+function WhiteboardCard({
+  whiteboard,
+  editingId,
+  editingTitle,
+  deletingId,
+  onStartEditing,
+  onSaveTitle,
+  setEditingTitle,
+  onDelete,
+  onRedirect,
+}: {
+  whiteboard: Doc<"whiteboards">;
+  editingId: Id<"whiteboards"> | null;
+  editingTitle: string;
+  deletingId: Id<"whiteboards"> | null;
+  onStartEditing: (id: Id<"whiteboards"> | null, title: string) => void;
+  onSaveTitle: (id: Id<"whiteboards">) => void;
+  setEditingTitle: (title: string) => void;
+  onDelete: (id: Id<"whiteboards">) => void;
+  onRedirect: () => void;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [referenceElement, setReferenceElement] =
+    useState<HTMLButtonElement | null>(null);
+  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    placement: "bottom-end",
+    modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
+  });
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        menuOpen &&
+        popperElement &&
+        !popperElement.contains(event.target as Node) &&
+        referenceElement &&
+        !referenceElement.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [menuOpen, popperElement, referenceElement]);
+
+  const handleRenameClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    onStartEditing(whiteboard._id, whiteboard.title ?? "Untitled");
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    onDelete(whiteboard._id);
+  };
+
+  const handleMenuToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMenuOpen((prev) => !prev);
+  };
+
+  return (
+    <div className="flex flex-col overflow-hidden rounded-lg bg-gray-700 shadow-lg">
+      <Link
+        href={`/whiteboard/${whiteboard._id}`}
+        onClick={(e) => {
+          if ((e.target as Element).closest(".no-link")) {
+            e.preventDefault();
+          } else {
+            onRedirect();
+          }
+        }}
+        className="group flex h-full cursor-pointer flex-col"
+        aria-label={`Open whiteboard: ${whiteboard.title ?? "Untitled"}`}
+      >
+        <div className="relative block">
+          <div className="relative h-40 w-full bg-gray-600">
+            {whiteboard.previewUrl ? (
+              <Image
+                src={whiteboard.previewUrl}
+                alt={whiteboard.title ?? "Whiteboard preview"}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-all duration-300 group-hover:blur-sm"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <p className="text-gray-400">Preview does not exist.</p>
+              </div>
+            )}
+          </div>
+          <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-gray-900 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <p className="text-lg font-semibold">Press to open</p>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col justify-between p-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              {editingId === whiteboard._id ? (
+                <input
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  onBlur={() => onSaveTitle(whiteboard._id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onSaveTitle(whiteboard._id);
+                    if (e.key === "Escape") onStartEditing(null, "");
+                  }}
+                  className="no-link w-full cursor-text rounded bg-gray-600 px-2 py-0.5 text-base font-medium text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  autoFocus
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <h3 className="truncate py-0.5 text-base font-medium">
+                  {whiteboard.title ?? "Untitled"}
+                </h3>
+              )}
+            </div>
+            <div className="no-link relative flex-shrink-0">
+              <button
+                ref={setReferenceElement}
+                onClick={handleMenuToggle}
+                className="cursor-pointer rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-600 hover:text-white"
+                aria-label="More options"
+              >
+                <MoreVertical className="h-5 w-5" />
+              </button>
+              {menuOpen && (
+                <div
+                  ref={setPopperElement}
+                  style={styles.popper}
+                  {...attributes.popper}
+                  className="ring-opacity-5 z-10 w-32 rounded-md bg-gray-800 shadow-lg ring-1 ring-black focus:outline-none"
+                >
+                  <div className="py-1">
+                    <button
+                      onClick={handleRenameClick}
+                      className="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >
+                      Rename
+                    </button>
+                    <button
+                      onClick={handleDeleteClick}
+                      className="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
+                      disabled={deletingId === whiteboard._id}
+                    >
+                      {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <p className="text-xs text-gray-400">
+            {formatDate(whiteboard.updatedAt)}
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+}
 
 export default function WhiteboardsClient() {
   const whiteboards = useQuery(api.whiteboards.listWhiteboards);
@@ -28,12 +205,10 @@ export default function WhiteboardsClient() {
     );
   });
 
-  // Add optimistic update for editing the title
   const convexEditWhiteboard = useMutation(
     api.whiteboards.editWhiteboard,
   ).withOptimisticUpdate((localStore, args) => {
     const { id, title } = args;
-    // Only apply optimistic update if title is being changed
     if (typeof title !== "string") return;
 
     const currentWhiteboards = localStore.getQuery(
@@ -56,8 +231,6 @@ export default function WhiteboardsClient() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreatingWhiteboard, setIsCreatingWhiteboard] =
     useState<boolean>(false);
-
-  // State for in-place title editing
   const [editingId, setEditingId] = useState<Id<"whiteboards"> | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -65,9 +238,7 @@ export default function WhiteboardsClient() {
   const router = useRouter();
 
   const handleCreateWhiteboard = async () => {
-    if (isCreatingWhiteboard) {
-      return;
-    }
+    if (isCreatingWhiteboard) return;
     setErrorMessage(null);
     const title = newWhiteboardName.trim();
     try {
@@ -84,9 +255,7 @@ export default function WhiteboardsClient() {
     } catch (error) {
       console.error("Failed to create whiteboard:", error);
       setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "An unknown error occurred while creating the whiteboard.",
+        error instanceof Error ? error.message : "An unknown error occurred.",
       );
       setIsCreatingWhiteboard(false);
     }
@@ -100,16 +269,17 @@ export default function WhiteboardsClient() {
     } catch (error) {
       console.error("Failed to delete whiteboard:", error);
       setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "An unknown error occurred while deleting the whiteboard.",
+        error instanceof Error ? error.message : "An unknown error occurred.",
       );
     } finally {
       setDeletingId(null);
     }
   };
 
-  const handleStartEditing = (id: Id<"whiteboards">, currentTitle: string) => {
+  const handleStartEditing = (
+    id: Id<"whiteboards"> | null,
+    currentTitle: string,
+  ) => {
     setEditingId(id);
     setEditingTitle(currentTitle);
   };
@@ -118,14 +288,13 @@ export default function WhiteboardsClient() {
     const trimmedTitle = editingTitle.trim();
     const originalWhiteboard = whiteboards?.find((w) => w._id === id);
 
-    // Don't save if title is empty or unchanged
     if (!trimmedTitle || trimmedTitle === originalWhiteboard?.title) {
       setEditingId(null);
       return;
     }
 
     try {
-      void convexEditWhiteboard({ id, title: trimmedTitle });
+      await convexEditWhiteboard({ id, title: trimmedTitle });
     } catch (error) {
       console.error("Failed to edit whiteboard title:", error);
       setErrorMessage(
@@ -136,14 +305,6 @@ export default function WhiteboardsClient() {
     }
   };
 
-  const formatDate = (timestamp: bigint | undefined | null): string => {
-    if (!timestamp) return "N/A";
-    const date = new Date(Number(timestamp));
-    if (isToday(date)) return "Today";
-    if (isYesterday(date)) return "Yesterday";
-    return formatDistanceToNow(date, { addSuffix: true });
-  };
-
   if (whiteboards === undefined || isCreatingWhiteboard || isRedirecting) {
     return <Loading />;
   }
@@ -152,9 +313,7 @@ export default function WhiteboardsClient() {
     <div className="min-h-screen bg-gray-900 pt-16 text-white">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="text-3xl font-bold">Your Whiteboards</h1>
-          </div>
+          <h1 className="text-3xl font-bold">Your Whiteboards</h1>
         </div>
 
         <div className="mb-8 rounded-lg bg-gray-800 p-6">
@@ -165,9 +324,7 @@ export default function WhiteboardsClient() {
               value={newWhiteboardName}
               onChange={(e) => setNewWhiteboardName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  void handleCreateWhiteboard();
-                }
+                if (e.key === "Enter") void handleCreateWhiteboard();
               }}
               placeholder="Whiteboard Name"
               className="mr-2 flex-grow rounded bg-gray-700 px-4 py-2 text-white"
@@ -184,7 +341,6 @@ export default function WhiteboardsClient() {
 
         <div className="rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-semibold">Your Whiteboards</h2>
-
           {errorMessage && (
             <div className="mb-4 rounded-md border border-red-600 bg-red-100 p-3 text-sm text-red-800">
               <p className="flex items-center">
@@ -206,7 +362,6 @@ export default function WhiteboardsClient() {
               </p>
             </div>
           )}
-
           {(whiteboards?.length ?? 0) === 0 ? (
             <p className="text-gray-400">
               No whiteboards found. Create one to get started!
@@ -214,88 +369,18 @@ export default function WhiteboardsClient() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {whiteboards.map((whiteboard) => (
-                <div
+                <WhiteboardCard
                   key={whiteboard._id}
-                  className="flex flex-col justify-between rounded-lg bg-gray-700 p-4 shadow-lg"
-                >
-                  <div>
-                    <div className="mb-2 flex h-32 w-full items-center justify-center overflow-hidden rounded bg-gray-600">
-                      {whiteboard.previewUrl ? (
-                        <Image
-                          src={whiteboard.previewUrl}
-                          alt={whiteboard.title ?? "Whiteboard preview"}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : null}
-                    </div>
-                    {editingId === whiteboard._id ? (
-                      <input
-                        type="text"
-                        value={editingTitle}
-                        onChange={(e) => setEditingTitle(e.target.value)}
-                        onBlur={() => handleSaveTitle(whiteboard._id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            void handleSaveTitle(whiteboard._id);
-                          }
-                          if (e.key === "Escape") {
-                            setEditingId(null);
-                          }
-                        }}
-                        className="mb-1 w-full rounded bg-gray-600 px-2 py-1 text-lg font-medium text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        autoFocus
-                      />
-                    ) : (
-                      <div
-                        className="group flex cursor-pointer items-center"
-                        onClick={() =>
-                          handleStartEditing(
-                            whiteboard._id,
-                            whiteboard.title ?? "Untitled",
-                          )
-                        }
-                      >
-                        <h3 className="text-lg font-medium">
-                          {whiteboard.title ?? "Untitled"}
-                        </h3>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="ml-2 hidden h-4 w-4 text-gray-400 group-hover:block"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                    <p className="text-sm text-gray-400">
-                      {formatDate(whiteboard.updatedAt)}
-                    </p>
-                  </div>
-                  <div className="mt-4 flex justify-between">
-                    <Link href={`/whiteboard/${whiteboard._id}`}>
-                      <button
-                        className="cursor-pointer rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-500"
-                        onClick={() => setIsRedirecting(true)}
-                      >
-                        Open
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteWhiteboard(whiteboard._id)}
-                      className="cursor-pointer rounded bg-red-600 px-3 py-1 text-white hover:bg-red-500"
-                      disabled={deletingId === whiteboard._id}
-                    >
-                      {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                </div>
+                  whiteboard={whiteboard}
+                  editingId={editingId}
+                  editingTitle={editingTitle}
+                  deletingId={deletingId}
+                  onStartEditing={handleStartEditing}
+                  onSaveTitle={handleSaveTitle}
+                  setEditingTitle={setEditingTitle}
+                  onDelete={handleDeleteWhiteboard}
+                  onRedirect={() => setIsRedirecting(true)}
+                />
               ))}
             </div>
           )}
