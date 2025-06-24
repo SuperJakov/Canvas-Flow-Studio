@@ -267,8 +267,7 @@ export default function WhiteboardsClient() {
                       Created: {formatDate(whiteboard.createdAt)}
                     </p>
                     <p className="mt-2 text-sm text-gray-300">
-                      {whiteboard.nodes.length} nodes ·{" "}
-                      {whiteboard.edges.length} connections
+                      {whiteboard.nodes.length} nodes
                     </p>
                   </div>
                   <div className="mt-4 flex justify-between">
