@@ -328,10 +328,8 @@ export const deletePreviewImage = internalMutation({
     storageId: v.id("_storage"),
   },
   handler: async (ctx, { storageId }) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    // User has to be authenticated before calling this internal mutation
 
-    // Delete the storage object
     await ctx.storage.delete(storageId);
   },
 });
