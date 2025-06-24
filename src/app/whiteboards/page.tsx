@@ -7,6 +7,8 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import Loading from "../loading";
 import Link from "next/link";
+import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import Image from "next/image";
 
 export default function WhiteboardsClient() {
   const whiteboards = useQuery(api.whiteboards.listWhiteboards);
@@ -136,7 +138,10 @@ export default function WhiteboardsClient() {
 
   const formatDate = (timestamp: bigint | undefined | null): string => {
     if (!timestamp) return "N/A";
-    return new Date(Number(timestamp)).toLocaleString();
+    const date = new Date(Number(timestamp));
+    if (isToday(date)) return "Today";
+    if (isYesterday(date)) return "Yesterday";
+    return formatDistanceToNow(date, { addSuffix: true });
   };
 
   if (whiteboards === undefined || isCreatingWhiteboard || isRedirecting) {
@@ -214,6 +219,15 @@ export default function WhiteboardsClient() {
                   className="flex flex-col justify-between rounded-lg bg-gray-700 p-4 shadow-lg"
                 >
                   <div>
+                    <div className="mb-2 flex h-32 w-full items-center justify-center overflow-hidden rounded bg-gray-600">
+                      {whiteboard.previewUrl ? (
+                        <Image
+                          src={whiteboard.previewUrl}
+                          alt={whiteboard.title ?? "Whiteboard preview"}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
                     {editingId === whiteboard._id ? (
                       <input
                         type="text"
@@ -261,13 +275,7 @@ export default function WhiteboardsClient() {
                       </div>
                     )}
                     <p className="text-sm text-gray-400">
-                      Last updated: {formatDate(whiteboard.updatedAt)}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Created: {formatDate(whiteboard.createdAt)}
-                    </p>
-                    <p className="mt-2 text-sm text-gray-300">
-                      {whiteboard.nodes.length} nodes
+                      {formatDate(whiteboard.updatedAt)}
                     </p>
                   </div>
                   <div className="mt-4 flex justify-between">
