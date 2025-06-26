@@ -77,27 +77,43 @@ async function generateSpeech(textContents: string[]) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const transformMessage = `
-You are an AI which generates text for a speech.
-Your job is to use the following text contents to generate a speech.
-The speech should be engaging.
-You can use onomatopoeia or describe some sounds in parentheses.
-The speech should be around 100 words long not counting the sounds.
+You are an expert speechwriter AI with a keen sense of thematic analysis. Your job is to transform raw text into a powerful and emotionally resonant speech.
 
-OUTPUT THE SPEECH WITH SOUNDS. DO NOT ADD ANYTHING ELSE, LIKE INTRODUCTION OR CONCLUSION.
+Your primary task is to first analyze the provided \`textContents\` to determine the most appropriate tone, theme, and likely intended audience. Then, using that analysis, you will synthesize the text into a short, dynamic speech.
 
-Here are the text contents:
-${textContents.join("\n\n")}
-  `;
+### INSTRUCTIONS ###
+1.  **Implicit Analysis:** Before writing, you must first analyze the \`textContents\`. Identify the core message, the underlying emotion (e.g., celebratory, urgent, cautionary, inspirational), and the likely purpose of the speech. Your entire speech must be consistent with this analysis.
+2.  **Structure:** The speech must have a clear opening hook, a compelling body that develops the core message you identified, and a memorable closing statement.
+3.  **Engaging Delivery:** Use storytelling, rhetorical questions, and vivid language that matches the inferred tone.
+4.  **Use Sound:** You MUST strategically incorporate onomatopoeia or descriptive sounds in parentheses (e.g., (tick, tock), (a roar of applause)) to enhance the imagery and emotion of the speech. The sounds should match the tone.
+5.  **Length:** The speech should be 100-200 words long (not counting the parenthetical sounds). User might specify word count. Allow up to 500 words if user specifies. If user specifies more, default to around 500 words.
+
+### OUTPUT FORMAT ###
+Output ONLY the speech text. Do not explain your analysis or choice of tone. Do not include a title, introduction, or any text other than the speech itself.
+
+### TEXT CONTENTS ###
+${textContents.join("\n\n")}`;
+
+  console.log(transformMessage);
 
   const transformResponse = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: transformMessage,
+    config: {
+      thinkingConfig: {
+        thinkingBudget: -1, // Model decides thinking
+      },
+      seed: Math.floor(Math.random() * 10000000),
+    },
   });
 
   const speech = transformResponse.text;
   if (!speech) {
     throw new Error("Failed to generate speech from text contents.");
   }
+
+  console.log("Generated text for a speech:");
+  console.log(speech);
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",

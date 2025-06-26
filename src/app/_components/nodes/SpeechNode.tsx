@@ -95,14 +95,16 @@ export default function SpeechNode({
   const [isDownloading, setIsDownloading] = useState(false);
   const edges = useEdges();
 
-  // State for controlling the upgrade banner
   const [isBannerOpen, setIsBannerOpen] = useState(false);
   const [bannerFeature, setBannerFeature] = useState("");
 
-  // Get whiteboardId from route params
   const params = useParams();
   const whiteboardId = params?.id as string | undefined;
+
+  // State for the converted speech data and loading status
   const [speechData, setSpeechData] = useState<string>("");
+  const [isConverting, setIsConverting] = useState(false);
+  const [conversionError, setConversionError] = useState<string | null>(null);
 
   const openBanner = useCallback((feature: string) => {
     setBannerFeature(feature);
@@ -113,7 +115,6 @@ export default function SpeechNode({
     setIsBannerOpen(false);
   }, []);
 
-  // Calculate hours until reset from retryAfter (in milliseconds)
   const hoursUntilReset = retryAfterSeconds
     ? Math.ceil(retryAfterSeconds / 3600 / 1000)
     : 0;
@@ -121,7 +122,6 @@ export default function SpeechNode({
   const daysUntilReset =
     hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
 
-  // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
   useEffect(() => {
@@ -143,17 +143,51 @@ export default function SpeechNode({
     isRateLimited,
     speechUrl,
   ]);
-  useEffect(() => {
-    async function convertIfNeeded() {
-      if (!speechUrl) return;
-      const pcmData = await (await fetch(speechUrl)).arrayBuffer();
-      const wavBlob = pcmToWavBlob(new Uint8Array(pcmData));
-      const url = URL.createObjectURL(wavBlob);
 
-      setSpeechData(url);
+  // Effect to fetch PCM data, convert to WAV, and create a blob URL
+  useEffect(() => {
+    let objectUrl: string | null = null;
+
+    async function convertAndSetUrl() {
+      if (!speechUrl) {
+        setSpeechData("");
+        setConversionError(null);
+        return;
+      }
+
+      setIsConverting(true);
+      setConversionError(null);
+      setSpeechData("");
+
+      try {
+        const response = await fetch(speechUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch audio data: ${response.statusText}`);
+        }
+        const pcmData = await response.arrayBuffer();
+        const wavBlob = pcmToWavBlob(new Uint8Array(pcmData));
+        objectUrl = URL.createObjectURL(wavBlob);
+        setSpeechData(objectUrl);
+      } catch (error) {
+        console.error("Failed to process speech data:", error);
+        setConversionError(
+          error instanceof Error ? error.message : "An unknown error occurred.",
+        );
+      } finally {
+        setIsConverting(false);
+      }
     }
-    void convertIfNeeded();
+
+    void convertAndSetUrl();
+
+    // Cleanup function to revoke the URL when the component unmounts or the URL changes
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, [speechUrl]);
+
   const toggleLock = useCallback(() => {
     updateNodeData({
       nodeId: id,
@@ -187,35 +221,36 @@ export default function SpeechNode({
     openBanner,
   ]);
 
-  const handleDownload = useCallback(async () => {
-    if (!speechUrl || isDownloading) return;
+  const handleDownload = useCallback(() => {
+    if (!speechData || isDownloading) return;
 
     setIsDownloading(true);
     try {
-      const response = await fetch(speechUrl);
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-
       const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = `speech-${id}.mp3`;
+      link.href = speechData;
+      link.download = `speech-${id}.wav`; // It's a WAV file
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Failed to download speech:", error);
     } finally {
       setIsDownloading(false);
     }
-  }, [speechUrl, id, isDownloading]);
+  }, [speechData, id, isDownloading]);
 
   if (!whiteboardId) {
     throw new Error(
       "No whiteboardId found in route params when speech node was rendered",
     );
   }
+
+  const heightClass =
+    isRunning || isConverting
+      ? "h-[110px]"
+      : speechData || conversionError
+        ? "h-[70px]"
+        : "h-[90px]";
 
   return (
     <div className={`relative`}>
@@ -234,7 +269,6 @@ export default function SpeechNode({
             : `${selected ? "border-blue-500" : "border-white"}`
         }`}
       >
-        {/* Rate limit warning - compact header bar */}
         {isRateLimited && (
           <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-500">
             <div className="flex items-center justify-between px-4 py-3">
@@ -271,7 +305,6 @@ export default function SpeechNode({
             </div>
           </div>
         )}
-        {/* Header */}
         {!isRateLimited && (
           <div className="flex items-center justify-between px-1 py-2">
             <div className="flex items-center">
@@ -316,12 +349,13 @@ export default function SpeechNode({
         {/* Content */}
         <div className="bg-gray-800 p-2">
           <Handle type="target" position={Position.Top} />
-          <div className="group relative flex min-h-[70px] items-center justify-center bg-gray-800">
+          <div
+            className={`relative flex w-[340px] items-center justify-center bg-gray-800 transition-[height] duration-300 ease-in-out ${heightClass}`}
+          >
             {isRunning ? (
               <div className="flex flex-col items-center text-gray-400">
                 <Loader2 size={48} className="animate-spin" />
                 <p className="mt-2">Generating speech...</p>
-                {/* Show upgrade message during generation - non-intrusive */}
                 <button
                   type="button"
                   onClick={() => openBanner("Streaming Speech")}
@@ -331,21 +365,26 @@ export default function SpeechNode({
                   <ExternalLink size={10} />
                 </button>
               </div>
-            ) : speechUrl ? (
-              <>
-                {/* Speech is generated - no upgrade message here to avoid interrupting */}
-                <div className="relative h-full w-full">
-                  <audio
-                    src={speechData === "" ? undefined : speechData}
-                    controls
-                  />
-                </div>
-                {/* Download button - appears on hover */}
+            ) : isConverting ? (
+              <div className="flex flex-col items-center text-gray-400">
+                <Loader2 size={48} className="animate-spin" />
+                <p className="mt-2">Preparing audio...</p>
+              </div>
+            ) : conversionError ? (
+              <div className="flex flex-col items-center px-4 text-center text-red-400">
+                <AlertCircle size={24} />
+                <p className="mt-1 text-sm">Could not load audio</p>
+              </div>
+            ) : speechData ? (
+              <div className="flex w-full items-center gap-2 px-2">
+                <audio src={speechData} controls className="flex-grow" />
                 <button
                   onClick={handleDownload}
                   disabled={isDownloading}
-                  className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  title={isDownloading ? "Downloading..." : "Download speech"}
+                  className="flex h-9 w-9 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-gray-700 text-white shadow-lg transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  title={
+                    isDownloading ? "Downloading..." : "Download speech (WAV)"
+                  }
                 >
                   {isDownloading ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -353,12 +392,11 @@ export default function SpeechNode({
                     <Download size={18} />
                   )}
                 </button>
-              </>
+              </div>
             ) : (
               <div className="flex flex-col items-center text-gray-400">
                 <Volume2 size={24} />
                 <p className="mt-1 text-sm">No speech generated yet</p>
-                {/* Show upgrade message when idle and not rate limited - helpful context */}
                 {!isRateLimited && (
                   <button
                     type="button"
