@@ -45,7 +45,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       html-to-image:
-        specifier: ^1.11.11
+        specifier: 1.11.11
         version: 1.11.11
       jotai:
         specifier: ^2.12.5

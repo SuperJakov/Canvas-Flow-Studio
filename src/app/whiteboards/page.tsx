@@ -12,6 +12,7 @@ import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import Image from "next/image";
 import { MoreVertical } from "lucide-react";
 import type { Doc } from "../../../convex/_generated/dataModel";
+import UpgradeBanner from "../whiteboard/UpgradeBanner";
 
 const formatDate = (timestamp: bigint | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -189,6 +190,10 @@ function WhiteboardCard({
 
 export default function WhiteboardsClient() {
   const whiteboards = useQuery(api.whiteboards.listWhiteboards);
+  const whiteboardCountLimit = useQuery(
+    api.whiteboards.getWhiteboardCountLimit,
+  );
+
   const convexCreateWhiteboard = useMutation(api.whiteboards.createWhiteboard);
   const convexDeleteWhiteboard = useMutation(
     api.whiteboards.deleteWhiteboard,
@@ -234,11 +239,25 @@ export default function WhiteboardsClient() {
   const [editingId, setEditingId] = useState<Id<"whiteboards"> | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
 
   const router = useRouter();
 
+  // Check if limit is reached
+  const isLimitReached = whiteboardCountLimit
+    ? whiteboardCountLimit.currentWhiteboardCount >=
+      whiteboardCountLimit.maxWhiteboardCount
+    : false;
+
   const handleCreateWhiteboard = async () => {
     if (isCreatingWhiteboard) return;
+
+    // Check if limit is reached and show upgrade banner
+    if (isLimitReached) {
+      setShowUpgradeBanner(true);
+      return;
+    }
+
     setErrorMessage(null);
     const title = newWhiteboardName.trim();
     try {
@@ -305,7 +324,12 @@ export default function WhiteboardsClient() {
     }
   };
 
-  if (whiteboards === undefined || isCreatingWhiteboard || isRedirecting) {
+  if (
+    whiteboards === undefined ||
+    isCreatingWhiteboard ||
+    isRedirecting ||
+    !whiteboardCountLimit
+  ) {
     return <Loading />;
   }
 
@@ -314,28 +338,61 @@ export default function WhiteboardsClient() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Your Whiteboards</h1>
+          {/* Show whiteboard count */}
+          <div className="text-sm text-gray-400">
+            {whiteboardCountLimit.currentWhiteboardCount} /{" "}
+            {whiteboardCountLimit.maxWhiteboardCount === Infinity
+              ? "Unlimited"
+              : whiteboardCountLimit.maxWhiteboardCount}
+          </div>
         </div>
 
         <div className="mb-8 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-semibold">Create New Whiteboard</h2>
-          <div className="flex">
-            <input
-              type="text"
-              value={newWhiteboardName}
-              onChange={(e) => setNewWhiteboardName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void handleCreateWhiteboard();
-              }}
-              placeholder="Whiteboard Name"
-              className="mr-2 flex-grow rounded bg-gray-700 px-4 py-2 text-white"
-              maxLength={30}
-            />
-            <button
-              onClick={handleCreateWhiteboard}
-              className="cursor-pointer rounded bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-500"
-            >
-              Create
-            </button>
+          <div className="flex flex-col">
+            <div className="flex">
+              <input
+                type="text"
+                value={newWhiteboardName}
+                onChange={(e) => setNewWhiteboardName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleCreateWhiteboard();
+                }}
+                placeholder="Whiteboard Name"
+                className={`mr-2 flex-grow rounded px-4 py-2 text-white ${
+                  isLimitReached
+                    ? "cursor-not-allowed bg-gray-600 opacity-50"
+                    : "bg-gray-700"
+                }`}
+                maxLength={30}
+                disabled={isLimitReached}
+              />
+              <button
+                onClick={handleCreateWhiteboard}
+                className={`rounded px-4 py-2 font-medium text-white transition-colors ${
+                  isLimitReached
+                    ? "cursor-not-allowed bg-gray-600 opacity-50"
+                    : "cursor-pointer bg-green-600 hover:bg-green-500"
+                }`}
+                disabled={isLimitReached}
+              >
+                Create
+              </button>
+            </div>
+            {/* Show limit message when reached */}
+            {isLimitReached && (
+              <p className="mt-2 text-sm text-yellow-400">
+                You&#39;ve reached your whiteboard limit (
+                {whiteboardCountLimit.maxWhiteboardCount}).
+                <span
+                  onClick={() => setShowUpgradeBanner(true)}
+                  className="ml-1 cursor-pointer underline hover:text-yellow-300"
+                >
+                  Upgrade your plan
+                </span>{" "}
+                to create more whiteboards.
+              </p>
+            )}
           </div>
         </div>
 
@@ -386,6 +443,13 @@ export default function WhiteboardsClient() {
           )}
         </div>
       </div>
+
+      {/* Upgrade Banner */}
+      <UpgradeBanner
+        isOpen={showUpgradeBanner}
+        onCloseAction={() => setShowUpgradeBanner(false)}
+        featureName="More Whiteboards"
+      />
     </div>
   );
 }

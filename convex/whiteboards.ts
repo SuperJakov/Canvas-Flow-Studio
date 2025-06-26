@@ -4,7 +4,49 @@ import { internalMutation, mutation } from "./functions";
 import { v } from "convex/values";
 import { AppEdge, AppNode } from "./schema";
 import { v4 as uuidv4 } from "uuid";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
+import type { Tier } from "~/Types/stripe";
+
+function getWhiteboardCountLimitForTier(tier: Tier) {
+  switch (tier) {
+    case "Free":
+      return 5; // Free tier allows up to 5 whiteboards
+    case "Plus":
+      return 50; // Plus tier allows up to 50 whiteboards
+    case "Pro":
+      return Infinity; // Pro tier allows unlimited whiteboards
+    default:
+      throw new Error(`Unknown tier: ${String(tier)}`);
+  }
+}
+
+export const getWhiteboardCountLimit = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
+    if (!userPlanInfo) throw new Error("User plan not found");
+
+    const maxWhiteboards = getWhiteboardCountLimitForTier(userPlanInfo.plan);
+    console.log(
+      `Calculated max whiteboards ${maxWhiteboards} for user ${identity.subject} with plan ${userPlanInfo.plan}`,
+    );
+
+    const usersWhiteboards = await ctx.db
+      .query("whiteboards")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", identity.subject))
+      .collect();
+
+    if (!usersWhiteboards) {
+      throw new Error("Error when listing user's whiteboards");
+    }
+    return {
+      maxWhiteboardCount: maxWhiteboards,
+      currentWhiteboardCount: usersWhiteboards.length,
+    };
+  },
+});
 
 // --- Create a new whiteboard ---
 export const createWhiteboard = mutation({
@@ -15,6 +57,16 @@ export const createWhiteboard = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    const { maxWhiteboardCount, currentWhiteboardCount } = await ctx.runQuery(
+      api.whiteboards.getWhiteboardCountLimit,
+    );
+
+    if (currentWhiteboardCount + 1 > maxWhiteboardCount) {
+      throw new Error(
+        `You have reached the limit of ${maxWhiteboardCount} whiteboards for your plan.
+      Please delete some whiteboards or upgrade your plan.`,
+      );
+    }
     if (title && title.length > 30) {
       throw new Error("Title must be at most 30 characters long");
     }
