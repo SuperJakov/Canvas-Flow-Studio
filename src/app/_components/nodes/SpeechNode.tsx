@@ -23,6 +23,52 @@ import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
 import { useParams } from "next/navigation";
 
+function pcmToWavBlob(pcmData: Uint8Array, sampleRate = 24000): Blob {
+  const numChannels = 1;
+  const bitsPerSample = 16;
+  const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+  const blockAlign = (numChannels * bitsPerSample) / 8;
+  const wavBuffer = new ArrayBuffer(44 + pcmData.length);
+  const view = new DataView(wavBuffer);
+
+  let offset = 0;
+
+  const writeString = (s: string) => {
+    for (let i = 0; i < s.length; i++) {
+      view.setUint8(offset++, s.charCodeAt(i));
+    }
+  };
+
+  writeString("RIFF");
+  view.setUint32(offset, 36 + pcmData.length, true);
+  offset += 4;
+  writeString("WAVE");
+  writeString("fmt ");
+  view.setUint32(offset, 16, true);
+  offset += 4; // Subchunk1Size
+  view.setUint16(offset, 1, true);
+  offset += 2; // AudioFormat (PCM)
+  view.setUint16(offset, numChannels, true);
+  offset += 2;
+  view.setUint32(offset, sampleRate, true);
+  offset += 4;
+  view.setUint32(offset, byteRate, true);
+  offset += 4;
+  view.setUint16(offset, blockAlign, true);
+  offset += 2;
+  view.setUint16(offset, bitsPerSample, true);
+  offset += 2;
+  writeString("data");
+  view.setUint32(offset, pcmData.length, true);
+  offset += 4;
+
+  for (const byte of pcmData) {
+    view.setUint8(offset++, byte);
+  }
+
+  return new Blob([view], { type: "audio/wav" });
+}
+
 export default function SpeechNode({
   id,
   data,
@@ -56,6 +102,7 @@ export default function SpeechNode({
   // Get whiteboardId from route params
   const params = useParams();
   const whiteboardId = params?.id as string | undefined;
+  const [speechData, setSpeechData] = useState<string>("");
 
   const openBanner = useCallback((feature: string) => {
     setBannerFeature(feature);
@@ -96,7 +143,17 @@ export default function SpeechNode({
     isRateLimited,
     speechUrl,
   ]);
+  useEffect(() => {
+    async function convertIfNeeded() {
+      if (!speechUrl) return;
+      const pcmData = await (await fetch(speechUrl)).arrayBuffer();
+      const wavBlob = pcmToWavBlob(new Uint8Array(pcmData));
+      const url = URL.createObjectURL(wavBlob);
 
+      setSpeechData(url);
+    }
+    void convertIfNeeded();
+  }, [speechUrl]);
   const toggleLock = useCallback(() => {
     updateNodeData({
       nodeId: id,
@@ -259,7 +316,7 @@ export default function SpeechNode({
         {/* Content */}
         <div className="bg-gray-800 p-2">
           <Handle type="target" position={Position.Top} />
-          <div className="group relative flex h-[300px] w-[300px] items-center justify-center bg-gray-800">
+          <div className="group relative flex min-h-[70px] items-center justify-center bg-gray-800">
             {isRunning ? (
               <div className="flex flex-col items-center text-gray-400">
                 <Loader2 size={48} className="animate-spin" />
@@ -278,7 +335,10 @@ export default function SpeechNode({
               <>
                 {/* Speech is generated - no upgrade message here to avoid interrupting */}
                 <div className="relative h-full w-full">
-                  <audio src={speechUrl} controls className="object-contain" />
+                  <audio
+                    src={speechData === "" ? undefined : speechData}
+                    controls
+                  />
                 </div>
                 {/* Download button - appears on hover */}
                 <button

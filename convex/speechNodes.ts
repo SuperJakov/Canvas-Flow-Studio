@@ -75,28 +75,30 @@ const TextEditorExecutionSchema = v.object({
 
 async function generateSpeech(textContents: string[]) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
   const transformMessage = `
-  You are an AI which generates text for a speech.
-  Your job is to use the following text contents to generate a speech.
-  The speech should be engaging.
-  You can use onomatopoeia or describe some sounds in paraentheses.
-  The speech should be around 100 words long not counting the sounds.
+You are an AI which generates text for a speech.
+Your job is to use the following text contents to generate a speech.
+The speech should be engaging.
+You can use onomatopoeia or describe some sounds in parentheses.
+The speech should be around 100 words long not counting the sounds.
 
-  OUTPUT THE SPEECH WITH SOUNDS. DO NOT ADD ANYTHING ELSE, LIKE INTRODUCTION OR CONCLUSION.
+OUTPUT THE SPEECH WITH SOUNDS. DO NOT ADD ANYTHING ELSE, LIKE INTRODUCTION OR CONCLUSION.
 
-  Here are the text contents:
-  ${textContents.join("\n\n")}
+Here are the text contents:
+${textContents.join("\n\n")}
   `;
+
   const transformResponse = await ai.models.generateContent({
     model: "gemini-2.0-flash",
     contents: transformMessage,
   });
+
   const speech = transformResponse.text;
   if (!speech) {
     throw new Error("Failed to generate speech from text contents.");
   }
 
-  // Generate speech audio using the Gemini API
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
     contents: [{ parts: [{ text: speech }] }],
@@ -111,13 +113,19 @@ async function generateSpeech(textContents: string[]) {
   });
 
   const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-  if (!data) {
-    throw new Error("Failed to generate speech audio data.");
-  }
-  const audioBuffer = Buffer.from(data, "base64");
   const mimeType =
     response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
-  return { audioBuffer, mimeType } as const;
+  if (!data || !mimeType) {
+    throw new Error("Failed to generate speech audio data.");
+  }
+  console.log("mimeType", mimeType);
+  const binaryString = atob(data);
+  const audioBytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    audioBytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return { audioBuffer: audioBytes, mimeType } as const;
 }
 
 export const generateAndStoreSpeech = action({

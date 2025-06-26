@@ -5,6 +5,7 @@ import type {
   AppEdge,
   TextEditorNodeType,
   ImageNodeType,
+  SpeechNodeType,
 } from "~/Types/nodes";
 import {
   edgesAtom,
@@ -42,6 +43,10 @@ function executeTextNode(
       }
       case "image": {
         // text->image: no need to update data, image node will get text from sourceNodes
+        break;
+      }
+      case "speech": {
+        // text->speech: no need to update data, speech node will get text from sourceNodes
         break;
       }
       default: {
@@ -114,7 +119,62 @@ async function executeImageNode(
     console.groupEnd();
   }
 }
+async function executeSpeechNode(
+  get: Getter,
+  set: Setter,
+  currentNode: SpeechNodeType,
+  _targetNode: AppNode,
+) {
+  try {
+    console.groupCollapsed(
+      `executeSpeechNode: Executing speech node ${currentNode.id}`,
+    );
+    const whiteboardId = get(currentWhiteboardIdAtom);
+    if (!whiteboardId) {
+      throw new Error("whiteboardId not set");
+    }
 
+    // Check if the node is rate limited
+    if (currentNode.data.internal?.isRateLimited) {
+      console.log("Node cannot run: rate limit reached");
+      return;
+    }
+
+    // Get all edges that connect to this image node
+    const incomingConnections = get(edgesAtom).filter(
+      (edge) => edge.target === currentNode.id,
+    );
+
+    // Find all source nodes that are connected to this image node
+    const allNodes = get(nodesAtom);
+    const connectedSourceNodes = allNodes.filter((node) =>
+      incomingConnections.some((connection) => connection.source === node.id),
+    );
+
+    const sourceNodes = connectedSourceNodes
+      .filter((node): node is TextEditorNodeType => node.type === "textEditor")
+      .map((node) => {
+        // We only need some data from the node, so we destructure it
+        const { type, id, data } = node;
+        // and then tell TS "this shape is exactly the same as the incoming node"
+        return { type, id, data } as typeof node;
+      });
+
+    if (!currentNode.data.internal?.generateAndStoreSpeechAction) {
+      throw new Error("generateAndStoreSpeechAction not defined.");
+    }
+    console.log("Running generateAndStoreSpeechAction");
+    await currentNode.data.internal.generateAndStoreSpeechAction({
+      nodeId: currentNode.id,
+      sourceNodes,
+      whiteboardId: whiteboardId as Id<"whiteboards">,
+    });
+  } catch (error) {
+    console.error("Error executing speech node:", error);
+  } finally {
+    console.groupEnd();
+  }
+}
 function calculateTotalNodesToExecute(
   nodes: AppNode[],
   edges: AppEdge[],
@@ -202,7 +262,13 @@ export async function executeNodeLogic(
         await delay(1000);
         await executeImageNode(get, set, thisNode, {} as AppNode);
       }
-
+      if (thisNode.type === "speech") {
+        console.log(
+          "Detected speech node. Waiting 1 second before executing speech node logic.",
+        );
+        await delay(1000);
+        await executeSpeechNode(get, set, thisNode, {} as AppNode);
+      }
       // Get outgoing edges for further node execution
       const outgoingEdges = allEdges.filter((edge) => edge.source === nodeId);
       console.log("Outgoing edges:", outgoingEdges);
