@@ -160,7 +160,7 @@ export default function WhiteboardPreviewCreator() {
         0.1, // padding
       );
       const imageDataUrl = await toPng(reactFlowViewport, {
-        backgroundColor: "#ffffff",
+        backgroundColor: "#111827", // bg-gray-900,
         width: IMAGE_WIDTH,
         height: IMAGE_HEIGHT,
         style: {

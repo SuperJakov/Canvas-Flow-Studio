@@ -136,7 +136,10 @@ function WhiteboardCard({
                   }}
                   className="no-link w-full cursor-text rounded bg-gray-600 px-2 py-0.5 text-base font-medium text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   autoFocus
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                 />
               ) : (
                 <h3 className="truncate py-0.5 text-base font-medium">
@@ -163,13 +166,13 @@ function WhiteboardCard({
                   <div className="py-1">
                     <button
                       onClick={handleRenameClick}
-                      className="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="block w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
                     >
                       Rename
                     </button>
                     <button
                       onClick={handleDeleteClick}
-                      className="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
+                      className="block w-full cursor-pointer px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
                       disabled={deletingId === whiteboard._id}
                     >
                       {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
