@@ -113,6 +113,38 @@ export const deleteImageNodesByWhiteboard = internalMutation({
   },
 });
 
+export const deletePreviewImageForWhiteboard = internalMutation({
+  args: { whiteboardId: v.id("whiteboards") },
+  handler: async (ctx, { whiteboardId }) => {
+    const whiteboard = await ctx.db
+      .query("whiteboards")
+      .withIndex("by_id", (q) => q.eq("_id", whiteboardId))
+      .first();
+    if (!whiteboard) {
+      console.warn("Whiteboard not found for ID:", whiteboardId);
+      return;
+    }
+
+    const storageId = whiteboard.previewStorageId;
+    if (!storageId) {
+      console.warn(
+        "No preview image storage ID found for whiteboard ID:",
+        whiteboardId,
+      );
+      return;
+    }
+
+    // Delete the preview image file
+    await ctx.storage.delete(storageId);
+    console.log(
+      "Deleted preview image for whiteboard ID:",
+      whiteboardId,
+      "Storage ID:",
+      storageId,
+    );
+  },
+});
+
 triggers.register("whiteboards", async (ctx, change) => {
   if (change.operation === "delete") {
     console.log(
@@ -123,6 +155,13 @@ triggers.register("whiteboards", async (ctx, change) => {
     await ctx.scheduler.runAfter(
       0,
       internal.functions.deleteImageNodesByWhiteboard,
+      {
+        whiteboardId: change.oldDoc._id,
+      },
+    );
+    await ctx.scheduler.runAfter(
+      0,
+      internal.functions.deletePreviewImageForWhiteboard,
       {
         whiteboardId: change.oldDoc._id,
       },

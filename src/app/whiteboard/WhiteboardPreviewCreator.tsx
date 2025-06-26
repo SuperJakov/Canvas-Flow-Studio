@@ -7,7 +7,7 @@ import { useMutation } from "convex/react";
 import { useCallback, useEffect, useRef } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { currentWhiteboardIdAtom } from "./atoms";
+import { currentWhiteboardIdAtom, edgesAtom, nodesAtom } from "./atoms";
 
 // Define constants for the generated image dimensions
 const IMAGE_WIDTH = 1365;
@@ -48,8 +48,9 @@ function dataURLtoBlob(dataUrl: string): Blob {
  * a preview image of a whiteboard whenever its content changes.
  */
 export default function WhiteboardPreviewCreator() {
-  const { getNodes, getNodesBounds } = useReactFlow();
-  const nodes = getNodes();
+  const { getNodesBounds } = useReactFlow();
+  const [nodes] = useAtom(nodesAtom);
+  const [edges] = useAtom(edgesAtom);
   const [whiteboardId] = useAtom(currentWhiteboardIdAtom);
   const uploadPreviewImage = useMutation(api.whiteboards.uploadPreviewImage);
 
@@ -131,62 +132,57 @@ export default function WhiteboardPreviewCreator() {
   );
 
   /**
-   * Generates a PNG image of the current view of the React Flow canvas.
-   * Memoized with useCallback to maintain a stable function reference.
-   */
-  const generatePreview = useCallback(async () => {
-    // Only log on error or success
-    const reactFlowViewport = document.querySelector<HTMLElement>(
-      ".react-flow__viewport",
-    );
-    if (!reactFlowViewport) {
-      console.error(
-        "[WhiteboardPreviewCreator] Could not find the .react-flow__viewport element to capture.",
-      );
-      return;
-    }
-    try {
-      const nodes = getNodes();
-      if (nodes.length === 0) {
-        return;
-      }
-      const nodesBounds = getNodesBounds(nodes);
-      const viewport = getViewportForBounds(
-        nodesBounds,
-        IMAGE_WIDTH,
-        IMAGE_HEIGHT,
-        0.5, // minZoom
-        2, // maxZoom
-        0.1, // padding
-      );
-      const imageDataUrl = await toPng(reactFlowViewport, {
-        backgroundColor: "#111827", // bg-gray-900,
-        width: IMAGE_WIDTH,
-        height: IMAGE_HEIGHT,
-        style: {
-          width: `${IMAGE_WIDTH}px`,
-          height: `${IMAGE_HEIGHT}px`,
-          transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-        },
-      });
-      await uploadImage(imageDataUrl);
-    } catch (error) {
-      console.error(
-        "[WhiteboardPreviewCreator] Failed to generate whiteboard preview:",
-        error,
-      );
-    }
-  }, [getNodes, uploadImage, getNodesBounds]);
-
-  /**
    * This effect sets up the debounced call to generate a preview.
-   * It triggers after a delay whenever the whiteboard content (represented by getNodes())
+   * It triggers after a delay whenever the whiteboard content (nodes or edges)
    * or the whiteboardId changes.
    */
   useEffect(() => {
     if (!whiteboardId) {
       return undefined;
     }
+
+    const generatePreview = async () => {
+      const reactFlowViewport = document.querySelector<HTMLElement>(
+        ".react-flow__viewport",
+      );
+      if (!reactFlowViewport) {
+        console.error(
+          "[WhiteboardPreviewCreator] Could not find the .react-flow__viewport element to capture.",
+        );
+        return;
+      }
+      try {
+        if (nodes.length === 0) {
+          return;
+        }
+        const nodesBounds = getNodesBounds(nodes);
+        const viewport = getViewportForBounds(
+          nodesBounds,
+          IMAGE_WIDTH,
+          IMAGE_HEIGHT,
+          0.5, // minZoom
+          2, // maxZoom
+          0.1, // padding
+        );
+        const imageDataUrl = await toPng(reactFlowViewport, {
+          backgroundColor: "#111827", // bg-gray-900,
+          width: IMAGE_WIDTH,
+          height: IMAGE_HEIGHT,
+          style: {
+            width: `${IMAGE_WIDTH}px`,
+            height: `${IMAGE_HEIGHT}px`,
+            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+          },
+        });
+        await uploadImage(imageDataUrl);
+      } catch (error) {
+        console.error(
+          "[WhiteboardPreviewCreator] Failed to generate whiteboard preview:",
+          error,
+        );
+      }
+    };
+
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
@@ -200,7 +196,7 @@ export default function WhiteboardPreviewCreator() {
         clearTimeout(debounceTimeout.current);
       }
     };
-  }, [whiteboardId, generatePreview, getNodes, nodes]);
+  }, [whiteboardId, nodes, edges, uploadImage, getNodesBounds]);
 
   // This component does not render any UI itself.
   return null;
