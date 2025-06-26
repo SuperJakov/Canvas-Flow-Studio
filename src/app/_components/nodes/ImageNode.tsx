@@ -80,6 +80,8 @@ export default function ImageNode({
     ? Math.ceil(retryAfterSeconds / 3600 / 1000)
     : 0;
 
+  const daysUntilReset = hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
+
   useEffect(() => {
     updateNodeData({
       nodeId: id,
@@ -230,8 +232,12 @@ export default function ImageNode({
                     Rate Limit Reached
                   </span>
                   <span className="text-xs text-red-100">
-                    Resets in {hoursUntilReset} hour
-                    {hoursUntilReset !== 1 ? "s" : ""}
+                    Resets in{" "}
+                    {daysUntilReset > 0
+                      ? `${daysUntilReset} day${daysUntilReset > 1 ? "s" : ""}`
+                      : `${hoursUntilReset} hour${
+                          hoursUntilReset !== 1 ? "s" : ""
+                        }`}
                   </span>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import type { UserIdentity } from "convex/server";
 import type { Tier } from "~/Types/stripe";
 
 const DAY = 24 * HOUR;
+const MONTH = 30 * DAY;
 
 // Limits will be defined dynamically based on the user's plan.
 const rateLimiter = new RateLimiter(components.rateLimiter);
@@ -18,12 +19,12 @@ const rateLimiter = new RateLimiter(components.rateLimiter);
 export const getRateLimitConfigForPlan = (plan: Tier) => {
   switch (plan) {
     case "Pro":
-      return { kind: "fixed window" as const, period: DAY, rate: 250 };
+      return { kind: "fixed window" as const, period: MONTH, rate: 250 };
     case "Plus":
-      return { kind: "fixed window" as const, period: DAY, rate: 100 };
+      return { kind: "fixed window" as const, period: MONTH, rate: 100 };
     case "Free":
     default:
-      return { kind: "fixed window" as const, period: DAY, rate: 10 };
+      return { kind: "fixed window" as const, period: MONTH, rate: 10 };
   }
 };
 
