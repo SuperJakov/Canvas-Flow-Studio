@@ -112,7 +112,7 @@ export default function Sidebar() {
           <div
             className="flex h-10 w-10 cursor-grab items-center justify-center rounded border border-gray-700 bg-green-900/50 p-2 text-white hover:bg-green-800/50"
             draggable
-            onDragStart={(e) => onDragStart(e, "speechNode")}
+            onDragStart={(e) => onDragStart(e, "speech")}
             onDragEnd={onDragEnd}
             title="Speech Node"
           >

@@ -122,6 +122,18 @@ export default function Whiteboard({ id }: Props) {
             zIndex: n.zIndex,
           };
         }
+        if (n.type === "speech") {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { internal, ...nodeDataWithoutInternal } = n.data;
+
+          return {
+            id: n.id,
+            type: n.type,
+            position: n.position,
+            data: nodeDataWithoutInternal,
+            zIndex: n.zIndex,
+          };
+        }
         return {
           id: n.id,
           type: n.type,
@@ -372,6 +384,18 @@ export default function Whiteboard({ id }: Props) {
             data: {
               isLocked: false,
               text: "",
+            },
+          };
+          break;
+        case "speech":
+          newNode = {
+            id: newNodeId,
+            type: dndType,
+            position,
+            data: {
+              isLocked: false,
+              isRunning: false,
+              speechUrl: null,
             },
           };
           break;

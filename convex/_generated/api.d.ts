@@ -12,6 +12,7 @@ import type * as functions from "../functions.js";
 import type * as http from "../http.js";
 import type * as imageNodes from "../imageNodes.js";
 import type * as migrations from "../migrations.js";
+import type * as speechNodes from "../speechNodes.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   imageNodes: typeof imageNodes;
   migrations: typeof migrations;
+  speechNodes: typeof speechNodes;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;
   users: typeof users;

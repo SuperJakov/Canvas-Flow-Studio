@@ -33,6 +33,21 @@ const ImageNodeSchema = v.object({
   zIndex: v.optional(v.number()),
 });
 
+const SpeechNodeSchema = v.object({
+  id: v.string(),
+  type: v.literal("speech"),
+  data: v.object({
+    speechUrl: v.union(v.string(), v.null()),
+    isLocked: v.boolean(),
+    isRunning: v.boolean(),
+  }),
+  position: v.object({
+    x: v.number(),
+    y: v.number(),
+  }),
+  zIndex: v.optional(v.number()),
+});
+
 const CommentNodeSchema = v.object({
   id: v.string(),
   type: v.literal("comment"),
@@ -53,6 +68,7 @@ export const AppNode = v.union(
   TextEditorSchema,
   ImageNodeSchema,
   CommentNodeSchema,
+  SpeechNodeSchema,
 );
 
 export const AppEdge = v.object({
@@ -78,6 +94,17 @@ const whiteboards = defineTable({
 const imageNodes = defineTable({
   nodeId: v.string(),
   imageUrl: v.union(v.string(), v.null()),
+  storageId: v.id("_storage"),
+  whiteboardId: v.id("whiteboards"),
+})
+  .index("by_nodeId", ["nodeId"])
+  .index("by_whiteboardId", ["whiteboardId"])
+  .index("by_storageId", ["storageId"])
+  .index("by_nodeId_and_whiteboardId", ["nodeId", "whiteboardId"]);
+
+const speechNodes = defineTable({
+  nodeId: v.string(),
+  speechUrl: v.union(v.string(), v.null()),
   storageId: v.id("_storage"),
   whiteboardId: v.id("whiteboards"),
 })
@@ -128,6 +155,7 @@ const schema = defineSchema({
   subscriptions,
   whiteboards,
   imageNodes,
+  speechNodes,
 });
 
 export default schema;

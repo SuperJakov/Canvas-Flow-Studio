@@ -1,6 +1,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { api } from "../../convex/_generated/api";
 import type { ReactAction } from "convex/react";
+import { internal } from "convex/_generated/api";
 
 export type CommentNodeData = {
   text: string;
@@ -22,6 +23,19 @@ export type ImageNodeData = {
   internal?: {
     generateAndStoreImageAction?: ReactAction<
       typeof api.imageNodes.generateAndStoreImage
+    >;
+    isRateLimited?: boolean;
+  };
+  zIndex?: number;
+};
+
+export type SpeechNodeData = {
+  speechUrl: string | null;
+  isLocked: boolean;
+  isRunning: boolean;
+  internal?: {
+    generateAndStoreSpeechAction?: ReactAction<
+      typeof api.speechNodes.generateAndStoreSpeech
     >;
     isRateLimited?: boolean;
   };
@@ -52,6 +66,7 @@ export type StrictNode<
 export type TextEditorNodeType = StrictNode<TextEditorNodeData, "textEditor">;
 export type ImageNodeType = StrictNode<ImageNodeData, "image">;
 export type CommentNodeType = StrictNode<CommentNodeData, "comment">;
+export type SpeechNodeType = StrictNode<SpeechNodeData, "speech">;
 export type PreviewImageNodeType = StrictNode<
   PreviewImageNodeData,
   "previewImage"
@@ -61,7 +76,11 @@ export type PreviewTextNodeType = StrictNode<
   "previewText"
 >;
 
-export type AppNode = TextEditorNodeType | ImageNodeType | CommentNodeType;
+export type AppNode =
+  | TextEditorNodeType
+  | ImageNodeType
+  | CommentNodeType
+  | SpeechNodeType;
 
 /**
  * Nodes for the main (normal) whiteboard. Only includes editable/interactive nodes.
