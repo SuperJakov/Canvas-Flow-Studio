@@ -1,7 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { api } from "../../convex/_generated/api";
 import type { ReactAction } from "convex/react";
-import { internal } from "convex/_generated/api";
 
 export type CommentNodeData = {
   text: string;

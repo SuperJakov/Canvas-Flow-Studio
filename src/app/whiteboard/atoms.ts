@@ -60,7 +60,7 @@ export const updateNodeDataAtom = atom(
     const updatedNodes = nodes.map((node) =>
       node.id === nodeId && node.type === nodeType
         ? { ...node, data: { ...node.data, ...updatedData } }
-        : node,
+        : { ...node },
     );
     // ! TODO: Ignore for now, we will fix later
     set(nodesAtom, updatedNodes as AppNode[]);
