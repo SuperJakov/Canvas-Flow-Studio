@@ -359,7 +359,7 @@ export default function SpeechNode({
     updateNodeData({
       nodeId: id,
       updatedData: { isLocked: !isLocked },
-      nodeType: "image",
+      nodeType: "speech",
     });
   }, [id, isLocked, updateNodeData]);
 
@@ -368,7 +368,7 @@ export default function SpeechNode({
       updateNodeData({
         nodeId: id,
         updatedData: { isRunning: false },
-        nodeType: "image",
+        nodeType: "speech",
       });
     } else if (hasIncomingConnections && !isRateLimited) {
       void executeNode({ nodeId: id });
