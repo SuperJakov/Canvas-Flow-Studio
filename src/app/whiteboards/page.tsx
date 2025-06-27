@@ -211,6 +211,21 @@ export default function WhiteboardsClient() {
       {},
       currentWhiteboards.filter((whiteboard) => whiteboard._id !== id),
     );
+
+    const currentWhiteboardLimit = localStore.getQuery(
+      api.whiteboards.getWhiteboardCountLimit,
+      {},
+    );
+    if (!currentWhiteboardLimit) return;
+    localStore.setQuery(
+      api.whiteboards.getWhiteboardCountLimit,
+      {},
+      {
+        ...currentWhiteboardLimit,
+        currentWhiteboardCount:
+          currentWhiteboardLimit.currentWhiteboardCount - 1,
+      },
+    );
   });
 
   const convexEditWhiteboard = useMutation(
