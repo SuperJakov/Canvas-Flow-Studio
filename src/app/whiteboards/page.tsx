@@ -140,6 +140,7 @@ function WhiteboardCard({
                     e.preventDefault();
                     e.stopPropagation();
                   }}
+                  maxLength={30}
                 />
               ) : (
                 <h3 className="truncate py-0.5 text-base font-medium">
