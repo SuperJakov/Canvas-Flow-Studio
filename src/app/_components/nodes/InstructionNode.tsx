@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, type ChangeEvent } from "react";
+import { useCallback, useLayoutEffect, type ChangeEvent } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { InstructionNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
@@ -9,6 +9,8 @@ import {
   updateNodeDataAtom,
 } from "~/app/whiteboard/atoms";
 import { AlertCircle, Lock, LockOpen, Play, Square, Wand2 } from "lucide-react";
+import { useAction } from "convex/react";
+import { api } from "convex/_generated/api";
 
 export default function InstructionNode({
   data,
@@ -20,9 +22,25 @@ export default function InstructionNode({
   const [, executeNode] = useAtom(executeNodeAtom);
   const [edges] = useAtom(edgesAtom);
 
+  const detectOutputNodeTypeAction = useAction(
+    api.instructionNodes.detectOutputNodeType,
+  );
+
   const hasInGoingConnections = edges.some((edge) => edge.target === id);
-  const hasOutgoingConnections = edges.some((edge) => edge.source === id);
-  const canRunNode = hasInGoingConnections && hasOutgoingConnections;
+  const canRunNode =
+    hasInGoingConnections && !!data.internal?.detectOutputNodeTypeAction;
+
+  useLayoutEffect(() => {
+    updateNodeData({
+      nodeId: id,
+      nodeType: "instruction",
+      updatedData: {
+        internal: {
+          detectOutputNodeTypeAction,
+        },
+      },
+    });
+  }, [detectOutputNodeTypeAction, id, updateNodeData]);
 
   function toggleRunning() {
     if (!isRunning === true) {

@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { type AppEdge, type AppNode } from "~/Types/nodes";
 import { executeNodeLogic } from "./execution";
+import { merge } from "lodash";
 
 export const nodesAtom = atom<AppNode[]>([]);
 export const edgesAtom = atom<AppEdge[]>([]); // Edges can be added later if needed
@@ -59,10 +60,10 @@ export const updateNodeDataAtom = atom(
     const nodes = get(nodesAtom);
     const updatedNodes = nodes.map((node) =>
       node.id === nodeId && node.type === nodeType
-        ? { ...node, data: { ...node.data, ...updatedData } }
+        ? { ...node, data: merge({}, node.data, updatedData) }
         : { ...node },
     );
-    // ! TODO: Ignore for now, we will fix later
+
     set(nodesAtom, updatedNodes as AppNode[]);
   },
 );

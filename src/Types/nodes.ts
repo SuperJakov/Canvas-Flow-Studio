@@ -32,6 +32,11 @@ export type InstructionNodeData = {
   isLocked: boolean;
   isRunning: boolean;
   text: string;
+  internal: {
+    detectOutputNodeTypeAction?: ReactAction<
+      typeof api.instructionNodes.detectOutputNodeType
+    >;
+  };
   zIndex?: number;
 };
 

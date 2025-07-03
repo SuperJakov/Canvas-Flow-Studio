@@ -6,6 +6,12 @@ import type {
   TextEditorNodeType,
   ImageNodeType,
   SpeechNodeType,
+  InstructionNodeType,
+  CommentNodeData,
+  InstructionNodeData,
+  SpeechNodeData,
+  ImageNodeData,
+  TextEditorNodeData,
 } from "~/Types/nodes";
 import {
   edgesAtom,
@@ -16,7 +22,7 @@ import {
   currentWhiteboardIdAtom,
 } from "./atoms";
 import type { Id } from "convex/_generated/dataModel";
-
+import { v4 as uuidv4 } from "uuid";
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -73,6 +79,7 @@ function executeTextNode(
         break;
       case "image":
       case "speech":
+      case "instruction":
         // These nodes will get text from sourceNodes
         break;
       default:
@@ -174,6 +181,132 @@ async function executeSpeechNode(
   }
 }
 
+async function executeInstructionNode(
+  get: Getter,
+  set: Setter,
+  thisNode: InstructionNodeType,
+  _targetNode: AppNode,
+) {
+  console.groupCollapsed(
+    `executeInstructionNode: Executing instruction node ${thisNode.id}`,
+  );
+
+  try {
+    // Get the instruction text from thisNode
+    const instruction = thisNode.data.text;
+
+    // Get connected source nodes
+    const connectedSourceNodes = getConnectedSourceNodes(get, thisNode.id);
+
+    // Extract node types from connected nodes
+    const inputNodeTypes = connectedSourceNodes
+      .filter(
+        (node) =>
+          node.type === "textEditor" ||
+          node.type === "image" ||
+          node.type === "speech",
+      )
+      .map((node) => node.type);
+
+    console.log("Instruction:", instruction);
+    console.log("Connected node types:", inputNodeTypes);
+    console.log(thisNode.data);
+    const { detectOutputNodeTypeAction } = thisNode.data.internal;
+    if (!detectOutputNodeTypeAction) {
+      throw new Error("detectOutputNodeTypeAction is undefined");
+    }
+    const outputNodeTypeRaw = await detectOutputNodeTypeAction({
+      instruction,
+      inputNodeTypes,
+    });
+
+    // Normalize output node type to match expected casing
+    const outputNodeType =
+      outputNodeTypeRaw === "texteditor" ? "textEditor" : outputNodeTypeRaw;
+    // Create a node with the specified type with y+300 from thisNode
+    const currentNodes = get(nodesAtom);
+    const newNodeId = uuidv4();
+
+    // Create the new node based on the detected output type
+    const newNode = {
+      id: newNodeId,
+      type: outputNodeType,
+      position: {
+        x: thisNode.position.x,
+        y: thisNode.position.y + 300, // Position 300 pixels below
+      },
+      data: getDefaultNodeData(outputNodeType),
+    } as AppNode;
+
+    // Add the new node to the nodes array
+    const updatedNodes = [...currentNodes, newNode];
+    set(nodesAtom, updatedNodes);
+
+    // Create an edge connecting the instruction node to the new node
+    const currentEdges = get(edgesAtom);
+    const newEdge: AppEdge = {
+      id: `edge-${thisNode.id}-${newNodeId}`,
+      source: thisNode.id,
+      target: newNodeId,
+      type: "default",
+    };
+
+    const updatedEdges = [...currentEdges, newEdge];
+    set(edgesAtom, updatedEdges);
+
+    console.log(`Created new ${outputNodeType} node with ID: ${newNodeId}`);
+  } catch (error) {
+    console.error("Error executing instruction node:", error);
+  } finally {
+    console.groupEnd();
+  }
+}
+
+function getDefaultNodeData(nodeType: AppNode["type"]) {
+  switch (nodeType) {
+    case "textEditor":
+      return {
+        text: "",
+        isLocked: false,
+        isRunning: false,
+      } satisfies TextEditorNodeData;
+
+    case "image":
+      return {
+        imageUrl: null,
+        isLocked: false,
+        isRunning: false,
+        // internal will be populated later when the node is initialized with actions
+      } satisfies ImageNodeData;
+
+    case "speech":
+      return {
+        speechUrl: null,
+        isLocked: false,
+        isRunning: false,
+        // internal will be populated later when the node is initialized with actions
+      } satisfies SpeechNodeData;
+
+    case "instruction":
+      return {
+        isLocked: false,
+        isRunning: false,
+        text: "",
+        internal: {
+          // detectOutputNodeTypeAction will be populated when the node is initialized
+        },
+      } satisfies InstructionNodeData;
+
+    case "comment":
+      return {
+        text: "",
+        isLocked: false,
+      } satisfies CommentNodeData;
+    default:
+      throw new Error(`Unknown node type`);
+  }
+}
+
 // Progress tracking
 function initializeExecutionProgress(
   get: Getter,
@@ -271,6 +404,9 @@ async function executeCurrentNode(get: Getter, set: Setter, node: AppNode) {
     case "speech":
       await executeSpeechNode(get, set, node, {} as AppNode);
       break;
+    case "instruction":
+      await executeInstructionNode(get, set, node, {} as AppNode);
+      break;
     default:
       throw new Error(`No executor found for node type: ${node.type}`);
   }
@@ -363,7 +499,11 @@ export async function executeNodeLogic(
       updateExecutionProgress(get, set);
 
       // Execute the current node if it's an image or speech node
-      if (currentNode.type === "image" || currentNode.type === "speech") {
+      if (
+        currentNode.type === "image" ||
+        currentNode.type === "speech" ||
+        currentNode.type === "instruction"
+      ) {
         await executeCurrentNode(get, set, currentNode);
       }
 

@@ -135,11 +135,13 @@ export default function Whiteboard({ id }: Props) {
           };
         }
         if (n.type === "instruction") {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { internal, ...nodeDataWithoutInternal } = n.data;
           return {
             id: n.id,
             type: n.type,
             position: n.position,
-            data: n.data,
+            data: nodeDataWithoutInternal,
             zIndex: n.zIndex,
           };
         }
@@ -413,7 +415,7 @@ export default function Whiteboard({ id }: Props) {
             id: newNodeId,
             type: dndType,
             position,
-            data: { isLocked: false, isRunning: false, text: "" },
+            data: { isLocked: false, isRunning: false, text: "", internal: {} },
           };
           break;
         default:
