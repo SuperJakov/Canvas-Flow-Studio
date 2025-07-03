@@ -83,7 +83,7 @@ export default function HomePage() {
                   type: "previewText",
                   position: { x: 100, y: 600 },
                   data: {
-                    text: "Swimming at the bottom of the ocean wearing goggles an playing with other fish",
+                    text: "Swimming at the bottom of the ocean wearing goggles and playing with other fish",
                   },
                 },
                 {
