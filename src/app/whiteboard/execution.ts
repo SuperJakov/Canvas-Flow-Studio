@@ -21,6 +21,37 @@ async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Helper functions
+function getConnectedSourceNodes(get: Getter, targetNodeId: string) {
+  const allNodes = get(nodesAtom);
+  const incomingConnections = get(edgesAtom).filter(
+    (edge) => edge.target === targetNodeId,
+  );
+
+  return allNodes.filter((node) =>
+    incomingConnections.some((connection) => connection.source === node.id),
+  );
+}
+
+function validateWhiteboardId(get: Getter): Id<"whiteboards"> {
+  const whiteboardId = get(currentWhiteboardIdAtom);
+  if (!whiteboardId) {
+    throw new Error("whiteboardId not set");
+  }
+  return whiteboardId as Id<"whiteboards">;
+}
+
+function isNodeExecutable(node: AppNode): boolean {
+  return (
+    !node.data.isLocked && !("isRunning" in node.data && node.data.isRunning)
+  );
+}
+
+function isNodeRateLimited(node: ImageNodeType | SpeechNodeType): boolean {
+  return node.data.internal?.isRateLimited ?? false;
+}
+
+// Node execution implementations
 function executeTextNode(
   get: Getter,
   set: Setter,
@@ -30,30 +61,24 @@ function executeTextNode(
   console.groupCollapsed(
     `executeTextNode: Passing data from node ${thisNode.id} to node ${nextNode.id} (type: ${nextNode.type})`,
   );
+
   try {
     switch (nextNode.type) {
-      case "textEditor": {
-        // text->text
+      case "textEditor":
         set(updateNodeDataAtom, {
           nodeId: nextNode.id,
           updatedData: { text: thisNode.data.text },
           nodeType: nextNode.type,
         });
         break;
-      }
-      case "image": {
-        // text->image: no need to update data, image node will get text from sourceNodes
+      case "image":
+      case "speech":
+        // These nodes will get text from sourceNodes
         break;
-      }
-      case "speech": {
-        // text->speech: no need to update data, speech node will get text from sourceNodes
-        break;
-      }
-      default: {
+      default:
         throw new Error(
-          "Unhandled node type in executeTextNode: " + nextNode.type,
+          `Unhandled node type in executeTextNode: ${nextNode.type}`,
         );
-      }
     }
   } finally {
     console.groupEnd();
@@ -64,110 +89,83 @@ async function executeImageNode(
   get: Getter,
   set: Setter,
   currentNode: ImageNodeType,
-  _targetNode: AppNode, // Prefixed with _ to indicate intentionally unused parameter
+  _targetNode: AppNode,
 ) {
   console.groupCollapsed(
     `executeImageNode: Executing image node ${currentNode.id}`,
   );
-  try {
-    const whiteboardId = get(currentWhiteboardIdAtom);
-    if (!whiteboardId) {
-      throw new Error("whiteboardId not set");
-    }
 
-    // Check if the node is rate limited
-    if (currentNode.data.internal?.isRateLimited) {
+  try {
+    const whiteboardId = validateWhiteboardId(get);
+
+    if (isNodeRateLimited(currentNode)) {
       console.log("Node cannot run: rate limit reached");
       return;
     }
 
+    if (!currentNode.data.internal?.generateAndStoreImageAction) {
+      throw new Error("generateAndStoreImageAction not defined.");
+    }
+
     console.log("Running an image node...");
-    // Get all edges that connect to this image node
-    const incomingConnections = get(edgesAtom).filter(
-      (edge) => edge.target === currentNode.id,
-    );
 
-    // Find all source nodes that are connected to this image node
-    const allNodes = get(nodesAtom);
-    const connectedSourceNodes = allNodes.filter((node) =>
-      incomingConnections.some((connection) => connection.source === node.id),
-    );
-
+    const connectedSourceNodes = getConnectedSourceNodes(get, currentNode.id);
     const sourceNodes = connectedSourceNodes
       .filter(
         (node): node is TextEditorNodeType | ImageNodeType =>
           node.type === "image" || node.type === "textEditor",
       )
       .map((node) => {
-        // We only need some data from the node, so we destructure it
         const { type, id, data } = node;
-        // and then tell TS "this shape is exactly the same as the incoming node"
         return { type, id, data } as typeof node;
       });
-
-    if (!currentNode.data.internal?.generateAndStoreImageAction) {
-      throw new Error("generateAndStoreImageAction not defined.");
-    }
 
     console.log("Running generateAndStoreImageAction");
     await currentNode.data.internal.generateAndStoreImageAction({
       nodeId: currentNode.id,
       sourceNodes,
-      whiteboardId: whiteboardId as Id<"whiteboards">,
+      whiteboardId,
     });
   } finally {
     console.groupEnd();
   }
 }
+
 async function executeSpeechNode(
   get: Getter,
   set: Setter,
   currentNode: SpeechNodeType,
   _targetNode: AppNode,
 ) {
-  try {
-    console.groupCollapsed(
-      `executeSpeechNode: Executing speech node ${currentNode.id}`,
-    );
-    const whiteboardId = get(currentWhiteboardIdAtom);
-    if (!whiteboardId) {
-      throw new Error("whiteboardId not set");
-    }
+  console.groupCollapsed(
+    `executeSpeechNode: Executing speech node ${currentNode.id}`,
+  );
 
-    // Check if the node is rate limited
-    if (currentNode.data.internal?.isRateLimited) {
+  try {
+    const whiteboardId = validateWhiteboardId(get);
+
+    if (isNodeRateLimited(currentNode)) {
       console.log("Node cannot run: rate limit reached");
       return;
     }
 
-    // Get all edges that connect to this image node
-    const incomingConnections = get(edgesAtom).filter(
-      (edge) => edge.target === currentNode.id,
-    );
-
-    // Find all source nodes that are connected to this image node
-    const allNodes = get(nodesAtom);
-    const connectedSourceNodes = allNodes.filter((node) =>
-      incomingConnections.some((connection) => connection.source === node.id),
-    );
-
-    const sourceNodes = connectedSourceNodes
-      .filter((node): node is TextEditorNodeType => node.type === "textEditor")
-      .map((node) => {
-        // We only need some data from the node, so we destructure it
-        const { type, id, data } = node;
-        // and then tell TS "this shape is exactly the same as the incoming node"
-        return { type, id, data } as typeof node;
-      });
-
     if (!currentNode.data.internal?.generateAndStoreSpeechAction) {
       throw new Error("generateAndStoreSpeechAction not defined.");
     }
+
+    const connectedSourceNodes = getConnectedSourceNodes(get, currentNode.id);
+    const sourceNodes = connectedSourceNodes
+      .filter((node): node is TextEditorNodeType => node.type === "textEditor")
+      .map((node) => {
+        const { type, id, data } = node;
+        return { type, id, data } as typeof node;
+      });
+
     console.log("Running generateAndStoreSpeechAction");
     await currentNode.data.internal.generateAndStoreSpeechAction({
       nodeId: currentNode.id,
       sourceNodes,
-      whiteboardId: whiteboardId as Id<"whiteboards">,
+      whiteboardId,
     });
   } catch (error) {
     console.error("Error executing speech node:", error);
@@ -175,6 +173,51 @@ async function executeSpeechNode(
     console.groupEnd();
   }
 }
+
+// Progress tracking
+function initializeExecutionProgress(
+  get: Getter,
+  set: Setter,
+  startNodeId: string,
+) {
+  const allNodes = get(nodesAtom);
+  const allEdges = get(edgesAtom);
+  const totalNodes = calculateTotalNodesToExecute(
+    allNodes,
+    allEdges,
+    startNodeId,
+  );
+
+  set(executionProgressAtom, {
+    isExecuting: true,
+    totalNodesForExecution: totalNodes,
+    executedNodesCount: 0,
+  });
+}
+
+function updateExecutionProgress(get: Getter, set: Setter) {
+  const progress = get(executionProgressAtom);
+  set(executionProgressAtom, {
+    ...progress,
+    executedNodesCount: progress.executedNodesCount + 1,
+  });
+}
+
+function finalizeExecutionProgress(
+  get: Getter,
+  set: Setter,
+  visited: Set<string>,
+) {
+  const progress = get(executionProgressAtom);
+  if (visited.size === progress.totalNodesForExecution) {
+    set(executionProgressAtom, {
+      isExecuting: false,
+      totalNodesForExecution: 0,
+      executedNodesCount: 0,
+    });
+  }
+}
+
 function calculateTotalNodesToExecute(
   nodes: AppNode[],
   edges: AppEdge[],
@@ -188,7 +231,7 @@ function calculateTotalNodesToExecute(
   if (!node || node.data.isLocked) return 0;
 
   const outgoingEdges = edges.filter((edge) => edge.source === startNodeId);
-  let totalNodes = 1; // Count current node
+  let totalNodes = 1;
 
   for (const edge of outgoingEdges) {
     totalNodes += calculateTotalNodesToExecute(
@@ -202,6 +245,90 @@ function calculateTotalNodesToExecute(
   return totalNodes;
 }
 
+// Node state management
+function setNodeRunning(
+  set: Setter,
+  nodeId: string,
+  nodeType: AppNode["type"],
+  isRunning: boolean,
+) {
+  set(updateNodeDataAtom, {
+    nodeId,
+    updatedData: { isRunning },
+    nodeType,
+  });
+}
+
+// Main execution logic
+async function executeCurrentNode(get: Getter, set: Setter, node: AppNode) {
+  console.log(`Detected ${node.type} node. Waiting 1 second before executing.`);
+  await delay(1000);
+
+  switch (node.type) {
+    case "image":
+      await executeImageNode(get, set, node, {} as AppNode);
+      break;
+    case "speech":
+      await executeSpeechNode(get, set, node, {} as AppNode);
+      break;
+    default:
+      throw new Error(`No executor found for node type: ${node.type}`);
+  }
+}
+
+async function processOutgoingEdges(
+  get: Getter,
+  set: Setter,
+  currentNode: AppNode,
+  visited: Set<string>,
+) {
+  const allNodes = get(nodesAtom);
+  const allEdges = get(edgesAtom);
+  const outgoingEdges = allEdges.filter(
+    (edge) => edge.source === currentNode.id,
+  );
+
+  console.log("Outgoing edges:", outgoingEdges);
+
+  for (const edge of outgoingEdges) {
+    console.groupCollapsed(
+      `Processing edge from node ${currentNode.id} to ${edge.target}`,
+    );
+
+    try {
+      const nextNode = allNodes.find((n) => n.id === edge.target);
+      if (!nextNode) {
+        console.warn("Next node not found for edge:", edge);
+        continue;
+      }
+
+      if (!isNodeExecutable(nextNode)) {
+        console.warn("Next node is not executable:", nextNode);
+        continue;
+      }
+
+      // Handle data passing for text nodes
+      if (currentNode.type === "textEditor") {
+        console.log(
+          "Executing text node logic: passing text from",
+          currentNode.id,
+          "to",
+          nextNode.id,
+        );
+        executeTextNode(get, set, currentNode, nextNode);
+      }
+
+      console.log(
+        "Recursively executing node logic for next node:",
+        nextNode.id,
+      );
+      await executeNodeLogic(get, set, nextNode.id, visited);
+    } finally {
+      console.groupEnd();
+    }
+  }
+}
+
 export async function executeNodeLogic(
   get: Getter,
   set: Setter,
@@ -209,143 +336,45 @@ export async function executeNodeLogic(
   visited: Set<string> = new Set<string>(),
 ) {
   console.groupCollapsed(`executeNodeLogic: Executing node ${nodeId}`);
+
   try {
-    // If this is the initial call (no visited nodes), calculate total and initialize progress
+    // Initialize progress tracking on first call
     if (visited.size === 0) {
-      const allNodes = get(nodesAtom);
-      const allEdges = get(edgesAtom);
-      const totalNodes = calculateTotalNodesToExecute(
-        allNodes,
-        allEdges,
-        nodeId,
-      );
-      set(executionProgressAtom, {
-        isExecuting: true,
-        totalNodesForExecution: totalNodes,
-        executedNodesCount: 0,
-      });
+      initializeExecutionProgress(get, set, nodeId);
     }
 
+    // Skip if already visited
     if (visited.has(nodeId)) return;
     visited.add(nodeId);
-    const allNodes = get(nodesAtom);
-    const allEdges = get(edgesAtom);
-    const thisNode = allNodes.find((n) => n.id === nodeId);
 
-    if (
-      !thisNode ||
-      thisNode.data.isLocked ||
-      ("isRunning" in thisNode.data && thisNode.data.isRunning)
-    ) {
-      console.warn("Node is either locked or already running:", thisNode);
+    // Get and validate current node
+    const allNodes = get(nodesAtom);
+    const currentNode = allNodes.find((n) => n.id === nodeId);
+
+    if (!currentNode || !isNodeExecutable(currentNode)) {
+      console.warn("Node is not executable:", currentNode);
       return;
     }
 
     try {
-      set(updateNodeDataAtom, {
-        nodeId,
-        updatedData: { isRunning: true },
-        nodeType: thisNode.type,
-      });
-      set(isExecutingNodeAtom, true); // Update progress after processing this node
-      const progress = get(executionProgressAtom);
-      set(executionProgressAtom, {
-        ...progress,
-        executedNodesCount: progress.executedNodesCount + 1,
-      });
+      // Set node as running and update progress
+      setNodeRunning(set, nodeId, currentNode.type, true);
+      set(isExecutingNodeAtom, true);
+      updateExecutionProgress(get, set);
 
-      // If this is an image node, execute it first regardless of outgoing edges
-      if (thisNode.type === "image") {
-        console.log(
-          "Detected image node. Waiting 1 second before executing image node logic.",
-        );
-        await delay(1000);
-        await executeImageNode(get, set, thisNode, {} as AppNode);
+      // Execute the current node if it's an image or speech node
+      if (currentNode.type === "image" || currentNode.type === "speech") {
+        await executeCurrentNode(get, set, currentNode);
       }
-      if (thisNode.type === "speech") {
-        console.log(
-          "Detected speech node. Waiting 1 second before executing speech node logic.",
-        );
-        await delay(1000);
-        await executeSpeechNode(get, set, thisNode, {} as AppNode);
-      }
-      // Get outgoing edges for further node execution
-      const outgoingEdges = allEdges.filter((edge) => edge.source === nodeId);
-      console.log("Outgoing edges:", outgoingEdges);
 
-      // The execution logic for non-image nodes or subsequent connections
-      for (const edge of outgoingEdges) {
-        console.groupCollapsed(
-          `executeNodeLogic: Processing edge from node ${nodeId} to ${edge.target}`,
-        );
-        try {
-          console.log("Processing edge from node", nodeId, "to", edge.target);
-          const nextNode = allNodes.find((n) => n.id === edge.target);
-          if (!nextNode) {
-            console.warn("Next node not found for edge:", edge);
-            continue;
-          }
-          if (nextNode.data.isLocked) {
-            console.warn("Next node is locked:", nextNode);
-            continue;
-          }
-
-          console.log(
-            "Executing node logic for current node type:",
-            thisNode.type,
-            "with next node:",
-            nextNode.id,
-          ); // Only handle non-image nodes here since image nodes are handled above
-          switch (thisNode.type) {
-            case "textEditor": {
-              console.log(
-                "Detected textEditor node. Waiting 1 second before executing text node logic.",
-              );
-              await delay(1000);
-              console.log(
-                "Executing text node logic: passing text from",
-                thisNode.id,
-                "to",
-                nextNode.id,
-              );
-              executeTextNode(get, set, thisNode, nextNode);
-              break;
-            }
-            default: {
-              console.error(
-                "Unhandled node type in executeNodeLogic:",
-                thisNode.type,
-              );
-              throw new Error("Unhandled node type in executeNodeLogic");
-            }
-          }
-
-          console.log(
-            "Recursively executing node logic for next node:",
-            nextNode.id,
-          );
-          await executeNodeLogic(get, set, nextNode.id, visited);
-          console.log("Finished executing node logic for node:", nextNode.id);
-        } finally {
-          console.groupEnd();
-        }
-      }
+      // Process outgoing edges and continue execution
+      await processOutgoingEdges(get, set, currentNode, visited);
     } finally {
-      // Always set isRunning back to false when this node is done
-      set(updateNodeDataAtom, {
-        nodeId,
-        updatedData: { isRunning: false },
-        nodeType: thisNode.type,
-      });
+      // Always reset node running state
+      setNodeRunning(set, nodeId, currentNode.type, false);
 
-      // If this is the last node being executed, reset the progress
-      if (visited.size === get(executionProgressAtom).totalNodesForExecution) {
-        set(executionProgressAtom, {
-          isExecuting: false,
-          totalNodesForExecution: 0,
-          executedNodesCount: 0,
-        });
-      }
+      // Finalize progress if this was the last node
+      finalizeExecutionProgress(get, set, visited);
     }
   } finally {
     console.groupEnd();
