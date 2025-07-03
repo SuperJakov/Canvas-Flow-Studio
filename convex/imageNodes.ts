@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { action, query } from "./_generated/server";
 import { internalMutation } from "./functions";
 import { TextEditorNodeData } from "./schema";
-import OpenAI from "openai";
+import { AzureOpenAI } from "openai";
 import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
 import { api, components, internal } from "./_generated/api";
 import type { UserIdentity } from "convex/server";
@@ -84,45 +84,47 @@ const ImageNodeExecutionSchema = v.object({
   }),
 });
 
-async function generateAIImage(identity: UserIdentity, textContents: string[]) {
+async function generateAIImage(
+  identity: UserIdentity,
+  textContents: string[],
+): Promise<string> {
   // Check if PREVIEW_IMAGE_URL is present in environment variables
   const previewImageUrl = process.env.PREVIEW_IMAGE_URL;
   if (previewImageUrl) {
-    return previewImageUrl;
+    const response = await fetch(previewImageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch preview image: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    return base64;
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error(
-      "Add your OPENAI_API_KEY as an env variable in the " +
-        "[dashboard](https://dasboard.convex.dev)",
-    );
-  }
-
-  const openai = new OpenAI({ apiKey });
+  const client = getClient();
   const prompt = `Create a visually engaging image that includes the following elements:
   ${textContents.map((text) => `- ${text}`).join("\n")}
   Ensure the elements are clearly represented and cohesively integrated into the scene. Use a consistent visual style that enhances clarity and appeal.`;
 
-  const openAiResponse = await openai.images.generate({
+  const openAiResponse = await client.images.generate({
     prompt,
     model: "gpt-image-1",
     quality: "low",
     n: 1,
     size: "1024x1024",
-    user: identity.subject,
     moderation: "low",
+    output_format: "png",
   });
 
   if (!openAiResponse.data) {
     throw new Error("No data received from OpenAI image generation response");
   }
-  const generatedImageUrl = openAiResponse.data[0]?.url;
-  if (!generatedImageUrl) {
-    throw new Error("Failed to generate image URL from OpenAI");
+
+  const generatedImageBase64 = openAiResponse.data[0]?.b64_json;
+  if (!generatedImageBase64) {
+    throw new Error("Image generation didn't return base 64");
   }
 
-  return generatedImageUrl;
+  return generatedImageBase64;
 }
 
 export const generateAndStoreImage = action({
@@ -166,17 +168,17 @@ export const generateAndStoreImage = action({
       .map((textNode) => textNode.data.text);
 
     // Generate image using AI
-    const imageUrl = await generateAIImage(identity, textContents);
+    const base64OfImage = await generateAIImage(identity, textContents);
 
-    // Download the image
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(`failed to download: ${imageResponse.statusText}`);
+    // Convert base64 string to a Blob and store it in Convex storage
+    const binaryString = atob(base64OfImage);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
     }
-
-    // Store the image to Convex storage
-    const image = await imageResponse.blob();
-    const storageId = await ctx.storage.store(image);
+    const imageBlob = new Blob([bytes], { type: "image/png" });
+    const storageId = await ctx.storage.store(imageBlob);
 
     await ctx.runMutation(internal.imageNodes.storeResult, {
       storageId,
@@ -238,3 +240,26 @@ export const uploadAndStoreImage = action({
     });
   },
 });
+
+function getClient(): AzureOpenAI {
+  // You will need to set these environment variables or edit the following values
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const apiKey = process.env.AZURE_OPENAI_API_KEY;
+
+  // Required Azure OpenAI deployment name and API version
+  const apiVersion = process.env.OPENAI_API_VERSION;
+  const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
+
+  if (!endpoint || !apiKey || !apiVersion || !deploymentName) {
+    throw new Error(
+      "Please set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, OPENAI_API_VERSION, and AZURE_OPENAI_DEPLOYMENT_NAME in your environment variables.",
+    );
+  }
+
+  return new AzureOpenAI({
+    endpoint,
+    apiKey,
+    apiVersion,
+    deployment: deploymentName,
+  });
+}
