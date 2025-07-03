@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
@@ -25,6 +31,10 @@ import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
 import { useParams } from "next/navigation";
 import type { Id } from "../../../../convex/_generated/dataModel";
+import {
+  registerImageAction,
+  unregisterImageAction,
+} from "~/app/whiteboard/nodeActionRegistry";
 
 export default function ImageNode({
   id,
@@ -80,9 +90,10 @@ export default function ImageNode({
     ? Math.ceil(retryAfterSeconds / 3600 / 1000)
     : 0;
 
-  const daysUntilReset = hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
+  const daysUntilReset =
+    hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateNodeData({
       nodeId: id,
       nodeType: "image",
@@ -90,12 +101,16 @@ export default function ImageNode({
         imageUrl: url ?? null,
 
         internal: {
-          generateAndStoreImageAction,
           isRateLimited,
         },
       },
     });
   }, [generateAndStoreImageAction, id, updateNodeData, isRateLimited, url]);
+
+  useEffect(() => {
+    registerImageAction(id, generateAndStoreImageAction);
+    return () => unregisterImageAction(id); // tidy up on unmount
+  }, [id, generateAndStoreImageAction]);
 
   // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);

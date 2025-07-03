@@ -83,48 +83,87 @@ const ImageNodeExecutionSchema = v.object({
     imageUrl: v.union(v.null(), v.string()), // ! This is not traditional image node data, this should be added before sending
   }),
 });
+function arrayBufferToBase64(buf: ArrayBuffer): string {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary); // browser / Convex runtime API
+}
+
+async function fetchAsBase64(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok)
+    throw new Error(`Failed to fetch source image: ${res.statusText}`);
+  const arrayBuf = await res.arrayBuffer();
+  return arrayBufferToBase64(arrayBuf);
+}
 
 async function generateAIImage(
   identity: UserIdentity,
   textContents: string[],
+  inputImageBase64?: string,
 ): Promise<string> {
-  // Check if PREVIEW_IMAGE_URL is present in environment variables
   const previewImageUrl = process.env.PREVIEW_IMAGE_URL;
   if (previewImageUrl) {
     const response = await fetch(previewImageUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch preview image: ${response.statusText}`);
     }
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-    return base64;
+    const arrayBuf = await response.arrayBuffer();
+    return arrayBufferToBase64(arrayBuf);
   }
 
   const client = getClient();
-  const prompt = `Create a visually engaging image that includes the following elements:
-  ${textContents.map((text) => `- ${text}`).join("\n")}
-  Ensure the elements are clearly represented and cohesively integrated into the scene. Use a consistent visual style that enhances clarity and appeal.`;
+  const prompt =
+    textContents.length === 0
+      ? "Edit the supplied image."
+      : textContents.join("\n");
 
-  const openAiResponse = await client.images.generate({
-    prompt,
-    model: "gpt-image-1",
-    quality: "low",
-    n: 1,
-    size: "1024x1024",
-    moderation: "low",
-    output_format: "png",
-  });
+  let openAiResponse;
 
-  if (!openAiResponse.data) {
-    throw new Error("No data received from OpenAI image generation response");
+  if (inputImageBase64) {
+    // Convert base64 to File object
+    const base64ToFile = (base64String: string, filename: string): File => {
+      // Remove data URI prefix if present
+      const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+      // Convert base64 to Uint8Array
+      const binaryString = atob(cleanBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Create Blob and then File
+      const blob = new Blob([bytes], { type: "image/png" });
+      return new File([blob], filename, { type: "image/png" });
+    };
+
+    const imageFile = base64ToFile(inputImageBase64, "image.png");
+
+    openAiResponse = await client.images.edit({
+      model: "gpt-image-1",
+      image: imageFile,
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+    });
+  } else {
+    openAiResponse = await client.images.generate({
+      model: "gpt-image-1",
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+    });
   }
 
-  const generatedImageBase64 = openAiResponse.data[0]?.b64_json;
-  if (!generatedImageBase64) {
-    throw new Error("Image generation didn't return base 64");
-  }
-
-  return generatedImageBase64;
+  const generated = openAiResponse.data?.[0]?.b64_json;
+  if (!generated) throw new Error("Image generation didn't return base-64");
+  return generated;
 }
 
 export const generateAndStoreImage = action({
@@ -140,43 +179,44 @@ export const generateAndStoreImage = action({
     if (!identity) throw new Error("Not authenticated");
 
     const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
-    if (!userPlanInfo) {
-      throw new Error("Error when getting user's plan: User not logged in??");
-    }
+    if (!userPlanInfo) throw new Error("Error when getting user's plan");
 
-    // Get the dynamic rate limit configuration for the user's plan.
     const config = getRateLimitConfigForPlan(userPlanInfo.plan);
-
-    console.log(
-      `User ${identity.subject} requested image generation. They had ${userPlanInfo.plan} tier and got rate limit of ${config.rate}/${config.period / 1000 / 60 / 60 / 24}day.`,
-    );
-
-    // Apply the limit using the dynamic configuration.
     const { ok, retryAfter } = await rateLimiter.limit(ctx, "imageGeneration", {
       key: identity.subject,
-      config, // Pass the dynamic config here
+      config,
     });
-
     if (!ok) {
       throw new Error(
-        `Rate limit reached. Try after: ${Math.ceil(retryAfter / 1000)}s`,
+        `Rate limit reached. Try after: ${Math.ceil(retryAfter / 1000)} s`,
       );
     }
-    // Get all text contents from the text nodes, filtering out non-text nodes
+
     const textContents = sourceNodes
-      .filter((node) => node.type === "textEditor" && "data" in node)
-      .map((textNode) => textNode.data.text);
+      .filter((n) => n.type === "textEditor")
+      .map((n) => n.data.text);
 
-    // Generate image using AI
-    const base64OfImage = await generateAIImage(identity, textContents);
+    const imageNodes = sourceNodes.filter(
+      (n): n is typeof n & { type: "image" } => n.type === "image",
+    );
 
-    // Convert base64 string to a Blob and store it in Convex storage
-    const binaryString = atob(base64OfImage);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    let inputImageBase64: string | undefined = undefined;
+
+    if (imageNodes.length === 1) {
+      const url = imageNodes[0]!.data.imageUrl;
+      if (!url) throw new Error("Image node has no URL to edit.");
+      inputImageBase64 = await fetchAsBase64(url);
+    } else if (imageNodes.length > 1) {
+      throw new Error("Ambiguous request: more than one image supplied.");
     }
+
+    const base64OfImage = await generateAIImage(
+      identity,
+      textContents,
+      inputImageBase64,
+    );
+
+    const bytes = Uint8Array.from(atob(base64OfImage), (c) => c.charCodeAt(0));
     const imageBlob = new Blob([bytes], { type: "image/png" });
     const storageId = await ctx.storage.store(imageBlob);
 

@@ -23,6 +23,7 @@ import {
 } from "./atoms";
 import type { Id } from "convex/_generated/dataModel";
 import { v4 as uuidv4 } from "uuid";
+import { getImageAction } from "./nodeActionRegistry";
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -92,6 +93,39 @@ function executeTextNode(
   }
 }
 
+function collectSourceNodes(
+  get: Getter,
+  targetNodeId: string,
+  visited: Set<string> = new Set<string>(),
+): (ImageNodeType | TextEditorNodeType)[] {
+  if (visited.has(targetNodeId)) return [];
+  visited.add(targetNodeId);
+
+  const directSources = getConnectedSourceNodes(get, targetNodeId);
+
+  const payloadNodes: (ImageNodeType | TextEditorNodeType)[] = [];
+
+  for (const node of directSources) {
+    switch (node.type) {
+      case "image":
+      case "textEditor":
+        payloadNodes.push(node);
+        break;
+
+      case "instruction":
+        // Look one level deeper: whatever feeds the instruction also feeds us
+        payloadNodes.push(...collectSourceNodes(get, node.id, visited));
+        break;
+
+      // Any other node types (speech, comment, …) are irrelevant for images
+      default:
+        break;
+    }
+  }
+
+  return payloadNodes;
+}
+
 async function executeImageNode(
   get: Getter,
   set: Setter,
@@ -109,26 +143,42 @@ async function executeImageNode(
       console.log("Node cannot run: rate limit reached");
       return;
     }
-
-    if (!currentNode.data.internal?.generateAndStoreImageAction) {
-      throw new Error("generateAndStoreImageAction not defined.");
+    await delay(3000);
+    const action = getImageAction(currentNode.id);
+    if (!action) {
+      console.error(
+        "Image node executed before its callback was registered. Skipping.",
+      );
+      return; // or queue a retry if you prefer
     }
 
-    console.log("Running an image node...");
+    const rawNodes = collectSourceNodes(get, currentNode.id);
+    const sourceNodes = rawNodes.map((node) => {
+      if (node.type === "image") {
+        // the literal "image" is preserved by the as-const assertion
+        return {
+          id: node.id,
+          type: "image" as const,
+          data: {
+            isLocked: node.data.isLocked,
+            isRunning: node.data.isRunning,
+            imageUrl: node.data.imageUrl ?? null,
+          },
+        };
+      } else {
+        return {
+          id: node.id,
+          type: "textEditor" as const,
+          data: node.data, // TextEditorNodeData
+        };
+      }
+    });
 
-    const connectedSourceNodes = getConnectedSourceNodes(get, currentNode.id);
-    const sourceNodes = connectedSourceNodes
-      .filter(
-        (node): node is TextEditorNodeType | ImageNodeType =>
-          node.type === "image" || node.type === "textEditor",
-      )
-      .map((node) => {
-        const { type, id, data } = node;
-        return { type, id, data } as typeof node;
-      });
+    console.log(
+      `Running generateAndStoreImageAction with ${sourceNodes.length} source node(s)`,
+    );
 
-    console.log("Running generateAndStoreImageAction");
-    await currentNode.data.internal.generateAndStoreImageAction({
+    await action({
       nodeId: currentNode.id,
       sourceNodes,
       whiteboardId,
