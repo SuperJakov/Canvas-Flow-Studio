@@ -141,7 +141,7 @@ ${textContents.join("\n\n")}`;
     audioBytes[i] = binaryString.charCodeAt(i);
   }
 
-  return { audioBuffer: audioBytes, mimeType } as const;
+  return { audioBuffer: audioBytes, mimeType, speech } as const;
 }
 
 export const generateAndStoreSpeech = action({
@@ -188,7 +188,11 @@ export const generateAndStoreSpeech = action({
       .map((textNode) => textNode.data.text);
 
     // Generate speech using AI
-    const { audioBuffer, mimeType } = await generateSpeech(textContents);
+    const {
+      audioBuffer,
+      mimeType,
+      speech: speechText,
+    } = await generateSpeech(textContents);
 
     const speechBlob = new Blob([audioBuffer], { type: mimeType });
 
@@ -198,6 +202,7 @@ export const generateAndStoreSpeech = action({
       storageId,
       nodeId,
       whiteboardId,
+      speechText,
     });
   },
 });
@@ -207,6 +212,7 @@ export const storeResult = internalMutation({
     storageId: v.id("_storage"),
     nodeId: v.string(),
     whiteboardId: v.id("whiteboards"),
+    speechText: v.string(),
   },
   handler: async (ctx, args) => {
     // Find the node in the speechNodes table by nodeId
@@ -223,6 +229,7 @@ export const storeResult = internalMutation({
       await ctx.db.patch(existing._id, {
         speechUrl,
         storageId: args.storageId,
+        speechText: args.speechText,
       });
     } else {
       // Insert a new speech node record if it doesn't exist
@@ -231,6 +238,7 @@ export const storeResult = internalMutation({
         speechUrl,
         storageId: args.storageId,
         whiteboardId: args.whiteboardId,
+        speechText: args.speechText,
       });
     }
   },

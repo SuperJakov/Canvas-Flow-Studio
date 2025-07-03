@@ -28,6 +28,13 @@ export type ImageNodeData = {
   zIndex?: number;
 };
 
+export type InstructionNodeData = {
+  isLocked: boolean;
+  isRunning: boolean;
+  text: string;
+  zIndex?: number;
+};
+
 export type SpeechNodeData = {
   speechUrl: string | null;
   isLocked: boolean;
@@ -64,8 +71,13 @@ export type StrictNode<
 
 export type TextEditorNodeType = StrictNode<TextEditorNodeData, "textEditor">;
 export type ImageNodeType = StrictNode<ImageNodeData, "image">;
+export type InstructionNodeType = StrictNode<
+  InstructionNodeData,
+  "instruction"
+>;
 export type CommentNodeType = StrictNode<CommentNodeData, "comment">;
 export type SpeechNodeType = StrictNode<SpeechNodeData, "speech">;
+
 export type PreviewImageNodeType = StrictNode<
   PreviewImageNodeData,
   "previewImage"
@@ -78,16 +90,9 @@ export type PreviewTextNodeType = StrictNode<
 export type AppNode =
   | TextEditorNodeType
   | ImageNodeType
+  | InstructionNodeType
   | CommentNodeType
   | SpeechNodeType;
-
-/**
- * Nodes for the main (normal) whiteboard. Only includes editable/interactive nodes.
- */
-export type WhiteboardNode =
-  | TextEditorNodeType
-  | ImageNodeType
-  | CommentNodeType;
 
 /**
  * Nodes for the preview whiteboard. Only includes preview nodes.

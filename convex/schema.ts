@@ -64,11 +64,27 @@ const CommentNodeSchema = v.object({
   zIndex: v.optional(v.number()),
 });
 
+const InstructionNodeSchema = v.object({
+  id: v.string(),
+  type: v.literal("instruction"),
+  data: v.object({
+    isLocked: v.boolean(),
+    isRunning: v.boolean(),
+    text: v.string(),
+  }),
+  position: v.object({
+    x: v.number(),
+    y: v.number(),
+  }),
+  zIndex: v.optional(v.number()),
+});
+
 export const AppNode = v.union(
   TextEditorSchema,
   ImageNodeSchema,
   CommentNodeSchema,
   SpeechNodeSchema,
+  InstructionNodeSchema,
 );
 
 export const AppEdge = v.object({
@@ -107,6 +123,7 @@ const speechNodes = defineTable({
   speechUrl: v.union(v.string(), v.null()),
   storageId: v.id("_storage"),
   whiteboardId: v.id("whiteboards"),
+  speechText: v.string(),
 })
   .index("by_nodeId", ["nodeId"])
   .index("by_whiteboardId", ["whiteboardId"])
