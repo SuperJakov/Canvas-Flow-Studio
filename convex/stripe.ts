@@ -431,9 +431,8 @@ const scheduleSyncForUser = async (
 };
 
 export const handleEvent = internalAction({
-  args: { event: v.any() }, // The validated Stripe.Event object
-  handler: async (ctx, { event }) => {
-    const stripeEvent = event as Stripe.Event;
+  handler: async (ctx, { event }: { event: Stripe.Event }) => {
+    const stripeEvent = event;
 
     try {
       // Log every event received for auditing and debugging purposes.
