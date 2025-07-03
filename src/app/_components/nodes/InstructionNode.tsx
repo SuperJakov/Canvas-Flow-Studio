@@ -10,7 +10,7 @@ import {
 } from "~/app/whiteboard/atoms";
 import { AlertCircle, Lock, LockOpen, Play, Square, Wand2 } from "lucide-react";
 import { useAction } from "convex/react";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 
 export default function InstructionNode({
   data,
