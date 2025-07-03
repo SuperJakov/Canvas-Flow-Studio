@@ -93,17 +93,22 @@ function executeTextNode(
   }
 }
 
+// FIXED: This function now correctly collects instruction nodes.
 function collectSourceNodes(
   get: Getter,
   targetNodeId: string,
   visited: Set<string> = new Set<string>(),
-): (ImageNodeType | TextEditorNodeType)[] {
+): (ImageNodeType | TextEditorNodeType | InstructionNodeType)[] {
   if (visited.has(targetNodeId)) return [];
   visited.add(targetNodeId);
 
   const directSources = getConnectedSourceNodes(get, targetNodeId);
 
-  const payloadNodes: (ImageNodeType | TextEditorNodeType)[] = [];
+  const payloadNodes: (
+    | ImageNodeType
+    | TextEditorNodeType
+    | InstructionNodeType
+  )[] = [];
 
   for (const node of directSources) {
     switch (node.type) {
@@ -113,8 +118,8 @@ function collectSourceNodes(
         break;
 
       case "instruction":
-        // Look one level deeper: whatever feeds the instruction also feeds us
-        payloadNodes.push(...collectSourceNodes(get, node.id, visited));
+        // FIX: The instruction node ITSELF is the source. Add it to the payload.
+        payloadNodes.push(node);
         break;
 
       // Any other node types (speech, comment, …) are irrelevant for images
@@ -143,40 +148,87 @@ async function executeImageNode(
       console.log("Node cannot run: rate limit reached");
       return;
     }
-    await delay(3000);
+
     const action = getImageAction(currentNode.id);
     if (!action) {
       console.error(
         "Image node executed before its callback was registered. Skipping.",
       );
-      return; // or queue a retry if you prefer
+      return;
     }
 
-    const rawNodes = collectSourceNodes(get, currentNode.id);
-    const sourceNodes = rawNodes.map((node) => {
-      if (node.type === "image") {
-        // the literal "image" is preserved by the as-const assertion
-        return {
-          id: node.id,
-          type: "image" as const,
-          data: {
-            isLocked: node.data.isLocked,
-            isRunning: node.data.isRunning,
-            imageUrl: node.data.imageUrl ?? null,
-          },
-        };
-      } else {
-        return {
-          id: node.id,
-          type: "textEditor" as const,
-          data: node.data, // TextEditorNodeData
-        };
+    // Get direct parent nodes
+    const directParentNodes = collectSourceNodes(get, currentNode.id);
+
+    // Process parents to find valid sources according to filtering rules
+    const sourceNodes = directParentNodes.flatMap((parentNode) => {
+      // Rule: Disallow directly connected images
+      if (parentNode.type === "image") {
+        console.log(`Ignoring directly connected image node: ${parentNode.id}`);
+        return [];
       }
+
+      // Rule: Allow directly connected text editors
+      if (parentNode.type === "textEditor") {
+        return [
+          {
+            id: parentNode.id,
+            type: "textEditor" as const,
+            data: {
+              isLocked: parentNode.data.isLocked,
+              isRunning: parentNode.data.isRunning,
+              text: parentNode.data.text,
+            },
+          },
+        ];
+      }
+
+      // Rule: Allow images connected via instruction node (image -> instruction -> thisNode)
+      if (parentNode.type === "instruction") {
+        // Instruction node provides its text as a source
+        const sourcesFromInstruction = [
+          {
+            id: parentNode.id,
+            type: "textEditor" as const, // Treat as text for the backend
+            data: {
+              isLocked: parentNode.data.isLocked,
+              isRunning: parentNode.data.isRunning,
+              text: parentNode.data.text,
+            },
+          },
+        ];
+
+        // Look for image grandparents behind the instruction node
+        const grandParentNodes = collectSourceNodes(get, parentNode.id);
+        const imageGrandParents = grandParentNodes
+          .filter((gp) => gp.type === "image")
+          .map((imageNode) => ({
+            id: imageNode.id,
+            type: "image" as const,
+            data: {
+              isLocked: imageNode.data.isLocked,
+              isRunning: imageNode.data.isRunning,
+              imageUrl: imageNode.data.imageUrl ?? null,
+            },
+          }));
+
+        return [...sourcesFromInstruction, ...imageGrandParents];
+      }
+
+      return [];
     });
 
     console.log(
       `Running generateAndStoreImageAction with ${sourceNodes.length} source node(s)`,
+      sourceNodes,
     );
+
+    if (sourceNodes.length === 0) {
+      console.log(
+        "No valid source nodes found after filtering. Skipping execution.",
+      );
+      return;
+    }
 
     await action({
       nodeId: currentNode.id,

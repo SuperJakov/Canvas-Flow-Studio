@@ -116,11 +116,14 @@ async function generateAIImage(
   }
 
   const client = getClient();
-  const prompt =
-    textContents.length === 0
-      ? "Edit the supplied image."
-      : textContents.join("\n");
-
+  const prompt = inputImageBase64
+    ? `Edit the provided image based on the following instructions:
+  ${textContents.map((text) => `- ${text}`).join("\n")}
+Ensure these additions are clearly represented and cohesively integrated into the existing scene. Maintain a consistent visual style that enhances clarity and appeal.`
+    : `Create a visually engaging image that includes the following elements:
+  ${textContents.map((text) => `- ${text}`).join("\n")}
+  Ensure the elements are clearly represented and cohesively integrated into the scene. Use a consistent visual style that enhances clarity and appeal.`;
+  console.log("Using prompt to generate/edit an image:", prompt);
   let openAiResponse;
 
   if (inputImageBase64) {
@@ -161,9 +164,27 @@ async function generateAIImage(
     });
   }
 
-  const generated = openAiResponse.data?.[0]?.b64_json;
-  if (!generated) throw new Error("Image generation didn't return base-64");
-  return generated;
+  const imageUrl = openAiResponse.data?.[0]?.url;
+  let base64OfImage = openAiResponse.data?.[0]?.b64_json;
+
+  if (!imageUrl && !base64OfImage) {
+    throw new Error("Image generation failed to return a URL or base-64 JSON.");
+  }
+
+  if (imageUrl && !base64OfImage) {
+    console.log("Fetching image from URL to convert to base64:", imageUrl);
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      throw new Error(
+        `Failed to fetch generated image: ${imageResponse.statusText}`,
+      );
+    }
+    const arrayBuf = await imageResponse.arrayBuffer();
+    base64OfImage = arrayBufferToBase64(arrayBuf);
+  }
+
+  if (!base64OfImage) throw new Error("Image generation didn't return base-64");
+  return base64OfImage;
 }
 
 export const generateAndStoreImage = action({
@@ -199,13 +220,16 @@ export const generateAndStoreImage = action({
     const imageNodes = sourceNodes.filter(
       (n): n is typeof n & { type: "image" } => n.type === "image",
     );
-
+    console.log("imageNodes", imageNodes);
     let inputImageBase64: string | undefined = undefined;
 
     if (imageNodes.length === 1) {
+      console.log("imageNodes.length === 1");
       const url = imageNodes[0]!.data.imageUrl;
+      console.log("Got url", url);
       if (!url) throw new Error("Image node has no URL to edit.");
       inputImageBase64 = await fetchAsBase64(url);
+      console.log("Base64: ", inputImageBase64);
     } else if (imageNodes.length > 1) {
       throw new Error("Ambiguous request: more than one image supplied.");
     }
