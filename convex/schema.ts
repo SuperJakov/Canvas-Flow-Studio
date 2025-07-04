@@ -167,12 +167,28 @@ const subscriptions = defineTable({
   .index("by_userExternalId", ["userExternalId"])
   .index("by_subscriptionId", ["subscriptionId"]);
 
+const imageLogs = defineTable({
+  userExternalId: v.string(),
+  whiteboardId: v.id("whiteboards"),
+  nodeId: v.string(),
+  action: v.union(v.literal("generate"), v.literal("edit")),
+  timestamp: v.int64(),
+  model: v.literal("gpt-image-1"),
+  prompt: v.optional(v.string()),
+  quality: v.literal("low"),
+  resolution: v.literal("1024x1024"),
+})
+  .index("by_user", ["userExternalId"])
+  .index("by_whiteboard", ["whiteboardId"])
+  .index("by_node", ["nodeId"]);
+
 const schema = defineSchema({
   users,
   subscriptions,
   whiteboards,
   imageNodes,
   speechNodes,
+  imageLogs,
 });
 
 export default schema;

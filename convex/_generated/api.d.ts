@@ -10,6 +10,7 @@
 
 import type * as functions from "../functions.js";
 import type * as http from "../http.js";
+import type * as imageLogs from "../imageLogs.js";
 import type * as imageNodes from "../imageNodes.js";
 import type * as instructionNodes from "../instructionNodes.js";
 import type * as migrations from "../migrations.js";
@@ -36,6 +37,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   functions: typeof functions;
   http: typeof http;
+  imageLogs: typeof imageLogs;
   imageNodes: typeof imageNodes;
   instructionNodes: typeof instructionNodes;
   migrations: typeof migrations;

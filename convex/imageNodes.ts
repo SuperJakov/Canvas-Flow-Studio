@@ -220,16 +220,14 @@ export const generateAndStoreImage = action({
     const imageNodes = sourceNodes.filter(
       (n): n is typeof n & { type: "image" } => n.type === "image",
     );
-    console.log("imageNodes", imageNodes);
     let inputImageBase64: string | undefined = undefined;
+    let actionType: "generate" | "edit" = "generate";
 
     if (imageNodes.length === 1) {
-      console.log("imageNodes.length === 1");
       const url = imageNodes[0]!.data.imageUrl;
-      console.log("Got url", url);
       if (!url) throw new Error("Image node has no URL to edit.");
       inputImageBase64 = await fetchAsBase64(url);
-      console.log("Base64: ", inputImageBase64);
+      actionType = "edit";
     } else if (imageNodes.length > 1) {
       throw new Error("Ambiguous request: more than one image supplied.");
     }
@@ -248,6 +246,18 @@ export const generateAndStoreImage = action({
       storageId,
       nodeId,
       whiteboardId,
+    });
+
+    await ctx.scheduler.runAfter(0, internal.imageLogs.logGeneration, {
+      userExternalId: identity.subject,
+      whiteboardId,
+      nodeId,
+      action: actionType,
+      timestamp: BigInt(Date.now()),
+      model: "gpt-image-1",
+      prompt: textContents.join("\n"),
+      quality: "low",
+      resolution: "1024x1024",
     });
   },
 });
