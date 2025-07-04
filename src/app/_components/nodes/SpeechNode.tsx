@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import {
-  GripVertical,
   Lock,
   LockOpen,
   Play,
@@ -475,8 +474,7 @@ export default function SpeechNode({
         {!isRateLimited && (
           <div className="flex items-center justify-between px-1 py-2">
             <div className="flex items-center">
-              <GripVertical size={18} />
-              <Volume2 size={18} className="mr-1" />
+              <Volume2 size={18} className="mx-1" />
               <span className="mr-2 font-medium text-black">Speech</span>
             </div>
             <div className="flex items-center space-x-2">

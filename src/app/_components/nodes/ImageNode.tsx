@@ -11,7 +11,6 @@ import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import Image from "next/image";
 import {
-  GripVertical,
   Lock,
   LockOpen,
   Play,
@@ -76,6 +75,9 @@ export default function ImageNode({
   // Add isUploading state
   const [isUploading, setIsUploading] = useState(false);
 
+  // Add image loading state
+  const [isImageLoading, setIsImageLoading] = useState(false);
+
   const openBanner = useCallback((feature: string) => {
     setBannerFeature(feature);
     setIsBannerOpen(true);
@@ -111,6 +113,13 @@ export default function ImageNode({
     registerImageAction(id, generateAndStoreImageAction);
     return () => unregisterImageAction(id); // tidy up on unmount
   }, [id, generateAndStoreImageAction]);
+
+  // Set image loading state when URL changes
+  useEffect(() => {
+    if (url) {
+      setIsImageLoading(true);
+    }
+  }, [url]);
 
   // Check if this node has any incoming connections
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
@@ -204,6 +213,14 @@ export default function ImageNode({
     [id, uploadAndStoreImageAction, whiteboardId],
   );
 
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoading(false);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setIsImageLoading(false);
+  }, []);
+
   if (!whiteboardId) {
     throw new Error(
       "No whiteboardId found in route params when image node was rendered",
@@ -275,8 +292,7 @@ export default function ImageNode({
         {!isRateLimited && (
           <div className="flex items-center justify-between px-1 py-2">
             <div className="flex items-center">
-              <GripVertical size={18} />
-              <ImageIcon size={18} className="mr-1" />
+              <ImageIcon size={18} className="mx-1" />
               <span className="mr-2 font-medium text-black">Image</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -333,7 +349,16 @@ export default function ImageNode({
               </div>
             ) : url ? (
               <>
-                {/* Image is generated - no upgrade message here to avoid interrupting */}
+                {/* Show loading spinner while image is loading */}
+                {isImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                    <div className="flex flex-col items-center text-gray-400">
+                      <Loader2 size={32} className="animate-spin" />
+                      <p className="mt-2 text-sm">Loading image...</p>
+                    </div>
+                  </div>
+                )}
+                {/* Image is generated */}
                 <div className="relative h-full w-full">
                   <Image
                     src={url}
@@ -342,8 +367,8 @@ export default function ImageNode({
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-contain"
                     quality={75}
-                    loading="eager"
-                    priority
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
                   />
                 </div>
                 {/* Download button - appears on hover */}

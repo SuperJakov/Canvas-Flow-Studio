@@ -4,7 +4,7 @@ import { type NodeProps, NodeResizer } from "@xyflow/react";
 import type { CommentNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
 import { updateNodeDataAtom } from "~/app/whiteboard/atoms";
-import { GripVertical, Lock, LockOpen } from "lucide-react";
+import { Lock, LockOpen, MessageSquare } from "lucide-react";
 
 export default function CommentNode({
   data,
@@ -55,7 +55,7 @@ export default function CommentNode({
       {/* Header */}
       <div className="flex items-center justify-between px-2 py-1">
         <div className="handle flex cursor-grab items-center">
-          <GripVertical size={18} />
+          <MessageSquare size={18} />
           <span className="ml-2 font-medium text-black">Comment</span>
         </div>
         <button
