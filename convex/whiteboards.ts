@@ -26,7 +26,7 @@ export const getWhiteboardCountLimit = query({
     if (!identity) throw new Error("Not authenticated");
 
     const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
-    if (!userPlanInfo) throw new Error("User plan not found");
+    if (!userPlanInfo) throw new Error("User not found");
 
     const maxWhiteboards = getWhiteboardCountLimitForTier(userPlanInfo.plan);
     console.log(
