@@ -48,3 +48,6 @@ yarn-error.log*
 /.clerk/
 
 .vercel
+
+# My own script
+copy.ps1

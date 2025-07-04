@@ -21,7 +21,7 @@ export default async function WhiteboardPageWithId({ params }: Props) {
   try {
     whiteboard = await fetchQuery(
       api.whiteboards.getWhiteboard,
-      { id: id as Id<"whiteboards"> },
+      { id: id },
       { token },
     );
   } catch (err) {
@@ -31,8 +31,9 @@ export default async function WhiteboardPageWithId({ params }: Props) {
 
   if (!whiteboard) {
     console.log("Whiteboard not found:", id);
-    redirect("/");
+    redirect("/whiteboard/404");
   }
 
+  // Whiteboard id has been validated by the query
   return <WhiteboardPage id={id as Id<"whiteboards">} />;
 }

@@ -162,7 +162,7 @@ export const listWhiteboards = query({
 
 // --- Get a specific whiteboard by ID ---
 export const getWhiteboard = query({
-  args: { id: v.id("whiteboards") },
+  args: { id: v.string() },
   handler: async (ctx, { id }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");

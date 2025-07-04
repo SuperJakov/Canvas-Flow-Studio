@@ -1,7 +1,6 @@
 "use client"; // Error boundaries must be Client Components
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { AlertTriangle, Home } from "lucide-react";
 
 export default function Error({
@@ -46,13 +45,15 @@ export default function Error({
           >
             Try again
           </button>
-          <Link
+          {/* We need to use <a> because <Link> doesn't work here */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
             href="/"
             className="flex cursor-pointer items-center justify-center rounded-lg bg-gray-700 px-6 py-3 font-medium text-white shadow transition-all hover:bg-gray-600"
           >
             <Home className="mr-2 h-5 w-5" />
             Go to Homepage
-          </Link>
+          </a>
         </div>
       </div>
     </div>

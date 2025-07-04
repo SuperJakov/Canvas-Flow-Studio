@@ -13,6 +13,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     <ClerkProvider
       appearance={{ baseTheme: dark }}
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      afterSignOutUrl={"/"}
     >
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         {children}
