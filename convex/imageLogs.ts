@@ -2,7 +2,8 @@
 import { v } from "convex/values";
 import { internalMutation } from "./functions";
 import { internalQuery } from "./_generated/server";
-
+import type { Doc } from "./_generated/dataModel";
+import { imageLogFields } from "./schema";
 // Constants
 const outputTokens = {
   low: {
@@ -32,45 +33,33 @@ const ESTIMATED_TOKENS_IN_TEXT_INPUT = 200;
 // USD to EUR conversion (July 2025 avg): 1 USD = 0.8484 EUR
 const USD_TO_EUR = 0.85;
 
+type ImageLog = Doc<"imageLogs">;
+
 // Helper: compute USD cost for a single log entry
-function costUsdForLog(log: { action: "generate" | "edit" }): number {
-  console.log(`Calculating cost for action: ${log.action}`);
+function costUsdForLog(log: ImageLog): number {
   let price = 0;
   // Base output token cost
-  const outputCost = outputTokens.low["1024x1024"] * PRICE_PER_OUTPUT_TOKEN;
-  console.log(`Output token cost: $${outputCost.toFixed(6)}`);
+  const outputCost =
+    outputTokens[log.quality][log.resolution] * PRICE_PER_OUTPUT_TOKEN;
   price += outputCost;
 
   // Text input token cost
   const textCost = PRICE_PER_TEXT_INPUT_TOKEN * ESTIMATED_TOKENS_IN_TEXT_INPUT;
-  console.log(`Text input cost: $${textCost.toFixed(6)}`);
   price += textCost;
 
   // Image input token cost for edit actions
   if (log.action === "edit") {
     const imageInputCost =
       TOKENS_IN_IMAGE_INPUT["gpt-image-1"] * PRICE_PER_IMAGE_INPUT_TOKEN;
-    console.log(`Image input cost (edit): $${imageInputCost.toFixed(6)}`);
     price += imageInputCost;
   }
 
-  console.log(`Total cost for this log: $${price.toFixed(6)}`);
   return price;
 }
 
 // Mutation: Log image generation or edit events
 export const logGeneration = internalMutation({
-  args: {
-    userExternalId: v.string(),
-    whiteboardId: v.id("whiteboards"),
-    nodeId: v.string(),
-    action: v.union(v.literal("generate"), v.literal("edit")),
-    timestamp: v.int64(),
-    model: v.literal("gpt-image-1"),
-    prompt: v.optional(v.string()),
-    quality: v.literal("low"),
-    resolution: v.literal("1024x1024"),
-  },
+  args: imageLogFields,
   handler: async (ctx, args) => {
     console.log("logGeneration called with args:", args);
     await ctx.db.insert("imageLogs", args);

@@ -167,7 +167,7 @@ const subscriptions = defineTable({
   .index("by_userExternalId", ["userExternalId"])
   .index("by_subscriptionId", ["subscriptionId"]);
 
-const imageLogs = defineTable({
+export const imageLogFields = {
   userExternalId: v.string(),
   whiteboardId: v.id("whiteboards"),
   nodeId: v.string(),
@@ -175,9 +175,15 @@ const imageLogs = defineTable({
   timestamp: v.int64(),
   model: v.literal("gpt-image-1"),
   prompt: v.optional(v.string()),
-  quality: v.literal("low"),
-  resolution: v.literal("1024x1024"),
-})
+  quality: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+  resolution: v.union(
+    v.literal("1024x1024"),
+    v.literal("1024x1536"),
+    v.literal("1536x1024"),
+  ),
+};
+
+const imageLogs = defineTable(imageLogFields)
   .index("by_user", ["userExternalId"])
   .index("by_whiteboard", ["whiteboardId"])
   .index("by_node", ["nodeId"]);
