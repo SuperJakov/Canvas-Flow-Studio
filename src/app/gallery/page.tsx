@@ -99,12 +99,12 @@ export default function GalleryPage() {
 
         <div className="rounded-lg bg-gray-800 p-6">
           {allImages.length === 0 ? (
-            <>
-              <Images />
+            <div className="flex flex-col items-center justify-center space-y-4 py-16">
+              <Images size={40} className="text-gray-400" />
               <p className="text-gray-400">
                 No images found. Generate some images to see them here!
               </p>
-            </>
+            </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {allImages.map((image, index) => (
