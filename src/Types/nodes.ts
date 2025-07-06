@@ -25,6 +25,13 @@ export type ImageNodeData = {
     >;
     isRateLimited?: boolean;
   };
+  style?:
+    | "auto"
+    | "photorealistic"
+    | "anime"
+    | "oilpainting"
+    | "pixelart"
+    | "cyberpunk";
   zIndex?: number;
 };
 

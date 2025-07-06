@@ -384,6 +384,7 @@ export default function Whiteboard({ id }: Props) {
               isLocked: false,
               isRunning: false,
               imageUrl: null,
+              style: "auto",
             },
           };
           break;

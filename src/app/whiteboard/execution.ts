@@ -378,6 +378,7 @@ function getDefaultNodeData(nodeType: AppNode["type"]) {
         imageUrl: null,
         isLocked: false,
         isRunning: false,
+        style: "auto",
         // internal will be populated later when the node is initialized with actions
       } satisfies ImageNodeData;
 
