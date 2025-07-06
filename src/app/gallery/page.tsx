@@ -1,11 +1,11 @@
 "use client";
 
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import Loading from "~/app/loading";
 import { useState, useEffect } from "react";
-import { Download, Loader2, X, ExternalLink } from "lucide-react";
+import { Download, Loader2, X, ExternalLink, Images } from "lucide-react";
 import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import type { Doc } from "convex/_generated/dataModel";
 import Link from "next/link";
@@ -99,9 +99,12 @@ export default function GalleryPage() {
 
         <div className="rounded-lg bg-gray-800 p-6">
           {allImages.length === 0 ? (
-            <p className="text-gray-400">
-              No images found. Generate some images to see them here!
-            </p>
+            <>
+              <Images />
+              <p className="text-gray-400">
+                No images found. Generate some images to see them here!
+              </p>
+            </>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {allImages.map((image, index) => (
@@ -166,7 +169,7 @@ export default function GalleryPage() {
           {/* Close button */}
           <button
             onClick={handleCloseFullscreen}
-            className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-700"
+            className="absolute top-4 right-4 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-700"
             title="Close fullscreen"
           >
             <X size={20} />
