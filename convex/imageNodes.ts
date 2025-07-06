@@ -246,6 +246,7 @@ export const generateAndStoreImage = action({
       storageId,
       nodeId,
       whiteboardId,
+      authorId: identity.subject,
     });
 
     await ctx.scheduler.runAfter(0, internal.imageLogs.logGeneration, {
@@ -267,6 +268,7 @@ export const storeResult = internalMutation({
     storageId: v.id("_storage"),
     nodeId: v.string(),
     whiteboardId: v.id("whiteboards"),
+    authorId: v.string(),
   },
   handler: async (ctx, args) => {
     // Find the node in the imageNodes table by nodeId
@@ -288,6 +290,7 @@ export const storeResult = internalMutation({
         imageUrl,
         storageId: args.storageId,
         whiteboardId: args.whiteboardId,
+        authorExternalId: args.authorId,
       });
     }
   },
@@ -311,6 +314,7 @@ export const uploadAndStoreImage = action({
       storageId,
       nodeId,
       whiteboardId,
+      authorId: identity.subject,
     });
   },
 });
@@ -337,3 +341,18 @@ function getClient(): AzureOpenAI {
     deployment: deploymentName,
   });
 }
+
+export const getAllGeneratedImages = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const allGeneratedImages = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_userId", (q) => q.eq("authorExternalId", identity.subject))
+      .order("desc")
+      .collect();
+
+    return allGeneratedImages;
+  },
+});

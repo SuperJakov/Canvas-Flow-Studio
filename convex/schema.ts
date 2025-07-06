@@ -112,7 +112,9 @@ const imageNodes = defineTable({
   imageUrl: v.union(v.string(), v.null()),
   storageId: v.id("_storage"),
   whiteboardId: v.id("whiteboards"),
+  authorExternalId: v.string(),
 })
+  .index("by_userId", ["authorExternalId"])
   .index("by_nodeId", ["nodeId"])
   .index("by_whiteboardId", ["whiteboardId"])
   .index("by_storageId", ["storageId"])

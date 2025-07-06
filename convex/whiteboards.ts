@@ -297,6 +297,7 @@ export const copyPublicWhiteboard = mutation({
         storageId: mapping.storageId,
         imageUrl: mapping.imageUrl,
         whiteboardId: newWhiteboardId, // Link to the NEW whiteboard
+        authorExternalId: identity.subject, // Link to the new author
       });
     }
 
