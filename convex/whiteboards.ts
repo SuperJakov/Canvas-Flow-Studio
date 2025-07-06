@@ -156,6 +156,7 @@ export const listWhiteboards = query({
     return await ctx.db
       .query("whiteboards")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", identity.subject))
+      .order("desc")
       .collect();
   },
 });
