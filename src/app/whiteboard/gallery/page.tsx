@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import Loading from "~/app/loading";
