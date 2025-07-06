@@ -184,7 +184,7 @@ export const imageLogFields = {
 };
 
 const imageLogs = defineTable(imageLogFields)
-  .index("by_user", ["userExternalId"])
+  .index("by_userId", ["userExternalId"])
   .index("by_whiteboard", ["whiteboardId"])
   .index("by_node", ["nodeId"]);
 

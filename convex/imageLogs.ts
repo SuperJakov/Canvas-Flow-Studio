@@ -76,7 +76,7 @@ export const calculateImageCost = internalQuery({
     console.log(`calculateImageCost called for user: ${userExternalId}`);
     const logs = await ctx.db
       .query("imageLogs")
-      .withIndex("by_user", (q) => q.eq("userExternalId", userExternalId))
+      .withIndex("by_userId", (q) => q.eq("userExternalId", userExternalId))
       .collect();
     console.log(`Fetched ${logs.length} logs for user ${userExternalId}`);
 
