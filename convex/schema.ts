@@ -25,16 +25,6 @@ const ImageNodeSchema = v.object({
     imageUrl: v.union(v.string(), v.null()),
     isLocked: v.boolean(),
     isRunning: v.boolean(),
-    style: v.optional(
-      v.union(
-        v.literal("auto"),
-        v.literal("anime"),
-        v.literal("photorealistic"),
-        v.literal("oilpainting"),
-        v.literal("pixelart"),
-        v.literal("cyberpunk"),
-      ),
-    ),
   }),
   position: v.object({
     x: v.number(),
