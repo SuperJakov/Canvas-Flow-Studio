@@ -5,10 +5,18 @@ import { useQuery } from "convex/react";
 import Image from "next/image";
 import Loading from "~/app/loading";
 import { useState, useEffect } from "react";
-import { Download, Loader2, X, ExternalLink, Images } from "lucide-react";
+import {
+  Download,
+  Loader2,
+  X,
+  ExternalLink,
+  Images,
+  Archive,
+} from "lucide-react";
 import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import type { Doc } from "convex/_generated/dataModel";
 import Link from "next/link";
+import JSZip from "jszip";
 
 const formatDate = (timestamp: bigint | number | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -18,6 +26,12 @@ const formatDate = (timestamp: bigint | number | undefined | null): string => {
   return formatDistanceToNow(date, { addSuffix: true });
 };
 
+interface DownloadProgress {
+  current: number;
+  total: number;
+  status: string;
+}
+
 export default function GalleryPage() {
   const allImages = useQuery(api.imageNodes.getAllGeneratedImages);
   const [fullscreenImage, setFullscreenImage] =
@@ -25,6 +39,9 @@ export default function GalleryPage() {
   const [downloadingImages, setDownloadingImages] = useState<Set<string>>(
     new Set(),
   );
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [downloadProgress, setDownloadProgress] =
+    useState<DownloadProgress | null>(null);
 
   const handleDownload = async (
     imageUrl: string,
@@ -64,6 +81,125 @@ export default function GalleryPage() {
     }
   };
 
+  const handleDownloadAll = async () => {
+    if (!allImages || allImages.length === 0 || downloadingAll) return;
+
+    setDownloadingAll(true);
+    setDownloadProgress({
+      current: 0,
+      total: allImages.length,
+      status: "Preparing...",
+    });
+
+    try {
+      const zip = new JSZip();
+      const validImages = allImages.filter((image) => image.imageUrl);
+
+      setDownloadProgress({
+        current: 0,
+        total: validImages.length,
+        status: "Downloading images...",
+      });
+
+      // Download all images in parallel
+      let completedCount = 0;
+      const downloadPromises = validImages.map(async (image, index) => {
+        if (!image?.imageUrl) return null;
+
+        try {
+          const response = await fetch(image.imageUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+          const filename = `generated-image-${index + 1}-${image._id}.png`;
+
+          // Update progress atomically
+          completedCount++;
+          setDownloadProgress({
+            current: completedCount,
+            total: validImages.length,
+            status: `Downloading images...`,
+          });
+
+          return { filename, blob };
+        } catch (error) {
+          console.error(`Failed to download image ${index + 1}:`, error);
+          // Still increment count for failed downloads
+          completedCount++;
+          setDownloadProgress({
+            current: completedCount,
+            total: validImages.length,
+            status: `Downloading images...`,
+          });
+          return null;
+        }
+      });
+
+      // Wait for all downloads to complete
+      const downloadResults = await Promise.allSettled(downloadPromises);
+
+      // Add successfully downloaded images to zip
+      downloadResults.forEach((result) => {
+        if (result.status === "fulfilled" && result.value) {
+          zip.file(result.value.filename, result.value.blob);
+        }
+      });
+
+      setDownloadProgress({
+        current: validImages.length,
+        total: validImages.length,
+        status: "Creating zip file...",
+      });
+
+      // Generate zip file with 0% compression
+      const zipBlob = await zip.generateAsync({
+        type: "blob",
+        compression: "STORE", // 0% compression
+        compressionOptions: {
+          level: 0,
+        },
+      });
+
+      // Download the zip file
+      const url = window.URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = `gallery-images-${new Date().toISOString().split("T")[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setDownloadProgress({
+        current: validImages.length,
+        total: validImages.length,
+        status: "Download complete!",
+      });
+
+      // Clear progress after 2 seconds
+      setTimeout(() => {
+        setDownloadProgress(null);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to download all images:", error);
+      setDownloadProgress({
+        current: 0,
+        total: allImages.length,
+        status: "Download failed",
+      });
+
+      // Clear progress after 3 seconds
+      setTimeout(() => {
+        setDownloadProgress(null);
+      }, 3000);
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
   const handleImageClick = (image: Doc<"imageNodes">) => {
     setFullscreenImage(image);
     // Prevent body scroll when modal opens
@@ -90,11 +226,45 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-gray-900 pt-16 text-white">
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Image Gallery</h1>
-          <p className="mt-2 text-sm text-gray-400">
-            {allImages.length} {allImages.length === 1 ? "image" : "images"}
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Image Gallery</h1>
+            <p className="mt-2 text-sm text-gray-400">
+              {allImages.length} {allImages.length === 1 ? "image" : "images"}
+            </p>
+          </div>
+
+          {/* Download All Button */}
+          {allImages.length > 0 && (
+            <div className="flex flex-col items-end space-y-2">
+              <button
+                onClick={handleDownloadAll}
+                disabled={downloadingAll}
+                className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {downloadingAll ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Archive size={18} />
+                )}
+                Download All ({allImages.length})
+              </button>
+
+              {/* Progress Bar */}
+              {downloadProgress && (
+                <div className="w-64">
+                  <div className="h-2 overflow-hidden rounded-full bg-gray-700">
+                    <div
+                      className="h-full bg-purple-500 transition-all duration-300 ease-out"
+                      style={{
+                        width: `${Math.round((downloadProgress.current / downloadProgress.total) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="rounded-lg bg-gray-800 p-6">
