@@ -1,5 +1,11 @@
 "use client";
-import { useCallback, type DragEvent, useEffect, useRef } from "react";
+import {
+  useCallback,
+  type DragEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ReactFlow,
   applyEdgeChanges,
@@ -27,6 +33,8 @@ import { debounce } from "lodash";
 import Loading from "../loading";
 import SharingPopup from "./SharingPopup";
 import WhiteboardPreviewCreator from "./WhiteboardPreviewCreator";
+import Portal from "../_components/Portal";
+import UpgradeBanner from "./UpgradeBanner";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -41,12 +49,16 @@ export default function Whiteboard({ id }: Props) {
     api.whiteboards.getWhiteboard,
     id ? { id } : "skip",
   );
+  const nodeCountLimit = useQuery(api.whiteboards.getNodeCountLimit);
   const user = useQuery(api.users.current);
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const [isExecuting] = useAtom(isExecutingNodeAtom);
   const [dndType] = useDnD();
   const { screenToFlowPosition } = useReactFlow();
+
+  const [isBannerOpen, setIsBannerOpen] = useState(false);
+  const [bannerFeature, setBannerFeature] = useState("");
 
   const updateContentMutation = useMutation(api.whiteboards.editWhiteboard);
   const initialLoadDone = useRef(false);
@@ -350,12 +362,24 @@ export default function Whiteboard({ id }: Props) {
     [setEdges, isSharedWhiteboard],
   );
 
+  const openBanner = useCallback((feature: string) => {
+    setBannerFeature(feature);
+    setIsBannerOpen(true);
+  }, []);
+
+  const closeBanner = useCallback(() => {
+    setIsBannerOpen(false);
+  }, []);
+
   const onDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
-      if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
       event.preventDefault();
       if (!dndType) return;
-
+      if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
+      if (!nodeCountLimit?.maxNodeCount) return;
+      if (nodeCountLimit.maxNodeCount < nodes.length + 1)
+        return openBanner("Higher limits");
+      console.log(nodeCountLimit.maxNodeCount);
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
@@ -434,7 +458,15 @@ export default function Whiteboard({ id }: Props) {
         setNodes((prevNodes) => prevNodes.concat(newNode));
       }
     },
-    [screenToFlowPosition, dndType, setNodes, isSharedWhiteboard],
+    [
+      dndType,
+      isSharedWhiteboard,
+      nodeCountLimit,
+      nodes.length,
+      openBanner,
+      screenToFlowPosition,
+      setNodes,
+    ],
   );
 
   const onDragOver = useCallback(
@@ -461,28 +493,37 @@ export default function Whiteboard({ id }: Props) {
   }
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      fitView
-      fitViewOptions={{
-        padding: 0.9, // leave 90% margin -> zooms out further
-      }}
-      colorMode="dark"
-      proOptions={{
-        hideAttribution: true, // Remove "React flow" watermark
-      }}
-    >
-      <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-      <SharingPopup id={id} />
-      <WhiteboardPreviewCreator />
-    </ReactFlow>
+    <>
+      <Portal>
+        <UpgradeBanner
+          isOpen={isBannerOpen}
+          onCloseAction={closeBanner}
+          featureName={bannerFeature}
+        />
+      </Portal>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        fitView
+        fitViewOptions={{
+          padding: 0.9, // leave 90% margin -> zooms out further
+        }}
+        colorMode="dark"
+        proOptions={{
+          hideAttribution: true, // Remove "React flow" watermark
+        }}
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+        <SharingPopup id={id} />
+        <WhiteboardPreviewCreator />
+      </ReactFlow>
+    </>
   );
 }

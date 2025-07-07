@@ -36,6 +36,19 @@ function getWhiteboardCountLimitForTier(tier: Tier) {
   }
 }
 
+function getNodeCountLimitForTier(tier: Tier) {
+  switch (tier) {
+    case "Free":
+      return 10; // Free tier allows up to 10 node
+    case "Plus":
+      return 50; // Plus tier allows up to 50 nodes
+    case "Pro":
+      return 100; // Pro tier allows 100 nodes
+    default:
+      throw new Error(`Unknown tier: ${String(tier)}`);
+  }
+}
+
 export const getWhiteboardCountLimit = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -60,6 +73,22 @@ export const getWhiteboardCountLimit = query({
     return {
       maxWhiteboardCount: maxWhiteboards,
       currentWhiteboardCount: usersWhiteboards.length,
+    };
+  },
+});
+
+export const getNodeCountLimit = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
+    if (!userPlanInfo) throw new Error("User not found");
+
+    const nodeCountLimit = getNodeCountLimitForTier(userPlanInfo.plan);
+
+    return {
+      maxNodeCount: nodeCountLimit,
     };
   },
 });
@@ -125,13 +154,25 @@ export const editWhiteboard = mutation({
 
     if (nodes) {
       for (const node of nodes) {
-        if (node.type === "textEditor" || node.type === "comment") {
+        if (
+          node.type === "textEditor" ||
+          node.type === "comment" ||
+          node.type === "instruction"
+        ) {
           if (node.data.text.length > 10000) {
             throw new Error(
               "Text content exceeds maximum length of 10000 characters",
             );
           }
         }
+      }
+      const { maxNodeCount } = await ctx.runQuery(
+        api.whiteboards.getNodeCountLimit,
+      );
+      if (maxNodeCount < nodes.length) {
+        throw new Error(
+          `"Node count exceeds limit of ${maxNodeCount} nodes for this user`,
+        );
       }
     }
 
