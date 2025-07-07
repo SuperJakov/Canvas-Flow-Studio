@@ -36,3 +36,96 @@ export const setAuthorExternalId = migrations.define({
 export const runSetAuthorExternalId = migrations.runner(
   internal.migrations.setAuthorExternalId,
 );
+
+export const removeSpeechUrlField = migrations.define({
+  table: "whiteboards",
+  migrateOne: async (ctx, doc) => {
+    let hasChanges = false;
+
+    const updatedNodes = doc.nodes.map((node) => {
+      if (node.type === "speech" && "speechUrl" in node.data) {
+        hasChanges = true;
+        const { speechUrl, ...restData } = node.data;
+        return {
+          ...node,
+          data: restData,
+        };
+      }
+      return node;
+    });
+
+    // Only update if there were actual changes
+    if (hasChanges) {
+      await ctx.db.patch(doc._id, {
+        nodes: updatedNodes,
+      });
+    }
+  },
+});
+
+export const runRemoveSpeechUrlField = migrations.runner(
+  internal.migrations.removeSpeechUrlField,
+);
+
+export const removeIsRunningState = migrations.define({
+  table: "whiteboards",
+  migrateOne: async (ctx, doc) => {
+    const updatedNodes = doc.nodes.map((node) => {
+      switch (node.type) {
+        case "image": {
+          if ("isRunning" in node.data) {
+            const { isRunning, ...restData } = node.data;
+            return {
+              ...node,
+              data: restData,
+            };
+          }
+          break;
+        }
+        case "textEditor": {
+          if ("isRunning" in node.data) {
+            const { isRunning, ...restData } = node.data;
+            return {
+              ...node,
+              data: restData,
+            };
+          }
+          break;
+        }
+        case "instruction": {
+          if ("isRunning" in node.data) {
+            const { isRunning, ...restData } = node.data;
+            return {
+              ...node,
+              data: restData,
+            };
+          }
+          break;
+        }
+        case "speech": {
+          if ("isRunning" in node.data) {
+            const { isRunning, ...restData } = node.data;
+            return {
+              ...node,
+              data: restData,
+            };
+          }
+          break;
+        }
+        default:
+          break;
+      }
+      // Return unchanged node if no modifications were made
+      return node;
+    });
+
+    // Update the document with the modified nodes array
+    await ctx.db.patch(doc._id, {
+      nodes: updatedNodes,
+    });
+  },
+});
+
+export const runRemoveIsRunningState = migrations.runner(
+  internal.migrations.removeIsRunningState,
+);

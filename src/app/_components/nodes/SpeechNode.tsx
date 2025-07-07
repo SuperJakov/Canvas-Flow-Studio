@@ -259,7 +259,7 @@ export default function SpeechNode({
   const retryAfterSeconds = speechGenRateLimit?.retryAfter;
 
   const isLocked = data.isLocked ?? false;
-  const isRunning = data.isRunning ?? false;
+  const isRunning = data?.internal?.isRunning ?? false;
 
   const [isDownloading, setIsDownloading] = useState(false);
   const edges = useEdges();
@@ -297,10 +297,10 @@ export default function SpeechNode({
       nodeId: id,
       nodeType: "speech",
       updatedData: {
-        speechUrl: speechUrl ?? null,
         internal: {
           generateAndStoreSpeechAction,
           isRateLimited,
+          isRunning: isRunning,
         },
       },
     });
@@ -310,6 +310,7 @@ export default function SpeechNode({
     updateNodeData,
     isRateLimited,
     speechUrl,
+    isRunning,
   ]);
 
   useEffect(() => {
@@ -366,7 +367,7 @@ export default function SpeechNode({
     if (isRunning) {
       updateNodeData({
         nodeId: id,
-        updatedData: { isRunning: false },
+        updatedData: { internal: { isRunning: false } },
         nodeType: "speech",
       });
     } else if (hasIncomingConnections && !isRateLimited) {

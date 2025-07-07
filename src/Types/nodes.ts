@@ -11,46 +11,47 @@ export type CommentNodeData = {
 export type TextEditorNodeData = {
   text: string;
   isLocked: boolean;
-  isRunning: boolean;
   zIndex?: number;
+  internal?: {
+    isRunning: boolean;
+  };
 };
 
 export type ImageNodeData = {
   imageUrl: string | null;
   isLocked: boolean;
-  isRunning: boolean;
+  zIndex?: number;
   internal?: {
+    isRunning: boolean;
     generateAndStoreImageAction?: ReactAction<
       typeof api.imageNodes.generateAndStoreImage
     >;
     isRateLimited?: boolean;
   };
-  zIndex?: number;
 };
 
 export type InstructionNodeData = {
   isLocked: boolean;
-  isRunning: boolean;
   text: string;
-  internal: {
+  zIndex?: number;
+  internal?: {
+    isRunning: boolean;
     detectOutputNodeTypeAction?: ReactAction<
       typeof api.instructionNodes.detectOutputNodeType
     >;
   };
-  zIndex?: number;
 };
 
 export type SpeechNodeData = {
-  speechUrl: string | null;
   isLocked: boolean;
-  isRunning: boolean;
+  zIndex?: number;
   internal?: {
+    isRunning: boolean;
     generateAndStoreSpeechAction?: ReactAction<
       typeof api.speechNodes.generateAndStoreSpeech
     >;
     isRateLimited?: boolean;
   };
-  zIndex?: number;
 };
 
 export type PreviewImageNodeData = {

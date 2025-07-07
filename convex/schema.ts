@@ -4,7 +4,6 @@ import { v } from "convex/values";
 export const TextEditorNodeData = v.object({
   text: v.string(),
   isLocked: v.boolean(),
-  isRunning: v.boolean(),
 });
 
 const TextEditorSchema = v.object({
@@ -24,7 +23,6 @@ const ImageNodeSchema = v.object({
   data: v.object({
     imageUrl: v.union(v.string(), v.null()),
     isLocked: v.boolean(),
-    isRunning: v.boolean(),
   }),
   position: v.object({
     x: v.number(),
@@ -37,9 +35,7 @@ const SpeechNodeSchema = v.object({
   id: v.string(),
   type: v.literal("speech"),
   data: v.object({
-    speechUrl: v.union(v.string(), v.null()),
     isLocked: v.boolean(),
-    isRunning: v.boolean(),
   }),
   position: v.object({
     x: v.number(),
@@ -59,8 +55,8 @@ const CommentNodeSchema = v.object({
     x: v.number(),
     y: v.number(),
   }),
-  width: v.optional(v.union(v.number(), v.null())),
-  height: v.optional(v.union(v.number(), v.null())),
+  width: v.optional(v.union(v.number())),
+  height: v.optional(v.union(v.number())),
   zIndex: v.optional(v.number()),
 });
 
@@ -69,7 +65,6 @@ const InstructionNodeSchema = v.object({
   type: v.literal("instruction"),
   data: v.object({
     isLocked: v.boolean(),
-    isRunning: v.boolean(),
     text: v.string(),
   }),
   position: v.object({

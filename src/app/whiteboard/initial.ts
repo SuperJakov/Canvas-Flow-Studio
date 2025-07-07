@@ -12,7 +12,7 @@ export const initialNodes: AppNode[] = [
     data: {
       text: "This is a text node",
       isLocked: false,
-      isRunning: false,
+      internal: { isRunning: false },
     },
     position: { x: 400, y: 125 },
   },

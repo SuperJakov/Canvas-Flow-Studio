@@ -79,7 +79,7 @@ const ImageNodeExecutionSchema = v.object({
   type: v.literal("image"),
   data: v.object({
     isLocked: v.boolean(),
-    isRunning: v.boolean(),
+    internal: v.object({ isRunning: v.boolean() }),
     imageUrl: v.union(v.null(), v.string()), // ! This is not traditional image node data, this should be added before sending
   }),
 });

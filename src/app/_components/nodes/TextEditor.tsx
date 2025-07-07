@@ -22,7 +22,9 @@ export default function TextEditorNode({
   id,
   selected, // The `selected` prop is provided by @xyflow/react
 }: NodeProps<TextEditorNodeType>) {
-  const { isLocked, isRunning, text } = data;
+  const { isLocked, internal, text } = data;
+  const isRunning = internal?.isRunning;
+
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
   const [edges] = useAtom(edgesAtom);
@@ -37,7 +39,7 @@ export default function TextEditorNode({
     updateNodeData({
       nodeId: id,
       nodeType: "textEditor",
-      updatedData: { isRunning: !isRunning },
+      updatedData: { internal: { isRunning: !isRunning } },
     });
   }
 

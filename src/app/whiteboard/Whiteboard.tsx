@@ -60,8 +60,8 @@ export default function Whiteboard({ id }: Props) {
     if (whiteboardData && !initialLoadDone.current) {
       console.groupCollapsed("[Whiteboard] Loading whiteboard data into atoms");
       console.log("Loading whiteboard data into atoms:", whiteboardData);
-      setNodes(whiteboardData.nodes as AppNode[]);
-      setEdges(whiteboardData.edges as AppEdge[]);
+      setNodes(whiteboardData.nodes);
+      setEdges(whiteboardData.edges);
       initialLoadDone.current = true;
       console.groupEnd();
     } else if (whiteboardData === null && id && !initialLoadDone.current) {
@@ -145,11 +145,13 @@ export default function Whiteboard({ id }: Props) {
             zIndex: n.zIndex,
           };
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { internal, ...nodeDataWithoutInternal } = n.data;
         return {
           id: n.id,
           type: n.type,
           position: n.position,
-          data: n.data,
+          data: nodeDataWithoutInternal,
           zIndex: n.zIndex,
         };
       });
@@ -368,7 +370,7 @@ export default function Whiteboard({ id }: Props) {
             id: newNodeId,
             type: dndType,
             position,
-            data: { text: "", isLocked: false, isRunning: false },
+            data: { text: "", isLocked: false, internal: { isRunning: false } },
           };
           break;
         case "image":
@@ -378,8 +380,11 @@ export default function Whiteboard({ id }: Props) {
             position,
             data: {
               isLocked: false,
-              isRunning: false,
+
               imageUrl: null,
+              internal: {
+                isRunning: false,
+              },
             },
           };
           break;
@@ -401,8 +406,9 @@ export default function Whiteboard({ id }: Props) {
             position,
             data: {
               isLocked: false,
-              isRunning: false,
-              speechUrl: null,
+              internal: {
+                isRunning: false,
+              },
             },
           };
           break;
@@ -411,7 +417,13 @@ export default function Whiteboard({ id }: Props) {
             id: newNodeId,
             type: dndType,
             position,
-            data: { isLocked: false, isRunning: false, text: "", internal: {} },
+            data: {
+              isLocked: false,
+              text: "",
+              internal: {
+                isRunning: false,
+              },
+            },
           };
           break;
         default:

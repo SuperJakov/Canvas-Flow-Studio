@@ -57,7 +57,7 @@ export default function ImageNode({
   const isRateLimited = imageGenRateLimit ? !imageGenRateLimit.ok : false;
   const retryAfterSeconds = imageGenRateLimit?.retryAfter;
   const isLocked = data.isLocked ?? false;
-  const isRunning = data.isRunning ?? false;
+  const isRunning = data?.internal?.isRunning ?? false;
   const [isDownloading, setIsDownloading] = useState(false);
   const edges = useEdges();
 
@@ -104,10 +104,18 @@ export default function ImageNode({
 
         internal: {
           isRateLimited,
+          isRunning,
         },
       },
     });
-  }, [generateAndStoreImageAction, id, updateNodeData, isRateLimited, url]);
+  }, [
+    generateAndStoreImageAction,
+    id,
+    updateNodeData,
+    isRateLimited,
+    url,
+    isRunning,
+  ]);
 
   useEffect(() => {
     registerImageAction(id, generateAndStoreImageAction);
@@ -136,7 +144,7 @@ export default function ImageNode({
     if (isRunning) {
       updateNodeData({
         nodeId: id,
-        updatedData: { isRunning: false },
+        updatedData: { internal: { isRunning: false } },
         nodeType: "image",
       });
     } else if (hasIncomingConnections && !isRateLimited) {

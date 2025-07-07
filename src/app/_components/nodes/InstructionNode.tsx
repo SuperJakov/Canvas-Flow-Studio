@@ -17,7 +17,8 @@ export default function InstructionNode({
   id,
   selected, // The `selected` prop is provided by @xyflow/react
 }: NodeProps<InstructionNodeType>) {
-  const { isLocked, isRunning, text } = data;
+  const { isLocked, internal, text } = data;
+  const isRunning = internal?.isRunning;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
   const [edges] = useAtom(edgesAtom);
@@ -37,10 +38,11 @@ export default function InstructionNode({
       updatedData: {
         internal: {
           detectOutputNodeTypeAction,
+          isRunning: !!isRunning,
         },
       },
     });
-  }, [detectOutputNodeTypeAction, id, updateNodeData]);
+  }, [detectOutputNodeTypeAction, id, updateNodeData, isRunning]);
 
   function toggleRunning() {
     if (!isRunning === true) {
@@ -51,7 +53,7 @@ export default function InstructionNode({
     updateNodeData({
       nodeId: id,
       nodeType: "instruction",
-      updatedData: { isRunning: !isRunning },
+      updatedData: { internal: { isRunning: !isRunning } },
     });
   }
 

@@ -176,8 +176,10 @@ async function executeImageNode(
             type: "textEditor" as const,
             data: {
               isLocked: parentNode.data.isLocked,
-              isRunning: parentNode.data.isRunning,
               text: parentNode.data.text,
+              internal: {
+                isRunning: parentNode.data.internal?.isRunning ?? false,
+              },
             },
           },
         ];
@@ -192,8 +194,11 @@ async function executeImageNode(
             type: "textEditor" as const, // Treat as text for the backend
             data: {
               isLocked: parentNode.data.isLocked,
-              isRunning: parentNode.data.isRunning,
+
               text: parentNode.data.text,
+              internal: {
+                isRunning: parentNode.data.internal?.isRunning ?? false,
+              },
             },
           },
         ];
@@ -207,8 +212,10 @@ async function executeImageNode(
             type: "image" as const,
             data: {
               isLocked: imageNode.data.isLocked,
-              isRunning: imageNode.data.isRunning,
               imageUrl: imageNode.data.imageUrl ?? null,
+              internal: {
+                isRunning: parentNode.data.internal?.isRunning ?? false,
+              },
             },
           }));
 
@@ -266,8 +273,10 @@ async function executeSpeechNode(
     const sourceNodes = connectedSourceNodes
       .filter((node): node is TextEditorNodeType => node.type === "textEditor")
       .map((node) => {
-        const { type, id, data } = node;
-        return { type, id, data } as typeof node;
+        const { type, id } = node;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { internal, ...nodeDataWithoutInternal } = node.data;
+        return { type, id, data: nodeDataWithoutInternal } as typeof node;
       });
 
     console.log("Running generateAndStoreSpeechAction");
@@ -313,7 +322,7 @@ async function executeInstructionNode(
     console.log("Instruction:", instruction);
     console.log("Connected node types:", inputNodeTypes);
     console.log(thisNode.data);
-    const { detectOutputNodeTypeAction } = thisNode.data.internal;
+    const { detectOutputNodeTypeAction } = thisNode.data?.internal ?? {};
     if (!detectOutputNodeTypeAction) {
       throw new Error("detectOutputNodeTypeAction is undefined");
     }
@@ -370,32 +379,31 @@ function getDefaultNodeData(nodeType: AppNode["type"]) {
       return {
         text: "",
         isLocked: false,
-        isRunning: false,
+        internal: { isRunning: false },
       } satisfies TextEditorNodeData;
 
     case "image":
       return {
         imageUrl: null,
         isLocked: false,
-        isRunning: false,
-        // internal will be populated later when the node is initialized with actions
+        internal: { isRunning: false },
       } satisfies ImageNodeData;
 
     case "speech":
       return {
-        speechUrl: null,
         isLocked: false,
-        isRunning: false,
+        internal: {
+          isRunning: false,
+        },
         // internal will be populated later when the node is initialized with actions
       } satisfies SpeechNodeData;
 
     case "instruction":
       return {
         isLocked: false,
-        isRunning: false,
         text: "",
         internal: {
-          // detectOutputNodeTypeAction will be populated when the node is initialized
+          isRunning: false,
         },
       } satisfies InstructionNodeData;
 
@@ -489,7 +497,7 @@ function setNodeRunning(
 ) {
   set(updateNodeDataAtom, {
     nodeId,
-    updatedData: { isRunning },
+    updatedData: { internal: { isRunning } },
     nodeType,
   });
 }
