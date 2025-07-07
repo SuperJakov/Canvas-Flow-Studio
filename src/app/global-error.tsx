@@ -40,7 +40,13 @@ export default function Error({
 
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <button
-            onClick={() => reset()}
+            onClick={() => {
+              if (reset && typeof reset === "function") {
+                reset();
+              } else {
+                window.location.reload();
+              }
+            }}
             className="flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl"
           >
             Try again
