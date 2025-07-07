@@ -24,6 +24,7 @@ import {
 import type { Id } from "convex/_generated/dataModel";
 import { v4 as uuidv4 } from "uuid";
 import { getImageAction, getSpeechAction } from "./nodeActionRegistry";
+
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -93,12 +94,16 @@ function executeTextNode(
   }
 }
 
-// FIXED: This function now correctly collects instruction nodes.
 function collectSourceNodes(
   get: Getter,
   targetNodeId: string,
   visited: Set<string> = new Set<string>(),
-): (ImageNodeType | TextEditorNodeType | InstructionNodeType)[] {
+): (
+  | ImageNodeType
+  | TextEditorNodeType
+  | InstructionNodeType
+  | SpeechNodeType
+)[] {
   if (visited.has(targetNodeId)) return [];
   visited.add(targetNodeId);
 
@@ -108,21 +113,19 @@ function collectSourceNodes(
     | ImageNodeType
     | TextEditorNodeType
     | InstructionNodeType
+    | SpeechNodeType
   )[] = [];
 
   for (const node of directSources) {
     switch (node.type) {
       case "image":
       case "textEditor":
-        payloadNodes.push(node);
-        break;
-
+      case "speech":
       case "instruction":
-        // FIX: The instruction node ITSELF is the source. Add it to the payload.
         payloadNodes.push(node);
         break;
 
-      // Any other node types (speech, comment, …) are irrelevant for images
+      // Any other node types (comment, …) are irrelevant for payload
       default:
         break;
     }
@@ -259,20 +262,95 @@ async function executeSpeechNode(
     }
     const generateAndStoreSpeechAction = getSpeechAction(currentNode.id);
     if (!generateAndStoreSpeechAction) {
-      throw new Error("generateAndStoreSpeechAction not defined.");
+      console.error(
+        "Speech node executed before its callback was registered. Skipping.",
+      );
+      return;
     }
 
-    const connectedSourceNodes = getConnectedSourceNodes(get, currentNode.id);
-    const sourceNodes = connectedSourceNodes
-      .filter((node): node is TextEditorNodeType => node.type === "textEditor")
-      .map((node) => {
-        const { type, id } = node;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { internal, ...nodeDataWithoutInternal } = node.data;
-        return { type, id, data: nodeDataWithoutInternal } as typeof node;
-      });
+    // Get direct parent nodes using the updated helper function
+    const directParentNodes = collectSourceNodes(get, currentNode.id);
 
-    console.log("Running generateAndStoreSpeechAction");
+    // Process parents to find valid sources according to filtering rules
+    const sourceNodes = directParentNodes.flatMap((parentNode) => {
+      // Rule: Disallow directly connected speech nodes
+      if (parentNode.type === "speech") {
+        console.log(
+          `Ignoring directly connected speech node: ${parentNode.id}`,
+        );
+        return [];
+      }
+
+      // Rule: Allow directly connected text editors
+      if (parentNode.type === "textEditor") {
+        return [
+          {
+            id: parentNode.id,
+            type: "textEditor" as const,
+            data: {
+              isLocked: parentNode.data.isLocked,
+              text: parentNode.data.text,
+            },
+          },
+        ];
+      }
+
+      // Rule: Allow speech/text connected via an instruction node
+      if (parentNode.type === "instruction") {
+        // Instruction node provides its text as a source
+        const sourcesFromInstruction = [
+          {
+            id: parentNode.id,
+            type: "instruction" as const,
+            data: {
+              text: parentNode.data.text,
+            },
+          },
+        ];
+
+        // Look for speech or text grandparents behind the instruction node
+        const grandParentNodes = collectSourceNodes(get, parentNode.id);
+        const validGrandParents = grandParentNodes
+          .filter(
+            (gp): gp is SpeechNodeType | TextEditorNodeType =>
+              gp.type === "speech" || gp.type === "textEditor",
+          )
+          .map((gpNode) => {
+            if (gpNode.type === "speech") {
+              return {
+                id: gpNode.id,
+                type: "speech" as const,
+              };
+            }
+            // This must be a textEditor node due to the filter
+            return {
+              id: gpNode.id,
+              type: "textEditor" as const,
+              data: {
+                isLocked: gpNode.data.isLocked,
+                text: gpNode.data.text,
+              },
+            };
+          });
+
+        return [...sourcesFromInstruction, ...validGrandParents];
+      }
+
+      return [];
+    });
+
+    console.log(
+      `Running generateAndStoreSpeechAction with ${sourceNodes.length} source node(s)`,
+      sourceNodes,
+    );
+
+    if (sourceNodes.length === 0) {
+      console.log(
+        "No valid source nodes found after filtering. Skipping execution.",
+      );
+      return;
+    }
+
     await generateAndStoreSpeechAction({
       nodeId: currentNode.id,
       sourceNodes,

@@ -1,5 +1,10 @@
 import { v } from "convex/values";
-import { action, query } from "./_generated/server";
+import {
+  action,
+  type ActionCtx,
+  internalQuery,
+  query,
+} from "./_generated/server";
 import { internalMutation } from "./functions";
 import { TextEditorNodeData } from "./schema";
 import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
@@ -143,10 +148,108 @@ ${textContents.join("\n\n")}`;
 
   return { audioBuffer: audioBytes, mimeType, speech } as const;
 }
+async function editSpeech(
+  instruction: string,
+  speechNodeId: string,
+  ctx: ActionCtx,
+) {
+  const speechTranscript = await ctx.runQuery(
+    internal.speechNodes.getSpeechTranscript,
+    {
+      nodeId: speechNodeId,
+    },
+  );
+
+  const transformMessage = `
+  You are an expert speechwriter AI with a keen sense of thematic analysis. Your job is to transform a speech into a new powerful and emotionally resonant speech using an instruction provided by the user.
+  
+  Your primary task is to first analyze the provided speech and instruction to determine the most appropriate tone, theme, length, and likely intended audience. Then, using that analysis, you will synthesize the text into a short, dynamic speech.
+  
+  ### INSTRUCTIONS ###
+  1.  **Implicit Analysis:** Before writing, you must first analyze the \`instruction\`. Identify the what the user wants to change with the old speech. Your entire speech must be consistent with this analysis.
+  2.  **Structure:** Follow the similar structure of speech unless in analysis you've concluded it needs to change based on the users instruction
+  3.  **Engaging Delivery:** Use storytelling, rhetorical questions, and vivid language that matches the inferred tone.
+  4.  **Use Sound:** You are allowed to strategically incorporate onomatopoeia or descriptive sounds in parentheses (e.g., (tick, tock), (a roar of applause)) to enhance the imagery and emotion of the speech. The sounds should match the tone and user's intent.
+  5.  **Length:** The speech should be 100-200 words long (not counting the parenthetical sounds). User might specify word count. Allow up to 500 words if user specifies. If user specifies more, default to around 500 words. If user didn't specify in the instruction, follow similar length.
+  
+  ### OUTPUT FORMAT ###
+  Output ONLY the speech text. Do not explain your analysis or choice of tone. Do not include a title, introduction, or any text other than the speech itself.
+  
+  ### INSTRUCTION PROVIDED BY USER ###
+  ${instruction}
+  ### OLD SPEECH TRANSCRIPT ###
+  ${speechTranscript}`;
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+  const transformResponse = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: transformMessage,
+    config: {
+      thinkingConfig: {
+        thinkingBudget: -1, // Model decides thinking
+      },
+      seed: Math.floor(Math.random() * 10000000),
+    },
+  });
+
+  const speech = transformResponse.text;
+  if (!speech) {
+    throw new Error("Failed to generate speech from text contents.");
+  }
+
+  console.log("Generated text for a speech:");
+  console.log(speech);
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-preview-tts",
+    contents: [{ parts: [{ text: speech }] }],
+    config: {
+      responseModalities: ["AUDIO"],
+      speechConfig: {
+        voiceConfig: {
+          prebuiltVoiceConfig: { voiceName: "Kore" },
+        },
+      },
+    },
+  });
+
+  const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  const mimeType =
+    response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
+  if (!data || !mimeType) {
+    throw new Error("Failed to generate speech audio data.");
+  }
+  console.log("mimeType", mimeType);
+  const binaryString = atob(data);
+  const audioBytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    audioBytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return { audioBuffer: audioBytes, mimeType, speech } as const;
+}
+const SpeechNodeExecutionSchema = v.object({
+  id: v.string(),
+  type: v.literal("speech"),
+});
+
+const InstructionNodeExecutionSchema = v.object({
+  id: v.string(),
+  type: v.literal("instruction"),
+  data: v.object({
+    text: v.string(),
+  }),
+});
 
 export const generateAndStoreSpeech = action({
   args: {
-    sourceNodes: v.array(v.union(TextEditorExecutionSchema)),
+    sourceNodes: v.array(
+      v.union(
+        TextEditorExecutionSchema,
+        SpeechNodeExecutionSchema,
+        InstructionNodeExecutionSchema,
+      ),
+    ),
     nodeId: v.string(),
     whiteboardId: v.id("whiteboards"),
   },
@@ -186,13 +289,36 @@ export const generateAndStoreSpeech = action({
     const textContents = sourceNodes
       .filter((node) => node.type === "textEditor" && "data" in node)
       .map((textNode) => textNode.data.text);
+    const instruction = sourceNodes.find((node) => node.type === "instruction");
+    const speech = sourceNodes.find((node) => node.type === "speech");
+    if (!instruction) {
+      // Generate speech using AI
+      const {
+        audioBuffer,
+        mimeType,
+        speech: speechText,
+      } = await generateSpeech(textContents);
 
-    // Generate speech using AI
+      const speechBlob = new Blob([audioBuffer], { type: mimeType });
+
+      const storageId = await ctx.storage.store(speechBlob);
+
+      await ctx.runMutation(internal.speechNodes.storeResult, {
+        storageId,
+        nodeId,
+        whiteboardId,
+        speechText,
+      });
+      return;
+    }
+    if (!speech) {
+      throw new Error("Speech expected but not found");
+    }
     const {
       audioBuffer,
       mimeType,
-      speech: speechText,
-    } = await generateSpeech(textContents);
+      speech: newSpeechTranscript,
+    } = await editSpeech(instruction.data.text, speech.id, ctx);
 
     const speechBlob = new Blob([audioBuffer], { type: mimeType });
 
@@ -202,7 +328,7 @@ export const generateAndStoreSpeech = action({
       storageId,
       nodeId,
       whiteboardId,
-      speechText,
+      speechText: newSpeechTranscript,
     });
   },
 });
@@ -241,5 +367,22 @@ export const storeResult = internalMutation({
         speechText: args.speechText,
       });
     }
+  },
+});
+
+export const getSpeechTranscript = internalQuery({
+  args: {
+    nodeId: v.string(),
+  },
+  handler: async (ctx, { nodeId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+
+    const speech = await ctx.db
+      .query("speechNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+    if (!speech) throw new Error("Speech with that node id not found");
+    return speech.speechText;
   },
 });
