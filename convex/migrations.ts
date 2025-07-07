@@ -45,6 +45,7 @@ export const removeSpeechUrlField = migrations.define({
     const updatedNodes = doc.nodes.map((node) => {
       if (node.type === "speech" && "speechUrl" in node.data) {
         hasChanges = true;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { speechUrl, ...restData } = node.data;
         return {
           ...node,
@@ -74,6 +75,7 @@ export const removeIsRunningState = migrations.define({
       switch (node.type) {
         case "image": {
           if ("isRunning" in node.data) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { isRunning, ...restData } = node.data;
             return {
               ...node,
@@ -84,6 +86,7 @@ export const removeIsRunningState = migrations.define({
         }
         case "textEditor": {
           if ("isRunning" in node.data) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { isRunning, ...restData } = node.data;
             return {
               ...node,
@@ -94,6 +97,7 @@ export const removeIsRunningState = migrations.define({
         }
         case "instruction": {
           if ("isRunning" in node.data) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { isRunning, ...restData } = node.data;
             return {
               ...node,
@@ -104,6 +108,7 @@ export const removeIsRunningState = migrations.define({
         }
         case "speech": {
           if ("isRunning" in node.data) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { isRunning, ...restData } = node.data;
             return {
               ...node,
