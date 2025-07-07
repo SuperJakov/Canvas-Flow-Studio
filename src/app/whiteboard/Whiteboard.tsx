@@ -206,20 +206,16 @@ export default function Whiteboard({ id }: Props) {
   }, [nodes, edges, whiteboardData, isSharedWhiteboard]);
 
   useEffect(() => {
-    console.groupCollapsed("Edge Check");
-    console.time("Edge Check");
     for (const edge of edges) {
       // Check if both source and target nodes exist, if not, remove the edge
       const sourceNodeExists = checkIfNodeExists(nodes, edge.source);
       const targetNodeExists = checkIfNodeExists(nodes, edge.target);
 
       if (!sourceNodeExists || !targetNodeExists) {
-        console.log("Removing edge with id:", edge.id);
+        console.log("[Edge check] Removing edge with id:", edge.id);
         setEdges((prevEdges) => prevEdges.filter((e) => e.id !== edge.id));
       }
     }
-    console.timeEnd("Edge Check");
-    console.groupEnd();
   }, [edges, setEdges, nodes]);
 
   const onNodesChange = useCallback(
