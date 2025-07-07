@@ -177,9 +177,6 @@ async function executeImageNode(
             data: {
               isLocked: parentNode.data.isLocked,
               text: parentNode.data.text,
-              internal: {
-                isRunning: parentNode.data.internal?.isRunning ?? false,
-              },
             },
           },
         ];
@@ -194,11 +191,7 @@ async function executeImageNode(
             type: "textEditor" as const, // Treat as text for the backend
             data: {
               isLocked: parentNode.data.isLocked,
-
               text: parentNode.data.text,
-              internal: {
-                isRunning: parentNode.data.internal?.isRunning ?? false,
-              },
             },
           },
         ];
