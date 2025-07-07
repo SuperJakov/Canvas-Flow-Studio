@@ -22,3 +22,24 @@ export function unregisterImageAction(nodeId: string) {
 export function getImageAction(nodeId: string) {
   return imageActionMap.get(nodeId);
 }
+
+export type GenerateAndStoreSpeechAction = ReactAction<
+  typeof api.speechNodes.generateAndStoreSpeech
+>;
+
+const speechActionMap = new Map<string, GenerateAndStoreSpeechAction>();
+
+export function registerSpeechAction(
+  nodeId: string,
+  fn: GenerateAndStoreSpeechAction,
+) {
+  speechActionMap.set(nodeId, fn);
+}
+
+export function unregisterSpeechAction(nodeId: string) {
+  speechActionMap.delete(nodeId);
+}
+
+export function getSpeechAction(nodeId: string) {
+  return speechActionMap.get(nodeId);
+}

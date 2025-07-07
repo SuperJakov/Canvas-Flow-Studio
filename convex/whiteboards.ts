@@ -1,4 +1,3 @@
-import { initialEdges, initialNodes } from "~/app/whiteboard/initial";
 import { query } from "./_generated/server";
 import { internalMutation, mutation } from "./functions";
 import { v } from "convex/values";
@@ -6,6 +5,23 @@ import { AppEdge, AppNode } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import { api, internal } from "./_generated/api";
 import type { Tier } from "~/Types/stripe";
+
+function generateInitialNodes() {
+  return [
+    {
+      type: "textEditor" as const,
+      data: {
+        isLocked: false,
+        text: "This is a text node.",
+      },
+      id: uuidv4(),
+      position: {
+        x: 0,
+        y: 0,
+      },
+    },
+  ];
+}
 
 function getWhiteboardCountLimitForTier(tier: Tier) {
   switch (tier) {
@@ -77,8 +93,8 @@ export const createWhiteboard = mutation({
       createdAt: now,
       updatedAt: now,
       ownerId: identity.subject,
-      nodes: initialNodes,
-      edges: initialEdges,
+      nodes: generateInitialNodes(),
+      edges: [],
       isPublic: false,
     });
   },

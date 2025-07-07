@@ -21,6 +21,10 @@ import { api } from "../../../../convex/_generated/api";
 import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
 import { useParams } from "next/navigation";
+import {
+  registerSpeechAction,
+  unregisterImageAction,
+} from "~/app/whiteboard/nodeActionRegistry";
 
 function pcmToWavBlob(pcmData: Uint8Array, sampleRate = 24000): Blob {
   const numChannels = 1;
@@ -293,25 +297,22 @@ export default function SpeechNode({
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
   useEffect(() => {
+    registerSpeechAction(id, generateAndStoreSpeechAction);
+    return () => unregisterImageAction(id); // tidy up on unmount
+  }, [id, generateAndStoreSpeechAction]);
+
+  useEffect(() => {
     updateNodeData({
       nodeId: id,
       nodeType: "speech",
       updatedData: {
         internal: {
-          generateAndStoreSpeechAction,
           isRateLimited,
           isRunning: isRunning,
         },
       },
     });
-  }, [
-    generateAndStoreSpeechAction,
-    id,
-    updateNodeData,
-    isRateLimited,
-    speechUrl,
-    isRunning,
-  ]);
+  }, [id, updateNodeData, isRateLimited, speechUrl, isRunning]);
 
   useEffect(() => {
     let objectUrl: string | null = null;

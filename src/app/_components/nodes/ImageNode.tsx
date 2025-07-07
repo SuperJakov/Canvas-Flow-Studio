@@ -101,21 +101,13 @@ export default function ImageNode({
       nodeType: "image",
       updatedData: {
         imageUrl: url ?? null,
-
         internal: {
           isRateLimited,
           isRunning,
         },
       },
     });
-  }, [
-    generateAndStoreImageAction,
-    id,
-    updateNodeData,
-    isRateLimited,
-    url,
-    isRunning,
-  ]);
+  }, [id, updateNodeData, isRateLimited, url, isRunning]);
 
   useEffect(() => {
     registerImageAction(id, generateAndStoreImageAction);

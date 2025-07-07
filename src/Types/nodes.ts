@@ -23,9 +23,6 @@ export type ImageNodeData = {
   zIndex?: number;
   internal?: {
     isRunning: boolean;
-    generateAndStoreImageAction?: ReactAction<
-      typeof api.imageNodes.generateAndStoreImage
-    >;
     isRateLimited?: boolean;
   };
 };
@@ -47,9 +44,6 @@ export type SpeechNodeData = {
   zIndex?: number;
   internal?: {
     isRunning: boolean;
-    generateAndStoreSpeechAction?: ReactAction<
-      typeof api.speechNodes.generateAndStoreSpeech
-    >;
     isRateLimited?: boolean;
   };
 };

@@ -23,7 +23,7 @@ import {
 } from "./atoms";
 import type { Id } from "convex/_generated/dataModel";
 import { v4 as uuidv4 } from "uuid";
-import { getImageAction } from "./nodeActionRegistry";
+import { getImageAction, getSpeechAction } from "./nodeActionRegistry";
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -257,8 +257,8 @@ async function executeSpeechNode(
       console.log("Node cannot run: rate limit reached");
       return;
     }
-
-    if (!currentNode.data.internal?.generateAndStoreSpeechAction) {
+    const generateAndStoreSpeechAction = getSpeechAction(currentNode.id);
+    if (!generateAndStoreSpeechAction) {
       throw new Error("generateAndStoreSpeechAction not defined.");
     }
 
@@ -273,7 +273,7 @@ async function executeSpeechNode(
       });
 
     console.log("Running generateAndStoreSpeechAction");
-    await currentNode.data.internal.generateAndStoreSpeechAction({
+    await generateAndStoreSpeechAction({
       nodeId: currentNode.id,
       sourceNodes,
       whiteboardId,
