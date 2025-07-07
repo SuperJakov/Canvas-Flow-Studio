@@ -18,7 +18,7 @@ Whether you're a creative professional, developer, researcher, or business user,
 ## Features
 
 - **Visual Node-Based Editor**: Intuitive drag-and-drop interface for creating AI workflows
-- **Diverse Node Types**: Text inputs, image inputs, AI instruction nodes, and more
+- **Diverse Node Types**: Text, image, instruction nodes and more
 - **AI Model Integration**: Support for various text generation, image generation, and analysis models including Gemini 2.0 Flash and Google Cloud TTS
 - **Real-time Previews**: See outputs from each node as you build your workflow
 - **Workflow Saving & Loading**: Save your workflows and load them for future use or modification
@@ -32,8 +32,7 @@ AI Flow Studio is built with a modern technology stack:
 
 - **Frontend Framework**: [Next.js](https://nextjs.org/) - React framework with SSR/SSG capabilities
 - **UI Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- **Backend & Database**: [Supabase](https://supabase.io/) - Open-source Firebase alternative with PostgreSQL
-- **ORM / Query Builder**: [Drizzle ORM](https://orm.drizzle.team/) - TypeScript-first SQL query builder
+- **Backend & Database**: [Convex](https://convex.dev/) - Open-source reactive database
 - **State Management**: [Jotai](https://jotai.org/) - Atomic, primitive state management for React
 - **Diagramming/Flow**: [React Flow (@xyflow/react)](https://reactflow.dev/) - Library for building node-based editors
 - **Payment Processing**: [Stripe](https://stripe.com/) - Secure payment infrastructure for subscription management
@@ -43,14 +42,13 @@ AI Flow Studio is built with a modern technology stack:
 
 AI Flow Studio integrates with powerful AI models to provide a wide range of capabilities:
 
-| Category                          | Model                      | Description                                                                                          | Cost           | Speed                                     |
-| --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- | -------------- | ----------------------------------------- |
-| **Text Generation & Instruction** | Gemini 2.0 Flash Lite      | Basic text generation and instruction following                                                      | Free           | ⚡⚡⚡⚡⚡                                |
-|                                   | Gemini 2.0 Flash           | Advanced large language model for text generation, instruction following, and content transformation | Free           | ⚡⚡⚡⚡                                  |
-| **Image Generation**              | Gemini 2.0 Flash Image Gen | Creating images from text descriptions with Google's multimodal AI                                   | Free           | ⚡⚡⚡ (5-6s/image)                       |
-|                                   | GPT Image Gen 1            | High-quality image generation from text prompts                                                      | $0.01/image    | ⚡⚡ (15s/image) <sub>_Coming soon_</sub> |
-| **Speech & Audio**                | Gemini 2.0 Flash           | Text analysis and processing for speech content                                                      | Free           | ⚡⚡⚡⚡                                  |
-|                                   | Google Cloud TTS AI        | High-quality text-to-speech conversion with natural sounding voices                                  | Basically free | ⚡⚡⚡⚡                                  |
+| Category                          | Model                 | Description                                                                                          | Cost           | Speed            |
+| --------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------- | -------------- | ---------------- |
+| **Text Generation & Instruction** | Gemini 2.5 Flash Lite | Basic text generation and instruction following                                                      | Free           | ⚡⚡⚡⚡⚡       |
+|                                   | Gemini 2.5 Flash      | Advanced large language model for text generation, instruction following, and content transformation | Free           | ⚡⚡⚡⚡         |
+| **Image Generation**              | GPT Image Gen 1       | High-quality image generation from text prompts                                                      | $0.01/image    | ⚡⚡ (15s/image) |
+| **Speech & Audio**                | Gemini 2.5 Flash      | Text analysis and processing for speech content                                                      | Free           | ⚡⚡⚡⚡         |
+|                                   | Azure AI TTS          | High-quality text-to-speech conversion with natural sounding voices                                  | Basically free | ⚡⚡⚡⚡         |
 
 We continuously work to expand our supported models based on user needs and technological advancements.
 
@@ -101,6 +99,8 @@ Each subscription tier comes with different rate limits for our core features. A
 | **Priority Support**              | ❌        | ✅        | ✅       |
 | **Beta features**                 | ❌        | ✅        | ✅       |
 
+If the user uses all limits they can each month, we won't have any profit. Of course, we don't expect the user to always reach the limits.
+
 ## Getting Started
 
 ### Prerequisites
@@ -125,7 +125,6 @@ Each subscription tier comes with different rate limits for our core features. A
    ```
 
 3. Set up environment variables
-
    - Copy `.env.example` to `.env.local`
    - Fill in your Supabase credentials and other required variables
 
@@ -141,19 +140,19 @@ Each subscription tier comes with different rate limits for our core features. A
 
 ### Basic Text-to-Image Workflow
 
-1. Drag a Text Input node onto the canvas
+1. Drag a text node onto the canvas
 2. Type a detailed description for an image
-3. Drag an AI Image Generation node onto the canvas
-4. Connect the Text Input to the AI Image Generation node
+3. Drag an image node onto the canvas
+4. Connect the text node to the image node
 5. Execute the workflow to generate your image
 
-### Advanced Chained Workflow
+### Image edit workflow
 
-1. Start with a Text Input node (e.g., "A beautiful landscape with mountains")
-2. Connect to an AI Image Generation node to create the initial image
-3. Add another Text Input node with modification instructions (e.g., "Add snow to the mountains")
-4. Connect both the generated image and the modification text to an Image Editing AI node
-5. Execute to see your modified image
+1. Follow instructions before this
+2. Add instruction node to your canvas
+3. Connect the generate image node with your instruction node
+4. Type instruction on how to edit the image in the instruction node
+5. Run the instruction node
 
 ## Contributing
 
@@ -188,20 +187,20 @@ Our team will review all model recommendations and prioritize based on user dema
 
 ### Core Functionality
 
-- [ ] Basic auth
-- [ ] Drag & Drop interface
-- [ ] Text nodes
-- [ ] Image nodes
-- [ ] Image editing using instruction node
+- [x] Basic auth
+- [x] Drag & Drop interface
+- [x] Text nodes
+- [x] Image nodes
+- [x] Image editing using instruction node
 - [ ] Image model selection
 - [ ] Image style selection
-- [ ] Speech node
+- [x] Speech node
 - [ ] Speech style selection
 
 ### User Management & Monetization
 
 - [ ] Stable user tiers with Stripe
-- [ ] Ratelimit whiteboard creation for specific tiers
+- [x] Ratelimit whiteboard creation for specific tiers
 
 ### Additional Node Types
 
@@ -215,7 +214,7 @@ Our team will review all model recommendations and prioritize based on user dema
 
 ### User Experience & Documentation
 
-- [ ] Whiteboard previews on `/whiteboards`
+- [x] Whiteboard previews on `/whiteboards`
 - [ ] Mobile responsive design
 - [ ] Docs
 - [ ] Onboarding tutorial/guided tour
@@ -228,8 +227,11 @@ Our team will review all model recommendations and prioritize based on user dema
 
 ### Collaboration Features
 
-- [ ] Collaboration: Sharing whiteboards
+- [x] Collaboration: Sharing whiteboards
+- [ ] Collaboration: Permissions, real-time collaboration
 - [ ] Projects
+
+---
 
 ### Launch Preparation
 
