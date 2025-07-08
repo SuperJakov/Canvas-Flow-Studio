@@ -4,6 +4,7 @@ import "./src/env.js";
 const config: NextConfig = {
   experimental: {
     reactCompiler: true,
+    ppr: true,
   },
   images: {
     remotePatterns: [
