@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { X, Check, Sparkles, ArrowRight, Crown, Zap } from "lucide-react";
-import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { useConvexQuery } from "~/helpers/convex";
 
 const plans = [
   {
@@ -60,7 +60,7 @@ export default function UpgradeBanner({
   onCloseAction,
   featureName,
 }: UpgradeBannerProps) {
-  const userPlanInfo = useQuery(api.users.getCurrentUserPlanInfo);
+  const userPlanInfo = useConvexQuery(api.users.getCurrentUserPlanInfo);
   const userPlan = userPlanInfo?.plan ?? "Free";
   if (!isOpen) {
     return null;

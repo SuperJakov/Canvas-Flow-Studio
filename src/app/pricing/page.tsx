@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth } from "convex/react";
 import {
   Check,
   ArrowRight,
@@ -20,6 +20,7 @@ import { FeatureSection } from "./components/FeatureSection";
 import { SubscriptionStatus } from "./components/SubscriptionStatus";
 import { plans, tierRanks } from "./data/plans";
 import type { SubscriptionProperties } from "./types";
+import { useConvexQuery } from "~/helpers/convex";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -43,7 +44,7 @@ export default function PricingPage() {
   );
   const cancelSubscription = useAction(api.stripe.cancelSubscription);
   const reactivateSubscription = useAction(api.stripe.reactivateSubscription);
-  const planInfo = useQuery(api.users.getCurrentUserPlanInfo);
+  const planInfo = useConvexQuery(api.users.getCurrentUserPlanInfo);
 
   if (auth.isLoading || planInfo === undefined) {
     return <Loading />;

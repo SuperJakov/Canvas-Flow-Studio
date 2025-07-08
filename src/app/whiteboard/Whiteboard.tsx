@@ -25,7 +25,7 @@ import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms";
 import { useAtom } from "jotai";
 import { useDnD } from "./DnDContext";
 import { v4 as uuidv4 } from "uuid";
-import { useQuery, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import Link from "next/link";
@@ -35,6 +35,7 @@ import SharingPopup from "./SharingPopup";
 import WhiteboardPreviewCreator from "./WhiteboardPreviewCreator";
 import Portal from "../_components/Portal";
 import UpgradeBanner from "./UpgradeBanner";
+import { useConvexQuery } from "~/helpers/convex";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -45,12 +46,12 @@ function checkIfNodeExists(nodes: AppNode[], nodeId: string) {
 }
 
 export default function Whiteboard({ id }: Props) {
-  const whiteboardData = useQuery(
+  const whiteboardData = useConvexQuery(
     api.whiteboards.getWhiteboard,
     id ? { id } : "skip",
   );
-  const nodeCountLimit = useQuery(api.whiteboards.getNodeCountLimit);
-  const user = useQuery(api.users.current);
+  const nodeCountLimit = useConvexQuery(api.whiteboards.getNodeCountLimit);
+  const user = useConvexQuery(api.users.current);
   const [nodes, setNodes] = useAtom(nodesAtom);
   const [edges, setEdges] = useAtom(edgesAtom);
   const [isExecuting] = useAtom(isExecutingNodeAtom);

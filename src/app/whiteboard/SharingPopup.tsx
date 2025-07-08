@@ -1,15 +1,15 @@
-import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
+import { useConvexQuery } from "~/helpers/convex";
 
 type Props = {
   id: Id<"whiteboards">;
 };
 
 export default function SharingPopup({ id }: Props) {
-  const whiteboardData = useQuery(api.whiteboards.getWhiteboard, { id });
-  const user = useQuery(api.users.current);
+  const whiteboardData = useConvexQuery(api.whiteboards.getWhiteboard, { id });
+  const user = useConvexQuery(api.users.current);
   const { copyWhiteboard, isCopying, CopyingOverlay } = useCopyWhiteboard();
 
   if (!whiteboardData || !user) return null;

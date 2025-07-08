@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
-import { useAction, useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
@@ -34,6 +34,7 @@ import {
   registerImageAction,
   unregisterImageAction,
 } from "~/app/whiteboard/nodeActionRegistry";
+import { useConvexQuery } from "~/helpers/convex";
 
 export default function ImageNode({
   id,
@@ -48,10 +49,10 @@ export default function ImageNode({
   const uploadAndStoreImageAction = useAction(
     api.imageNodes.uploadAndStoreImage,
   );
-  const url = useQuery(api.imageNodes.getImageNodeUrl, {
+  const url = useConvexQuery(api.imageNodes.getImageNodeUrl, {
     nodeId: id,
   });
-  const imageGenRateLimit = useQuery(
+  const imageGenRateLimit = useConvexQuery(
     api.imageNodes.getImageGenerationRateLimit,
   );
   const isRateLimited = imageGenRateLimit ? !imageGenRateLimit.ok : false;

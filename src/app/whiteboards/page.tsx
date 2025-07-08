@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { usePopper } from "react-popper";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -13,6 +13,7 @@ import Image from "next/image";
 import { MoreVertical } from "lucide-react";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import UpgradeBanner from "../whiteboard/UpgradeBanner";
+import { useConvexQuery } from "~/helpers/convex";
 
 const formatDate = (timestamp: bigint | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -193,8 +194,8 @@ function WhiteboardCard({
 }
 
 export default function WhiteboardsClient() {
-  const whiteboards = useQuery(api.whiteboards.listWhiteboards);
-  const whiteboardCountLimit = useQuery(
+  const whiteboards = useConvexQuery(api.whiteboards.listWhiteboards);
+  const whiteboardCountLimit = useConvexQuery(
     api.whiteboards.getWhiteboardCountLimit,
   );
 

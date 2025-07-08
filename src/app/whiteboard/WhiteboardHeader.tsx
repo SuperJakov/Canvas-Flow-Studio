@@ -4,11 +4,12 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { ChevronsLeft, Share2 } from "lucide-react";
-import { Authenticated, useMutation, useQuery } from "convex/react";
+import { Authenticated, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
 import toast from "react-hot-toast";
+import { useConvexQuery } from "~/helpers/convex";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -17,8 +18,8 @@ type Props = {
 export default function WhiteboardHeader({ id }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
-  const whiteboard = useQuery(api.whiteboards.getWhiteboard, { id });
-  const user = useQuery(api.users.current);
+  const whiteboard = useConvexQuery(api.whiteboards.getWhiteboard, { id });
+  const user = useConvexQuery(api.users.current);
   const editWhiteboardMutation = useMutation(api.whiteboards.editWhiteboard);
   const setPublicStatusMutation = useMutation(
     api.whiteboards.setPublicStatus,

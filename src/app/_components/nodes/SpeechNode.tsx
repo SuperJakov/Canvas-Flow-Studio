@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { SpeechNodeType } from "~/Types/nodes";
-import { useAction, useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../Portal";
@@ -25,6 +25,7 @@ import {
   registerSpeechAction,
   unregisterImageAction,
 } from "~/app/whiteboard/nodeActionRegistry";
+import { useConvexQuery } from "~/helpers/convex";
 
 function pcmToWavBlob(pcmData: Uint8Array, sampleRate = 24000): Blob {
   const numChannels = 1;
@@ -252,11 +253,11 @@ export default function SpeechNode({
   const generateAndStoreSpeechAction = useAction(
     api.speechNodes.generateAndStoreSpeech,
   );
-  const speechUrl = useQuery(api.speechNodes.getSpeechUrl, {
+  const speechUrl = useConvexQuery(api.speechNodes.getSpeechUrl, {
     nodeId: id,
   });
 
-  const speechGenRateLimit = useQuery(
+  const speechGenRateLimit = useConvexQuery(
     api.speechNodes.getSpeechGenerationRateLimit,
   );
   const isRateLimited = speechGenRateLimit ? !speechGenRateLimit.ok : false;

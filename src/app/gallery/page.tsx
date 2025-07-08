@@ -1,7 +1,6 @@
 "use client";
 
 import { api } from "../../../convex/_generated/api";
-import { useQuery } from "convex/react";
 import Image from "next/image";
 import Loading from "~/app/loading";
 import { useState, useEffect } from "react";
@@ -17,6 +16,7 @@ import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import type { Doc } from "convex/_generated/dataModel";
 import Link from "next/link";
 import JSZip from "jszip";
+import { useConvexQuery } from "~/helpers/convex";
 
 const formatDate = (timestamp: bigint | number | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -33,7 +33,7 @@ interface DownloadProgress {
 }
 
 export default function GalleryPage() {
-  const allImages = useQuery(api.imageNodes.getAllGeneratedImages);
+  const allImages = useConvexQuery(api.imageNodes.getAllGeneratedImages);
   const [fullscreenImage, setFullscreenImage] =
     useState<Doc<"imageNodes"> | null>(null);
   const [downloadingImages, setDownloadingImages] = useState<Set<string>>(
