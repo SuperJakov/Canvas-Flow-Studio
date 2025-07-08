@@ -24,6 +24,7 @@
     "@convex-dev/rate-limiter": "^0.2.10",
     "@google/genai": "^1.8.0",
     "@t3-oss/env-nextjs": "^0.13.8",
+    "@vercel/speed-insights": "^1.2.0",
     "@xyflow/react": "^12.8.1",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "convex": "^1.25.2",
