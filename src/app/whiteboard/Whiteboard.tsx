@@ -343,6 +343,31 @@ export default function Whiteboard({ id }: Props) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [nodes, setNodes, isSharedWhiteboard]);
 
+  useEffect(() => {
+    setNodes((prevNodes) => {
+      // Check if normalization is needed
+      const sorted = [...prevNodes].sort(
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+      );
+      const needsNormalization = sorted.some(
+        (node, index) => (node.zIndex ?? 0) !== index + 1,
+      );
+
+      if (!needsNormalization) {
+        return prevNodes; // No changes needed
+      }
+
+      // Normalize z-indices to sequential values (1, 2, 3, 4...)
+      sorted.forEach((node, index) => {
+        node.zIndex = index + 1;
+      });
+
+      // Return nodes in original order with normalized z-indices
+      const idToZ = Object.fromEntries(sorted.map((n) => [n.id, n.zIndex]));
+      return prevNodes.map((node) => ({ ...node, zIndex: idToZ[node.id] }));
+    });
+  }, [nodes, setNodes]);
+
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
