@@ -15,6 +15,8 @@ const TextEditorSchema = v.object({
     y: v.number(),
   }),
   zIndex: v.optional(v.number()),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
 });
 
 const ImageNodeSchema = v.object({

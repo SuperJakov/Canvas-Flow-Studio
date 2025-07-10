@@ -166,6 +166,8 @@ export default function Whiteboard({ id }: Props) {
           position: n.position,
           data: nodeDataWithoutInternal,
           zIndex: n.zIndex,
+          width: n.width,
+          height: n.height,
         };
       });
 

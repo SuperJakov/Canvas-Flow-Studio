@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, type ChangeEvent } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, NodeResizer, Position, type NodeProps } from "@xyflow/react";
 import type { TextEditorNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
 import {
@@ -65,33 +65,48 @@ export default function TextEditorNode({
     [id, updateNodeData, isLocked],
   );
 
-  // We use a template literal to conditionally apply the outline color
-  // based on the `selected` prop.
-  const containerClasses = `overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2 ${
-    selected ? "outline-blue-600" : "outline-gray-200"
-  }`;
-
+  const containerClasses = `
+  flex h-full flex-col overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2
+  ${selected ? "outline-blue-600" : "outline-gray-200"}
+`;
   return (
     <div className={containerClasses}>
+      {/* Connection handles */}
       <Handle type="target" position={Position.Top} />
+
+      {/* Resizer – visible only when node is selected & unlocked */}
+      <NodeResizer
+        isVisible={selected && !isLocked}
+        minWidth={200}
+        minHeight={120}
+        maxWidth={500}
+        maxHeight={500}
+      />
+
+      {/* Header */}
       <div className="flex items-center justify-between px-1 py-2">
-        <div className="flex items-center">
+        <div className="handle flex cursor-grab items-center">
           <GripVertical size={18} />
-          <span className="mr-2 font-medium text-black">Text</span>
+          <span className="ml-2 font-medium text-black">Text</span>
         </div>
+
         <div className="flex items-center space-x-2">
+          {/* Lock / unlock */}
           <button
             className="nodrag cursor-pointer rounded p-1 text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
             onClick={toggleLock}
+            title={isLocked ? "Unlock node" : "Lock node"}
           >
             {isLocked ? <Lock size={18} /> : <LockOpen size={18} />}
           </button>
+
+          {/* Run / stop */}
           <button
-            className={`cursor-pointer rounded p-1 ${
+            className={`nodrag cursor-pointer rounded p-1 ${
               hasOutgoingConnections
                 ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
                 : "cursor-not-allowed text-gray-400"
-            } nodrag`}
+            }`}
             onClick={toggleRunning}
             title={
               hasOutgoingConnections ? "Run node" : "Cannot run: no connections"
@@ -108,18 +123,21 @@ export default function TextEditorNode({
           </button>
         </div>
       </div>
-      <div className="bg-gray-700">
+
+      {/* Body */}
+      <div className="flex-grow bg-gray-700">
         <textarea
           id="text"
           name="text"
           onChange={onChange}
-          className={`nodrag field-sizing-content max-h-[130px] min-h-[130px] w-full max-w-[290px] min-w-[290px] resize-none rounded border-none px-2 py-1 text-xl font-bold text-white focus:border-blue-500 focus:outline-none`}
+          className="nodrag custom-scrollbar h-full w-full resize-none rounded bg-transparent px-2 py-1 text-xl font-bold text-white outline-none"
           value={text}
           placeholder="Type..."
           readOnly={isLocked}
           maxLength={10000}
         />
       </div>
+
       <Handle type="source" position={Position.Bottom} id="a" />
     </div>
   );
