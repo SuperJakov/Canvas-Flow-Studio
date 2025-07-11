@@ -7,6 +7,7 @@ import "@xyflow/react/dist/style.css";
 import { previewNodeTypes } from "./preview-config";
 import { Button } from "~/components/ui/button";
 import TemplatesSection from "./_components/HomePage/TemplatesSection";
+import DocumentationSection from "./_components/HomePage/DocumentationSection";
 
 const previewImage1Url = "/preview1.png";
 
@@ -262,30 +263,7 @@ export default function HomePage() {
       <TemplatesSection />
 
       {/* Documentation Section */}
-      <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl rounded-xl border border-[var(--border)] bg-gray-800 p-8 shadow-lg">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div>
-              <h3 className="mb-2 text-2xl font-bold">
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-                  Comprehensive Documentation
-                </span>
-              </h3>
-              <p>
-                Explore our detailed guides, tutorials, and reference materials
-                to master AI Flow Studio and create powerful workflows.
-              </p>
-            </div>
-            <Link
-              href="/docs"
-              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-medium shadow-lg transition-all hover:shadow-xl"
-            >
-              <Book className="h-5 w-5" />
-              Browse Documentation
-            </Link>
-          </div>
-        </div>
-      </section>
+      <DocumentationSection />
 
       {/* CTA Section - keep this "Get Started Now" button as it's the main CTA */}
       <section className="px-4 py-16 sm:px-6 lg:px-8">
