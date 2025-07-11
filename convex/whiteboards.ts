@@ -19,6 +19,8 @@ function generateInitialNodes() {
         x: 0,
         y: 0,
       },
+      width: 280,
+      height: 180,
     },
   ];
 }
