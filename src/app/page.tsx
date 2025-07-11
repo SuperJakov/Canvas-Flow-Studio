@@ -1,22 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  Workflow,
-  Zap,
-  Layers,
-  Book,
-  Calendar,
-  FileText,
-  Image as ImageIcon,
-  Users,
-  MessageSquare,
-  PieChart,
-} from "lucide-react";
+import { ArrowRight, Workflow, Zap, Layers, Book } from "lucide-react";
 import { ReactFlow, Background, BackgroundVariant } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { previewNodeTypes } from "./preview-config";
+import { Button } from "~/components/ui/button";
+import TemplatesSection from "./_components/HomePage/TemplatesSection";
 
 const previewImage1Url = "/preview1.png";
 
@@ -36,40 +26,37 @@ function DiscordIcon() {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-[var(--background)] bg-gradient-to-b text-[var(--foreground)]">
       {/* Hero Section */}
       <section className="container mx-auto px-4 pt-32 pb-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mb-6 text-4xl font-bold text-white sm:text-5xl md:text-6xl">
+          <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
             <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Your Visual Canvas for Building AI-Powered Automations
             </span>
           </h1>
-          <p className="mb-10 text-xl text-gray-300">
+          <p className="mb-10 text-xl">
             Create, visualize, and run complex AI workflows through an intuitive
             drag-and-drop interface. No coding required.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link
-              href="/whiteboard"
-              className="flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-4 font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl"
-            >
-              Start Creating <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-            <Link
-              href="#demo"
-              className="flex cursor-pointer items-center justify-center rounded-lg bg-gray-700 px-8 py-4 font-medium text-white shadow transition-all hover:bg-gray-600"
-            >
-              Watch Demo
-            </Link>
+            <Button asChild size="xl">
+              <Link href="/whiteboard">
+                Start Creating
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild size="xl" variant={"secondary"}>
+              <Link href="#demo">Watch Demo</Link>
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Canvas Preview Section */}
       <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-xl border-2 border-gray-700 shadow-2xl shadow-purple-900/20">
-          <div className="pointer-events-none relative h-[500px] w-full overflow-hidden bg-gray-800">
+        <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] shadow-2xl shadow-purple-900/20">
+          <div className="pointer-events-none relative h-[500px] w-full overflow-hidden">
             <ReactFlow
               nodes={[
                 {
@@ -127,17 +114,17 @@ export default function HomePage() {
         className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
       >
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-8 text-center text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mb-8 text-center text-3xl font-bold sm:text-4xl">
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               See AI Flow Studio in Action
             </span>
           </h2>
-          <p className="mb-10 text-center text-xl text-gray-300">
+          <p className="mb-10 text-center text-xl">
             Watch how easy it is to create and run AI-powered workflows with our
             visual canvas
           </p>
 
-          <div className="overflow-hidden rounded-xl border-2 border-gray-700 bg-gray-800 shadow-2xl shadow-purple-900/20">
+          <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] bg-[var(--secondary)] shadow-2xl shadow-purple-900/20">
             <video className="w-full" autoPlay loop muted playsInline>
               <source src="/demo1.mp4" type="video/mp4" />
               Your browser does not support the video tag.
@@ -151,49 +138,45 @@ export default function HomePage() {
         id="features"
         className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
       >
-        <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
+        <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
           <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Powerful Features
           </span>
         </h2>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {/* Feature 1 */}
-          <div className="rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
               <Workflow className="h-6 w-6 text-white" />
             </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">
+            <h3 className="mb-2 text-xl font-semibold">
               Intuitive Visual Canvas
             </h3>
-            <p className="text-gray-300">
+            <p>
               Drag and drop nodes onto the canvas and connect them to create
               complex AI workflows without writing code.
             </p>
           </div>
 
           {/* Feature 2 */}
-          <div className="rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
               <Zap className="h-6 w-6 text-white" />
             </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">
-              AI Model Integration
-            </h3>
-            <p className="text-gray-300">
+            <h3 className="mb-2 text-xl font-semibold">AI Model Integration</h3>
+            <p>
               Connect to state-of-the-art AI models for text generation, image
               creation, analysis, and more.
             </p>
           </div>
 
           {/* Feature 3 */}
-          <div className="rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-pink-600 to-orange-600 shadow-lg">
               <Layers className="h-6 w-6 text-white" />
             </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">
-              Process Chaining
-            </h3>
-            <p className="text-gray-300">
+            <h3 className="mb-2 text-xl font-semibold">Process Chaining</h3>
+            <p>
               Chain together multiple AI processes to create sophisticated
               automations and workflows.
             </p>
@@ -206,7 +189,7 @@ export default function HomePage() {
         id="workflow"
         className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
       >
-        <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
+        <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
           <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             How It Works
           </span>
@@ -216,13 +199,11 @@ export default function HomePage() {
           {/* Step 1 */}
           <div className="flex items-start gap-6">
             <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-              <span className="font-bold text-white">1</span>
+              <span className="font-bold text-white select-none">1</span>
             </div>
             <div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
-                Add Input Nodes
-              </h3>
-              <p className="text-gray-300">
+              <h3 className="mb-2 text-xl font-semibold">Add Input Nodes</h3>
+              <p>
                 Start by dragging text or image input nodes onto the canvas.
                 These will be the starting points of your workflow.
               </p>
@@ -232,13 +213,13 @@ export default function HomePage() {
           {/* Step 2 */}
           <div className="flex items-start gap-6">
             <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
-              <span className="font-bold text-white">2</span>
+              <span className="font-bold text-white select-none">2</span>
             </div>
             <div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
+              <h3 className="mb-2 text-xl font-semibold">
                 Connect to AI Nodes
               </h3>
-              <p className="text-gray-300">
+              <p>
                 Connect your inputs to AI instruction nodes that will process
                 your data using powerful AI models. Configure instructions to
                 specify exactly what you want the AI to do.
@@ -249,13 +230,11 @@ export default function HomePage() {
           {/* Step 3 */}
           <div className="flex items-start gap-6">
             <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-pink-600 to-orange-600 shadow-lg">
-              <span className="font-bold text-white">3</span>
+              <span className="font-bold text-white select-none">3</span>
             </div>
             <div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
-                Chain Results
-              </h3>
-              <p className="text-gray-300">
+              <h3 className="mb-2 text-xl font-semibold">Chain Results</h3>
+              <p>
                 Use the outputs from one AI node as inputs to another. Chain
                 multiple nodes together to create complex workflows that
                 accomplish sophisticated tasks.
@@ -266,13 +245,11 @@ export default function HomePage() {
           {/* Step 4 */}
           <div className="flex items-start gap-6">
             <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-orange-600 to-red-600 shadow-lg">
-              <span className="font-bold text-white">4</span>
+              <span className="font-bold text-white select-none">4</span>
             </div>
             <div>
-              <h3 className="mb-2 text-xl font-semibold text-white">
-                Run & Iterate
-              </h3>
-              <p className="text-gray-300">
+              <h3 className="mb-2 text-xl font-semibold">Run & Iterate</h3>
+              <p>
                 Execute your flow with a single click, see the results in
                 real-time, and make adjustments to improve your process. Save
                 your flows for future use.
@@ -282,143 +259,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Templates Section */}
-      <section
-        className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
-        id="templates"
-      >
-        <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
-          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-            Get Started with an Example
-          </span>
-        </h2>
-        <p className="mb-10 text-center text-xl text-gray-300">
-          Jump-start your workflow with one of our pre-built templates
-        </p>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Template 1 - Describe and Generate */}
-          <Link
-            href="/template/describe-and-generate"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-orange-500/50 hover:shadow-orange-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 shadow-lg">
-              <Users className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-orange-400">
-              Describe and Generate
-            </h3>
-            <p className="text-gray-300">
-              Learn the basics of AI Flow Studio by describing images and
-              generating content with AI models.
-            </p>
-          </Link>
-
-          {/* Template 2 - Company Meeting */}
-          <Link
-            href="/template/company-meeting"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-blue-500/50 hover:shadow-blue-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg">
-              <Calendar className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-blue-400">
-              Company Meeting
-            </h3>
-            <p className="text-gray-300">
-              Generate meeting minutes, action items, and follow-ups from
-              meeting transcripts.
-            </p>
-          </Link>
-
-          {/* Template 3 */}
-          <Link
-            href="/template/content-creation"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-purple-500/50 hover:shadow-purple-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
-              <FileText className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-purple-400">
-              Content Creation
-            </h3>
-            <p className="text-gray-300">
-              Create blog posts, social media content, and visuals from a single
-              topic.
-            </p>
-          </Link>
-
-          {/* Template 4 */}
-          <Link
-            href="/template/image-generation"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-pink-500/50 hover:shadow-pink-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-pink-600 to-red-600 shadow-lg">
-              <ImageIcon className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-pink-400">
-              Image Generation
-            </h3>
-            <p className="text-gray-300">
-              Generate and refine images based on text descriptions and use
-              different styles.
-            </p>
-          </Link>
-
-          {/* Template 5 */}
-          <Link
-            href="/template/language-translation"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-green-500/50 hover:shadow-green-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
-              <MessageSquare className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-green-400">
-              Language Translation
-            </h3>
-            <p className="text-gray-300">
-              Translate and localize content between multiple languages while
-              preserving context.
-            </p>
-          </Link>
-
-          {/* Template 6 */}
-          <Link
-            href="/template/data-analysis"
-            className="group rounded-xl border border-gray-700 bg-gray-800 p-6 shadow-lg transition hover:border-teal-500/50 hover:shadow-teal-900/20"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-teal-600 to-cyan-600 shadow-lg">
-              <PieChart className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white group-hover:text-teal-400">
-              Data Analysis
-            </h3>
-            <p className="text-gray-300">
-              Extract insights, generate visualizations, and create reports from
-              your data.
-            </p>
-          </Link>
-        </div>
-      </section>
+      <TemplatesSection />
 
       {/* Documentation Section */}
       <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl rounded-xl border border-gray-700 bg-gray-800 p-8 shadow-lg">
+        <div className="mx-auto max-w-4xl rounded-xl border border-[var(--border)] bg-gray-800 p-8 shadow-lg">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div>
-              <h3 className="mb-2 text-2xl font-bold text-white">
+              <h3 className="mb-2 text-2xl font-bold">
                 <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
                   Comprehensive Documentation
                 </span>
               </h3>
-              <p className="text-gray-300">
+              <p>
                 Explore our detailed guides, tutorials, and reference materials
                 to master AI Flow Studio and create powerful workflows.
               </p>
             </div>
             <Link
               href="/docs"
-              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-medium text-white shadow-lg transition-all hover:shadow-xl"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-medium shadow-lg transition-all hover:shadow-xl"
             >
               <Book className="h-5 w-5" />
               Browse Documentation
@@ -431,7 +291,7 @@ export default function HomePage() {
       <section className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl rounded-2xl border border-purple-500/30 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 p-8 shadow-xl">
           <div className="text-center">
-            <h2 className="mb-4 text-3xl font-bold text-white">
+            <h2 className="mb-4 text-3xl font-bold">
               Ready to Build Your AI Workflow?
             </h2>
             <p className="mb-8 text-xl text-gray-300">

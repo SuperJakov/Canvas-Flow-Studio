@@ -26,7 +26,10 @@ export function Header() {
   return (
     <>
       <header
-        className="fixed z-50 w-full bg-gray-900/80 backdrop-blur-sm"
+        className="fixed z-50 w-full backdrop-blur-sm"
+        style={{
+          backgroundColor: `color-mix(in oklch, var(--background) 80%, transparent)`,
+        }}
         suppressHydrationWarning
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
