@@ -12,7 +12,7 @@ import Link from "next/link";
 export default function TemplatesSection() {
   return (
     <section
-      className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
+      className="container mx-auto px-4 pt-20 sm:px-6 lg:px-8"
       id="templates"
     >
       <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">

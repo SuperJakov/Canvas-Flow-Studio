@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Workflow, Zap, Layers } from "lucide-react";
-import { ReactFlow, Background, BackgroundVariant } from "@xyflow/react";
+import { ArrowRight } from "lucide-react";
 import "@xyflow/react/dist/style.css";
-import { previewNodeTypes } from "./preview-config";
 import { Button } from "~/components/ui/button";
 import TemplatesSection from "./_components/HomePage/TemplatesSection";
 import DocumentationSection from "./_components/HomePage/DocumentationSection";
 import Footer from "./_components/HomePage/Footer";
-
-const previewImage1Url = "/preview1.png";
+import CanvasPreviewSection from "./_components/HomePage/CanvasPreviewSection";
+import DemoVideoSection from "./_components/HomePage/DemoVideoSection";
+import FeaturesSection from "./_components/HomePage/FeaturesSection";
 
 export default function HomePage() {
   return (
@@ -42,135 +41,13 @@ export default function HomePage() {
       </section>
 
       {/* Canvas Preview Section */}
-      <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] shadow-2xl shadow-purple-900/20">
-          <div className="pointer-events-none relative h-[500px] w-full overflow-hidden">
-            <ReactFlow
-              nodes={[
-                {
-                  id: "1",
-                  type: "previewText",
-                  position: { x: 500, y: 600 },
-                  data: { text: "A dog" },
-                },
-                {
-                  id: "2",
-                  type: "previewText",
-                  position: { x: 100, y: 600 },
-                  data: {
-                    text: "Swimming at the bottom of the ocean wearing goggles and playing with other fish",
-                  },
-                },
-                {
-                  id: "3",
-                  type: "previewImage",
-                  position: { x: 300, y: 1000 },
-                  data: { imageUrl: previewImage1Url },
-                },
-              ]}
-              edges={[
-                {
-                  id: "e1-3",
-                  source: "1",
-                  target: "3",
-                },
-                {
-                  id: "e2-3",
-                  source: "2",
-                  target: "3",
-                },
-              ]}
-              nodeTypes={previewNodeTypes}
-              fitView
-              fitViewOptions={{ padding: 0.9 }}
-              proOptions={{ hideAttribution: true }}
-              colorMode="dark"
-              draggable={false}
-              connectOnClick={false}
-              unselectable="on"
-              preventScrolling={false}
-            >
-              <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
-            </ReactFlow>
-          </div>
-        </div>
-      </section>
+      <CanvasPreviewSection />
 
       {/* Demo Video Section */}
-      <section
-        id="demo"
-        className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
-      >
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-8 text-center text-3xl font-bold sm:text-4xl">
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              See AI Flow Studio in Action
-            </span>
-          </h2>
-          <p className="mb-10 text-center text-xl">
-            Watch how easy it is to create and run AI-powered workflows with our
-            visual canvas
-          </p>
-
-          <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] bg-[var(--secondary)] shadow-2xl shadow-purple-900/20">
-            <video className="w-full" autoPlay loop muted playsInline>
-              <source src="/demo1.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-      </section>
+      <DemoVideoSection />
 
       {/* Features Section */}
-      <section
-        id="features"
-        className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
-      >
-        <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-          <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Powerful Features
-          </span>
-        </h2>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {/* Feature 1 */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-              <Workflow className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold">
-              Intuitive Visual Canvas
-            </h3>
-            <p>
-              Drag and drop nodes onto the canvas and connect them to create
-              complex AI workflows without writing code.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
-              <Zap className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold">AI Model Integration</h3>
-            <p>
-              Connect to state-of-the-art AI models for text generation, image
-              creation, analysis, and more.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-pink-600 to-orange-600 shadow-lg">
-              <Layers className="h-6 w-6 text-white" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold">Process Chaining</h3>
-            <p>
-              Chain together multiple AI processes to create sophisticated
-              automations and workflows.
-            </p>
-          </div>
-        </div>
-      </section>
+      <FeaturesSection />
 
       {/* How It Works Section */}
       <section

@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 
 export default function DocumentationSection() {
   return (
-    <section className="w-full px-4 py-12 shadow-lg sm:px-6 lg:px-8">
+    <section className="w-full px-4 py-16 shadow-lg sm:px-6 lg:px-8">
       {/* Removed 'container' class - this was limiting the width */}
       <div className="p-8">
         <h3 className="mb-4 text-center text-3xl font-extrabold">
