@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Sparkles,
   X,
-  AlertTriangle,
   Calendar,
   CreditCard,
 } from "lucide-react";
@@ -216,177 +215,131 @@ export default function PricingPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Header */}
-      <section className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl md:text-6xl">
-            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              Pricing Plans
-            </span>
-          </h1>
-          <p className="mx-auto max-w-2xl text-xl text-gray-300">
-            Start free and scale as you grow. All plans include access to our
-            powerful AI whiteboard.
-          </p>
-        </div>
-      </section>
-
-      {/* Subscription Status Banner */}
-      {auth.isAuthenticated && subscriptionStatus && (
-        <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl">
-            <div
-              className={`rounded-xl border p-4 ${
-                subscriptionStatus.type === "warning"
-                  ? "border-yellow-500/30 bg-yellow-500/10"
-                  : subscriptionStatus.type === "error"
-                    ? "border-red-500/30 bg-red-500/10"
-                    : subscriptionStatus.type === "success"
-                      ? "border-green-500/30 bg-green-500/10"
-                      : "border-blue-500/30 bg-blue-500/10"
-              }`}
-            >
-              <div className="flex items-center">
-                <div
-                  className={`mr-3 ${
-                    subscriptionStatus.type === "warning"
-                      ? "text-yellow-400"
-                      : subscriptionStatus.type === "error"
-                        ? "text-red-400"
-                        : subscriptionStatus.type === "success"
-                          ? "text-green-400"
-                          : "text-blue-400"
-                  }`}
-                >
-                  {subscriptionStatus.icon}
-                </div>
-                <p
-                  className={`text-sm font-medium ${
-                    subscriptionStatus.type === "warning"
-                      ? "text-yellow-300"
-                      : subscriptionStatus.type === "error"
-                        ? "text-red-300"
-                        : subscriptionStatus.type === "success"
-                          ? "text-green-300"
-                          : "text-blue-300"
-                  }`}
-                >
-                  {subscriptionStatus.message}
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen w-full bg-gray-900 text-white">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900/90">
+        {/* Header */}
+        <section className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl md:text-6xl">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Pricing Plans
+              </span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg text-gray-300 sm:text-xl">
+              Start free and scale as you grow. All plans include access to our
+              powerful AI whiteboard.
+            </p>
           </div>
         </section>
-      )}
 
-      {/* Current Plan Info */}
-      {auth.isAuthenticated && planInfo && (
-        <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl">
-            <div className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-6">
-              <h3 className="mb-4 text-lg font-semibold text-white">
-                Current Plan: {currentTier}
-              </h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {planInfo.plan !== "Free" &&
-                  hasSubscriptionProperties(planInfo) && (
-                    <>
-                      <div className="flex items-center">
-                        <div className="mr-3 rounded-full bg-blue-500/20 p-2">
-                          <CreditCard className="h-4 w-4 text-blue-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-400">Status</p>
-                          <p className="font-medium text-white capitalize">
-                            {planInfo.status}
-                          </p>
-                        </div>
-                      </div>
-                      {planInfo.current_period_end && (
-                        <div className="flex items-center">
-                          <div className="mr-3 rounded-full bg-purple-500/20 p-2">
-                            <Calendar className="h-4 w-4 text-purple-400" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">
-                              {planInfo.cancel_at_period_end
-                                ? "Ends"
-                                : "Renews"}
-                            </p>
-                            <p className="font-medium text-white">
-                              {formatDate(planInfo.current_period_end)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {planInfo.cancel_at_period_end && (
-                        <div className="flex items-center">
-                          <div className="mr-3 rounded-full bg-yellow-500/20 p-2">
-                            <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">
-                              Auto-renewal
-                            </p>
-                            <p className="font-medium text-white">Canceled</p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+        {/* Subscription Status Banner */}
+        {auth.isAuthenticated && subscriptionStatus && (
+          <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl">
+              <div
+                className={`rounded-xl border border-green-500/30 bg-green-500/10 p-4`}
+              >
+                <div className="flex items-center">
+                  <div className={`mr-3 text-green-400`}>
+                    {subscriptionStatus.icon}
+                  </div>
+                  <p className={`text-sm font-medium text-green-300`}>
+                    {subscriptionStatus.message}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
-      {/* Pricing Cards */}
-      <section className="container mx-auto px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`group relative flex h-full flex-col rounded-3xl border border-gray-700/50 bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-8 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl ${
-                plan.popular
-                  ? "ring-2 ring-blue-500/30 hover:ring-blue-500/50"
-                  : "hover:ring-1 hover:ring-purple-500/30"
-              } ${
-                plan.name === currentTier
-                  ? "bg-gradient-to-b from-green-900/20 to-gray-900/50 ring-2 ring-green-500/30"
-                  : ""
-              }`}
-            >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                  <div className="flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Most Popular
-                  </div>
+        {/* Current Plan Info */}
+        {auth.isAuthenticated && planInfo && (
+          <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-4xl">
+              <div className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-6">
+                <h3 className="mb-4 text-lg font-semibold text-white">
+                  Current Plan: {currentTier}
+                </h3>
+                <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                  {planInfo.plan !== "Free" &&
+                    hasSubscriptionProperties(planInfo) && (
+                      <>
+                        <div className="flex items-center">
+                          <div className="mr-3 rounded-full bg-blue-500/20 p-2">
+                            <CreditCard className="h-4 w-4 text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-400">Status</p>
+                            <p className="font-medium text-white capitalize">
+                              {planInfo.status}
+                            </p>
+                          </div>
+                        </div>
+                        {planInfo.current_period_end && (
+                          <div className="flex items-center">
+                            <div className="mr-3 rounded-full bg-purple-500/20 p-2">
+                              <Calendar className="h-4 w-4 text-purple-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-400">
+                                {planInfo.cancel_at_period_end
+                                  ? "Ends"
+                                  : "Renews"}
+                              </p>
+                              <p className="font-medium text-white">
+                                {formatDate(planInfo.current_period_end)}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
                 </div>
-              )}
-
-              {/* Current Plan Badge */}
-              {plan.name === currentTier && (
-                <div className="absolute -top-4 right-4">
-                  <div className="flex items-center rounded-full bg-gradient-to-r from-green-500 to-green-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
-                    <Check className="mr-1 h-3 w-3" />
-                    Current
-                  </div>
-                </div>
-              )}
-
-              {/* Card Header */}
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                <p className="mt-2 text-sm text-gray-400">{plan.description}</p>
               </div>
+            </div>
+          </section>
+        )}
 
-              {/* Pricing */}
-              <div className="mb-8 border-b border-gray-700/50 pb-6">
-                <div className="flex items-end justify-between">
-                  <div>
+        {/* Pricing Cards */}
+        <section className="container mx-auto px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="grid [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))] gap-6 lg:gap-8">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`group relative flex h-full flex-col rounded-3xl border border-gray-700/50 bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-6 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl lg:p-8 ${
+                  plan.popular
+                    ? "ring-2 ring-blue-500/30 hover:ring-blue-500/50"
+                    : "hover:ring-1 hover:ring-purple-500/30"
+                } ${
+                  plan.name === currentTier
+                    ? "bg-gradient-to-b from-green-900/20 to-gray-900/50 ring-2 ring-green-500/30"
+                    : ""
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
+                    <div className="flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Most Popular
+                    </div>
+                  </div>
+                )}
+                {plan.name === currentTier && (
+                  <div className="absolute -top-4 right-4">
+                    <div className="flex items-center rounded-full bg-gradient-to-r from-green-500 to-green-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                      <Check className="mr-1 h-3 w-3" />
+                      Current
+                    </div>
+                  </div>
+                )}
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                  <p className="mt-2 text-sm text-gray-400">
+                    {plan.description}
+                  </p>
+                </div>
+                <div className="mb-8 border-b border-gray-700/50 pb-6">
+                  <div className="flex items-end">
                     <span className="text-5xl font-bold text-white">
                       {plan.currency}
                       {plan.price}
@@ -394,84 +347,66 @@ export default function PricingPage() {
                     <span className="ml-2 text-gray-400">/{plan.period}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Features */}
-              <div className="mb-8 grid flex-1 grid-cols-1 gap-5">
-                <FeatureSection
-                  title="Account & Whiteboards"
-                  features={plan.features.account}
-                  color="blue"
-                />
-
-                <FeatureSection
-                  title="Content Generation"
-                  features={plan.features.content}
-                  color="green"
-                />
-
-                <FeatureSection
-                  title="Integrations"
-                  features={plan.features.integrations}
-                  color="yellow"
-                />
-
-                <div className="flex flex-col">
-                  <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
-                    <span className="mr-2 h-0.5 w-5 bg-purple-500"></span>
-                    Premium Features
-                  </h4>
-                  <ul className="flex-1 space-y-3">
-                    {plan.features.premium.map((feature, idx) => (
-                      <li key={idx} className="flex items-center">
-                        {feature.included ? (
-                          <Check className="mr-3 h-5 w-5 rounded-full bg-green-500/20 p-1 text-green-400" />
-                        ) : (
-                          <X className="mr-3 h-5 w-5 rounded-full bg-red-500/20 p-1 text-red-400" />
-                        )}
-                        <span
-                          className={
-                            feature.included ? "text-white" : "text-gray-500"
-                          }
-                        >
-                          {feature.name}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="mb-8 flex flex-1 flex-col gap-y-6">
+                  <FeatureSection
+                    title="Account & Whiteboards"
+                    features={plan.features.account}
+                    color="blue"
+                  />
+                  <FeatureSection
+                    title="Content Generation"
+                    features={plan.features.content}
+                    color="green"
+                  />
+                  <div className="flex flex-col">
+                    <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
+                      <span className="mr-2 h-0.5 w-5 bg-purple-500"></span>
+                      Premium Features
+                    </h4>
+                    <ul className="flex-1 space-y-3">
+                      {plan.features.premium.map((feature, idx) => (
+                        <li key={idx} className="flex items-start">
+                          {feature.included ? (
+                            <Check className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-green-500/20 p-1 text-green-400" />
+                          ) : (
+                            <X className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-red-500/20 p-1 text-red-400" />
+                          )}
+                          <span
+                            className={`${feature.included ? "text-white" : "text-gray-500"}`}
+                          >
+                            {feature.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
+                <div className="mt-auto pt-4">{renderButton(plan)}</div>
               </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center text-sm text-gray-400">
+            *Unlimited access is subject to abuse guardrails.
+          </div>
+        </section>
 
-              {/* CTA Button */}
-              <div className="mt-auto">{renderButton(plan)}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 text-center text-sm text-gray-400">
-          *Unlimited access is subject to abuse guardrails.
-        </div>
-      </section>
+        <FAQ />
 
-      {/* FAQ Section */}
-      <FAQ />
-
-      {/* CTA Section */}
-      {!auth.isAuthenticated && (
-        <section className="px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl rounded-3xl border border-purple-500/30 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 p-10 shadow-2xl backdrop-blur-md">
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
-                <Sparkles className="h-7 w-7 text-white" />
-              </div>
-              <h2 className="mb-4 text-3xl font-bold text-white">
-                Ready to Build Powerful AI Workflows?
-              </h2>
-              <p className="mb-8 max-w-2xl text-xl text-gray-300">
-                Start with our generous free tier and upgrade when you&apos;re
-                ready to scale.
-              </p>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <SignUpButton mode="modal">
+        {!auth.isAuthenticated && (
+          <section className="px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-5xl rounded-3xl border border-purple-500/30 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 p-10 shadow-2xl backdrop-blur-md">
+              <div className="flex flex-col items-center text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
+                  <Sparkles className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="mb-4 text-3xl font-bold text-white">
+                  Ready to Build Powerful AI Workflows?
+                </h2>
+                <p className="mb-8 max-w-2xl text-xl text-gray-300">
+                  Start with our generous free tier and upgrade when you&apos;re
+                  ready to scale.
+                </p>
+                <SignUpButton>
                   <span className="flex cursor-pointer items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3.5 font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl">
                     Start Building for Free
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -479,9 +414,9 @@ export default function PricingPage() {
                 </SignUpButton>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }
