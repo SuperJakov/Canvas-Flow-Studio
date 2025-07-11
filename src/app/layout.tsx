@@ -33,7 +33,7 @@ export default function RootLayout({
               src="//unpkg.com/react-scan/dist/auto.global.js"
             />
           )}
-          <body>
+          <body className="dark">
             <Header />
             {children}
             <Toaster />

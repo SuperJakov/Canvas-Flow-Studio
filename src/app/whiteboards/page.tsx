@@ -14,6 +14,8 @@ import { MoreVertical } from "lucide-react";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import UpgradeBanner from "../whiteboard/UpgradeBanner";
 import { useConvexQuery } from "~/helpers/convex";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 const formatDate = (timestamp: bigint | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -89,7 +91,7 @@ function WhiteboardCard({
   };
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg bg-gray-700 shadow-lg">
+    <div className="flex flex-col overflow-hidden rounded-lg bg-[var(--muted)] shadow-lg">
       <Link
         href={`/whiteboard/${whiteboard._id}`}
         onClick={(e) => {
@@ -103,7 +105,7 @@ function WhiteboardCard({
         aria-label={`Open whiteboard: ${whiteboard.title ?? "Untitled"}`}
       >
         <div className="relative block">
-          <div className="relative aspect-[16/9] w-full bg-gray-600">
+          <div className="relative aspect-[16/9] w-full bg-[var(--muted)]">
             {whiteboard.previewUrl ? (
               <Image
                 src={whiteboard.previewUrl}
@@ -118,15 +120,16 @@ function WhiteboardCard({
               </div>
             )}
           </div>
-          <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-gray-900 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-[var(--muted)] text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <p className="text-lg font-semibold">Press to open</p>
           </div>
         </div>
         <div className="flex flex-1 flex-col justify-between p-2">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
+              {/* TODO: Fix styles to match the title*/}
               {editingId === whiteboard._id ? (
-                <input
+                <Input
                   type="text"
                   value={editingTitle}
                   onChange={(e) => setEditingTitle(e.target.value)}
@@ -135,7 +138,7 @@ function WhiteboardCard({
                     if (e.key === "Enter") onSaveTitle(whiteboard._id);
                     if (e.key === "Escape") onStartEditing(null, "");
                   }}
-                  className="no-link w-full cursor-text rounded bg-gray-600 px-2 py-0.5 text-base font-medium text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="no-link w-full cursor-text rounded px-2 py-0.5 text-base font-medium"
                   autoFocus
                   onClick={(e) => {
                     e.preventDefault();
@@ -150,41 +153,44 @@ function WhiteboardCard({
               )}
             </div>
             <div className="no-link relative flex-shrink-0">
-              <button
+              <Button
                 ref={setReferenceElement}
                 onClick={handleMenuToggle}
-                className="cursor-pointer rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-600 hover:text-white"
+                className="rounded-full p-1 transition-colors"
                 aria-label="More options"
+                variant={"ghost"}
               >
                 <MoreVertical className="h-5 w-5" />
-              </button>
+              </Button>
               {menuOpen && (
                 <div
                   ref={setPopperElement}
                   style={styles.popper}
                   {...attributes.popper}
-                  className="ring-opacity-5 z-10 w-32 rounded-md bg-gray-800 shadow-lg ring-1 ring-black focus:outline-none"
+                  className="ring-opacity-5 z-10 w-32 rounded-md bg-[var(--popover)] text-[var(--popover-foreground)] shadow-lg ring-1 ring-[var(--ring)]"
                 >
-                  <div className="py-1">
-                    <button
+                  <div>
+                    <Button
                       onClick={handleRenameClick}
-                      className="block w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                      className="block w-full px-4 py-2 text-left"
+                      variant="ghost"
                     >
                       Rename
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleDeleteClick}
-                      className="block w-full cursor-pointer px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 hover:text-red-300"
+                      className="block w-full px-4 py-2 text-left hover:bg-red-400"
                       disabled={deletingId === whiteboard._id}
+                      variant="ghost"
                     >
                       {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
             </div>
           </div>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-[var(--muted-foreground)]">
             {formatDate(whiteboard.updatedAt)}
           </p>
         </div>
@@ -354,12 +360,12 @@ export default function WhiteboardsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 pt-16 text-white">
+    <div className="min-h-screen bg-[var(--background)] pt-16 text-[var(--foreground)]">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Your Whiteboards</h1>
           {/* Show whiteboard count */}
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-[var(--muted-foreground)]">
             {whiteboardCountLimit.currentWhiteboardCount} /{" "}
             {whiteboardCountLimit.maxWhiteboardCount === Infinity
               ? "Unlimited"
@@ -367,11 +373,11 @@ export default function WhiteboardsClient() {
           </div>
         </div>
 
-        <div className="mb-8 rounded-lg bg-gray-800 p-6">
+        <div className="mb-8 rounded-lg bg-[var(--card)] p-6">
           <h2 className="mb-4 text-xl font-semibold">Create New Whiteboard</h2>
           <div className="flex flex-col">
             <div className="flex">
-              <input
+              <Input
                 type="text"
                 value={newWhiteboardName}
                 onChange={(e) => setNewWhiteboardName(e.target.value)}
@@ -379,25 +385,18 @@ export default function WhiteboardsClient() {
                   if (e.key === "Enter") void handleCreateWhiteboard();
                 }}
                 placeholder="Whiteboard Name"
-                className={`mr-2 flex-grow rounded px-4 py-2 text-white ${
-                  isLimitReached
-                    ? "cursor-not-allowed bg-gray-600 opacity-50"
-                    : "bg-gray-700"
-                }`}
+                className={`mr-2 flex-grow rounded`}
                 maxLength={30}
                 disabled={isLimitReached}
               />
-              <button
+              <Button
                 onClick={handleCreateWhiteboard}
-                className={`rounded px-4 py-2 font-medium text-white transition-colors ${
-                  isLimitReached
-                    ? "cursor-not-allowed bg-gray-600 opacity-50"
-                    : "cursor-pointer bg-green-600 hover:bg-green-500"
-                }`}
-                disabled={isLimitReached}
+                className={`font-mediu rounded px-4 py-2 transition-colors`}
+                disabled={false}
+                variant="default"
               >
                 Create
-              </button>
+              </Button>
             </div>
             {/* Show limit message when reached */}
             {isLimitReached && (
@@ -416,7 +415,7 @@ export default function WhiteboardsClient() {
           </div>
         </div>
 
-        <div className="rounded-lg bg-gray-800 p-6">
+        <div className="rounded-lg bg-[var(--card)] p-6">
           <h2 className="mb-4 text-xl font-semibold">Your Whiteboards</h2>
           {errorMessage && (
             <div className="mb-4 rounded-md border border-red-600 bg-red-100 p-3 text-sm text-red-800">
@@ -440,7 +439,7 @@ export default function WhiteboardsClient() {
             </div>
           )}
           {(whiteboards?.length ?? 0) === 0 ? (
-            <p className="text-gray-400">
+            <p className="text-[var(--muted-foreground)]">
               No whiteboards found. Create one to get started!
             </p>
           ) : (
