@@ -120,7 +120,7 @@ function WhiteboardCard({
               </div>
             )}
           </div>
-          <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-[var(--muted)] text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-[var(--background)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <p className="text-lg font-semibold">Press to open</p>
           </div>
         </div>
@@ -400,12 +400,12 @@ export default function WhiteboardsClient() {
             </div>
             {/* Show limit message when reached */}
             {isLimitReached && (
-              <p className="mt-2 text-sm text-yellow-400">
+              <p className="mt-2 text-sm text-[var(--popover-foreground)]">
                 You&#39;ve reached your whiteboard limit (
                 {whiteboardCountLimit.maxWhiteboardCount}).
                 <span
                   onClick={() => setShowUpgradeBanner(true)}
-                  className="ml-1 cursor-pointer underline hover:text-yellow-300"
+                  className="ml-1 cursor-pointer underline hover:text-[var(--accent)]"
                 >
                   Upgrade your plan
                 </span>{" "}
