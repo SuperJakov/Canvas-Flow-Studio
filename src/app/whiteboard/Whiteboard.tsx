@@ -423,6 +423,8 @@ export default function Whiteboard({ id }: Props) {
             type: dndType,
             position,
             data: { text: "", isLocked: false, internal: { isRunning: false } },
+            width: 280,
+            height: 180,
           };
           break;
         case "image":

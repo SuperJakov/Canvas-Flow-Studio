@@ -77,8 +77,8 @@ export default function TextEditorNode({
       {/* Resizer – visible only when node is selected & unlocked */}
       <NodeResizer
         isVisible={selected && !isLocked}
-        minWidth={200}
-        minHeight={120}
+        minWidth={270}
+        minHeight={170}
         maxWidth={500}
         maxHeight={500}
       />
