@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
 
 export function Header() {
   const pathname = usePathname();
@@ -113,32 +114,43 @@ export function Header() {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-gray-900/95 backdrop-blur-md md:hidden">
+        <div
+          className="fixed inset-0 z-40 backdrop-blur-md md:hidden"
+          style={{
+            backgroundColor: `color-mix(in oklch, var(--background) 90%, transparent)`,
+          }}
+        >
           <div className="flex h-full flex-col">
             {/* Navigation Links - Top Section */}
             <nav className="flex flex-1 flex-col items-start justify-center space-y-8 pt-20 pl-8">
-              <Link
-                href="/"
-                className="text-2xl font-medium text-gray-300 transition hover:text-white"
-                onClick={closeMenu}
-              >
-                Home
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-2xl font-medium text-gray-300 transition hover:text-white"
-                onClick={closeMenu}
-              >
-                Pricing
-              </Link>
-              <Authenticated>
+              <Button variant="link" asChild className="h-auto p-0 text-2xl">
                 <Link
-                  href="/whiteboards"
-                  className="text-2xl font-medium text-gray-300 transition hover:text-white"
+                  href="/"
+                  className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
                   onClick={closeMenu}
                 >
-                  Whiteboard
+                  Home
                 </Link>
+              </Button>
+              <Button variant="link" asChild className="h-auto p-0 text-2xl">
+                <Link
+                  href="/pricing"
+                  className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
+                  onClick={closeMenu}
+                >
+                  Pricing
+                </Link>
+              </Button>
+              <Authenticated>
+                <Button variant="link" asChild className="h-auto p-0 text-2xl">
+                  <Link
+                    href="/whiteboards"
+                    className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
+                    onClick={closeMenu}
+                  >
+                    Whiteboard
+                  </Link>
+                </Button>
               </Authenticated>
             </nav>
 
@@ -147,20 +159,23 @@ export function Header() {
               <Unauthenticated>
                 <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
                   <SignInButton mode="modal">
-                    <button
-                      className="flex h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-600 bg-transparent px-6 text-lg font-medium text-gray-300 transition hover:border-gray-400 hover:text-white"
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="h-12 border-[var(--border)] bg-transparent text-lg font-medium text-[var(--muted-foreground)] hover:border-[var(--border)]/80 hover:bg-[var(--accent)]/10 hover:text-[var(--foreground)]"
                       onClick={closeMenu}
                     >
                       Sign In
-                    </button>
+                    </Button>
                   </SignInButton>
                   <SignUpButton mode="modal">
-                    <button
-                      className="flex h-12 cursor-pointer items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-6 text-lg font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl"
+                    <Button
+                      size="lg"
+                      className="h-12 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-lg font-medium text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
                       onClick={closeMenu}
                     >
                       Sign Up
-                    </button>
+                    </Button>
                   </SignUpButton>
                 </div>
               </Unauthenticated>
