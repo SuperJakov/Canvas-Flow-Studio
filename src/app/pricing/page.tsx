@@ -20,6 +20,9 @@ import { SubscriptionStatus } from "./components/SubscriptionStatus";
 import { plans, tierRanks } from "./data/plans";
 import type { SubscriptionProperties } from "./types";
 import { useConvexQuery } from "~/helpers/convex";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -176,37 +179,84 @@ export default function PricingPage() {
     if (!auth.isAuthenticated) {
       if (plan.name === "Free") {
         return (
-          <Link
-            href="/whiteboard"
-            className={`flex w-full items-center justify-center rounded-xl px-6 py-3.5 font-medium shadow-lg transition-all ${plan.buttonStyle} ${plan.popular ? "shadow-blue-500/20" : "shadow-gray-900/20"} hover:scale-[1.02]`}
-          >
-            Get Started Free
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+          <Button asChild size="lg" className="w-full">
+            <Link
+              href="/whiteboard"
+              className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
+            >
+              Get Started Free
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
         );
       } else {
         return (
           <SignUpButton mode="modal">
-            <span className={buttonConfig.className}>
+            <Button
+              size="lg"
+              className={cn(
+                "w-full",
+                plan.popular
+                  ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
+                  : "bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:bg-[var(--secondary)]/80",
+              )}
+            >
               Sign Up to Upgrade
               <ArrowRight className="ml-2 h-4 w-4" />
-            </span>
+            </Button>
           </SignUpButton>
         );
       }
     }
 
+    // For authenticated users
+    const getButtonVariant = () => {
+      if (buttonConfig.disabled) return "outline";
+      if (plan.popular) return "default";
+      if (plan.name === currentTier) return "secondary";
+      return "outline";
+    };
+
+    const getButtonClassName = () => {
+      const baseClasses = "w-full";
+
+      if (buttonConfig.disabled) {
+        return cn(baseClasses, "opacity-50 cursor-not-allowed");
+      }
+
+      if (plan.popular) {
+        return cn(
+          baseClasses,
+          "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]",
+        );
+      }
+
+      if (plan.name === currentTier) {
+        return cn(
+          baseClasses,
+          "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]",
+        );
+      }
+
+      return cn(
+        baseClasses,
+        "bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-[var(--shadow-lg)] hover:bg-[var(--secondary)]/80 hover:scale-[1.02]",
+      );
+    };
+
     return (
-      <button
+      <Button
         onClick={buttonConfig.onClick ?? undefined}
         disabled={buttonConfig.disabled || isLoading}
-        className={buttonConfig.className}
+        variant={getButtonVariant()}
+        size="lg"
+        className={getButtonClassName()}
       >
         {isLoading ? "Processing..." : buttonConfig.text}
         {!buttonConfig.disabled && !isLoading && (
           <ArrowRight className="ml-2 h-4 w-4" />
         )}
-      </button>
+      </Button>
     );
   };
 
@@ -215,35 +265,41 @@ export default function PricingPage() {
     : null;
 
   return (
-    <div className="min-h-screen w-full bg-gray-900 text-white">
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900/90">
+    <div className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)]">
+      <div className="min-h-screen">
         {/* Header */}
         <section className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
-            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl md:text-6xl">
+            <h1 className="mb-4 text-4xl font-bold sm:text-5xl md:text-6xl">
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                 Pricing Plans
               </span>
             </h1>
-            <p className="mx-auto max-w-2xl text-lg text-gray-300 sm:text-xl">
+            <p className="mx-auto max-w-2xl text-lg sm:text-xl">
               Start free and scale as you grow. All plans include access to our
               powerful AI whiteboard.
             </p>
           </div>
         </section>
-
         {/* Subscription Status Banner */}
         {auth.isAuthenticated && subscriptionStatus && (
           <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl">
               <div
-                className={`rounded-xl border border-green-500/30 bg-green-500/10 p-4`}
+                className="rounded-xl border p-4"
+                style={{
+                  borderColor: "hsl(var(--accent) / 0.3)",
+                  backgroundColor: "hsl(var(--accent) / 0.1)",
+                }}
               >
                 <div className="flex items-center">
-                  <div className={`mr-3 text-green-400`}>
+                  <div className="mr-3" style={{ color: "hsl(var(--accent))" }}>
                     {subscriptionStatus.icon}
                   </div>
-                  <p className={`text-sm font-medium text-green-300`}>
+                  <p
+                    className="text-sm font-medium"
+                    style={{ color: "hsl(var(--accent-foreground))" }}
+                  >
                     {subscriptionStatus.message}
                   </p>
                 </div>
@@ -251,74 +307,77 @@ export default function PricingPage() {
             </div>
           </section>
         )}
-
         {/* Current Plan Info */}
         {auth.isAuthenticated && planInfo && (
           <section className="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-4xl">
-              <div className="rounded-xl border border-gray-700/50 bg-gray-800/30 p-6">
-                <h3 className="mb-4 text-lg font-semibold text-white">
-                  Current Plan: {currentTier}
-                </h3>
-                <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-                  {planInfo.plan !== "Free" &&
-                    hasSubscriptionProperties(planInfo) && (
-                      <>
-                        <div className="flex items-center">
-                          <div className="mr-3 rounded-full bg-blue-500/20 p-2">
-                            <CreditCard className="h-4 w-4 text-blue-400" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-400">Status</p>
-                            <p className="font-medium text-white capitalize">
-                              {planInfo.status}
-                            </p>
-                          </div>
-                        </div>
-                        {planInfo.current_period_end && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    Current Plan: {currentTier}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                    {planInfo.plan !== "Free" &&
+                      hasSubscriptionProperties(planInfo) && (
+                        <>
                           <div className="flex items-center">
-                            <div className="mr-3 rounded-full bg-purple-500/20 p-2">
-                              <Calendar className="h-4 w-4 text-purple-400" />
+                            <div className="mr-3 rounded-full bg-blue-500/20 p-2">
+                              <CreditCard className="h-4 w-4 text-blue-400" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-400">
-                                {planInfo.cancel_at_period_end
-                                  ? "Ends"
-                                  : "Renews"}
-                              </p>
-                              <p className="font-medium text-white">
-                                {formatDate(planInfo.current_period_end)}
+                              <p className="text-sm text-gray-400">Status</p>
+                              <p className="font-medium text-white capitalize">
+                                {planInfo.status}
                               </p>
                             </div>
                           </div>
-                        )}
-                      </>
-                    )}
-                </div>
-              </div>
+                          {planInfo.current_period_end && (
+                            <div className="flex items-center">
+                              <div className="mr-3 rounded-full bg-purple-500/20 p-2">
+                                <Calendar className="h-4 w-4 text-purple-400" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-400">
+                                  {planInfo.cancel_at_period_end
+                                    ? "Ends"
+                                    : "Renews"}
+                                </p>
+                                <p className="font-medium text-white">
+                                  {formatDate(planInfo.current_period_end)}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </section>
         )}
 
-        {/* Pricing Cards */}
+        {/* Pricing cards */}
         <section className="container mx-auto px-4 pb-20 sm:px-6 lg:px-8">
           <div className="grid [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))] gap-6 lg:gap-8">
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`group relative flex h-full flex-col rounded-3xl border border-gray-700/50 bg-gradient-to-b from-gray-800/50 to-gray-900/50 p-6 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl lg:p-8 ${
+                className={`group relative flex h-full flex-col rounded-3xl border border-[var(--border)] p-6 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl lg:p-8 ${
                   plan.popular
-                    ? "ring-2 ring-blue-500/30 hover:ring-blue-500/50"
-                    : "hover:ring-1 hover:ring-purple-500/30"
+                    ? "bg-[var(--card)] ring-2 ring-[var(--primary)]/30 hover:ring-[var(--primary)]/50"
+                    : "bg-[var(--card)] hover:ring-1 hover:ring-[var(--secondary)]/30"
                 } ${
                   plan.name === currentTier
-                    ? "bg-gradient-to-b from-green-900/20 to-gray-900/50 ring-2 ring-green-500/30"
+                    ? "bg-gradient-to-b from-green-900/20 to-[var(--card)] ring-2 ring-green-500/30"
                     : ""
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                    <div className="flex items-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
+                    <div className="flex items-center rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] px-4 py-2 text-sm font-bold text-[var(--primary-foreground)] shadow-lg">
                       <Sparkles className="mr-2 h-4 w-4" />
                       Most Popular
                     </div>
@@ -333,18 +392,22 @@ export default function PricingPage() {
                   </div>
                 )}
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
-                  <p className="mt-2 text-sm text-gray-400">
+                  <h3 className="text-2xl font-bold text-[var(--card-foreground)]">
+                    {plan.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-[var(--muted-foreground)]">
                     {plan.description}
                   </p>
                 </div>
-                <div className="mb-8 border-b border-gray-700/50 pb-6">
+                <div className="mb-8 border-b border-[var(--border)] pb-6">
                   <div className="flex items-end">
-                    <span className="text-5xl font-bold text-white">
+                    <span className="text-5xl font-bold text-[var(--card-foreground)]">
                       {plan.currency}
                       {plan.price}
                     </span>
-                    <span className="ml-2 text-gray-400">/{plan.period}</span>
+                    <span className="ml-2 text-[var(--muted-foreground)]">
+                      /{plan.period}
+                    </span>
                   </div>
                 </div>
                 <div className="mb-8 flex flex-1 flex-col gap-y-6">
@@ -359,20 +422,20 @@ export default function PricingPage() {
                     color="green"
                   />
                   <div className="flex flex-col">
-                    <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-gray-400 uppercase">
-                      <span className="mr-2 h-0.5 w-5 bg-purple-500"></span>
+                    <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-[var(--muted-foreground)] uppercase">
+                      <span className="mr-2 h-0.5 w-5 bg-[var(--primary)]"></span>
                       Premium Features
                     </h4>
                     <ul className="flex-1 space-y-3">
                       {plan.features.premium.map((feature, idx) => (
                         <li key={idx} className="flex items-start">
                           {feature.included ? (
-                            <Check className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-green-500/20 p-1 text-green-400" />
+                            <Check className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-[var(--chart-3)]/20 p-1 text-[var(--chart-3)]" />
                           ) : (
-                            <X className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-red-500/20 p-1 text-red-400" />
+                            <X className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-[var(--destructive)]/20 p-1 text-[var(--destructive)]" />
                           )}
                           <span
-                            className={`${feature.included ? "text-white" : "text-gray-500"}`}
+                            className={`${feature.included ? "text-[var(--card-foreground)]" : "text-[var(--muted-foreground)]"}`}
                           >
                             {feature.name}
                           </span>
@@ -385,7 +448,7 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center text-sm text-gray-400">
+          <div className="mt-8 text-center text-sm text-[var(--muted-foreground)]">
             *Unlimited access is subject to abuse guardrails.
           </div>
         </section>
