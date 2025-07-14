@@ -87,9 +87,9 @@ export default function InstructionNode({
     <div className={containerClasses}>
       <Handle type="target" position={Position.Top} />
       <div className="flex items-center justify-between px-1 py-2">
-        <div className="flex items-center">
+        <div className="flex items-center text-black">
           <Wand2 size={16} className="mx-1" />
-          <span className="mr-2 font-medium text-black">Instruction</span>
+          <span className="mr-2 font-medium">Instruction</span>
         </div>
         <div className="flex items-center space-x-2">
           <button

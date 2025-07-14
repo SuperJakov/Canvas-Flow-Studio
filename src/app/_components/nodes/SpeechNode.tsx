@@ -476,9 +476,9 @@ export default function SpeechNode({
         )}
         {!isRateLimited && (
           <div className="flex items-center justify-between px-1 py-2">
-            <div className="flex items-center">
+            <div className="flex items-center text-black">
               <Volume2 size={18} className="mx-1" />
-              <span className="mr-2 font-medium text-black">Speech</span>
+              <span className="mr-2 font-medium">Speech</span>
             </div>
             <div className="flex items-center space-x-2">
               <button

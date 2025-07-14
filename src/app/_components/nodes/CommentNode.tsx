@@ -54,9 +54,9 @@ export default function CommentNode({
 
       {/* Header */}
       <div className="flex items-center justify-between px-2 py-1">
-        <div className="handle flex cursor-grab items-center">
+        <div className="handle flex cursor-grab items-center text-black">
           <MessageSquare size={18} />
-          <span className="ml-2 font-medium text-black">Comment</span>
+          <span className="ml-2 font-medium">Comment</span>
         </div>
         <button
           onClick={toggleLock}

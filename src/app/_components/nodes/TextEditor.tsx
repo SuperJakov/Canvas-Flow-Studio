@@ -85,9 +85,9 @@ export default function TextEditorNode({
 
       {/* Header */}
       <div className="flex items-center justify-between px-1 py-2">
-        <div className="handle flex cursor-grab items-center">
+        <div className="handle flex cursor-grab items-center text-black">
           <GripVertical size={18} />
-          <span className="ml-2 font-medium text-black">Text</span>
+          <span className="ml-2 font-medium">Text</span>
         </div>
 
         <div className="flex items-center space-x-2">
