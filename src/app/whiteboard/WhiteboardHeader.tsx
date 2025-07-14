@@ -10,6 +10,9 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
 import toast from "react-hot-toast";
 import { useConvexQuery } from "~/helpers/convex";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { cn } from "~/lib/utils";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -57,6 +60,7 @@ export default function WhiteboardHeader({ id }: Props) {
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      e.currentTarget.blur();
       await handleTitleSubmit();
     } else if (e.key === "Escape") {
       setIsEditing(false);
@@ -96,7 +100,12 @@ export default function WhiteboardHeader({ id }: Props) {
 
   return (
     <>
-      <header className="fixed z-50 h-14 w-full bg-gray-900/80 text-white backdrop-blur-sm">
+      <header
+        className="fixed z-50 h-14 w-full backdrop-blur-sm"
+        style={{
+          backgroundColor: `color-mix(in oklch, var(--background) 80%, transparent)`,
+        }}
+      >
         <div className="container mx-auto h-full px-4 sm:px-6 lg:px-8">
           <div className="flex h-full items-center justify-between">
             <div className="flex items-center">
@@ -110,19 +119,19 @@ export default function WhiteboardHeader({ id }: Props) {
             </div>
             <div>
               {whiteboard ? (
-                <input
-                  type="text"
+                <Input
                   value={isEditing ? title : (whiteboard?.title ?? "Untitled")}
                   onChange={handleTitleChange}
                   onBlur={handleTitleSubmit}
                   onKeyDown={handleKeyDown}
                   onClick={startEditing}
                   onFocus={startEditing}
-                  className={`field-sizing-content max-w-[30vw] min-w-40 rounded bg-transparent px-2 text-center text-white ${
+                  className={cn(
+                    "field-sizing-content h-auto max-w-[30vw] min-w-40 px-2 py-0.5 text-center",
                     isEditing
-                      ? "ring-2 ring-blue-500 outline-none"
-                      : "cursor-pointer hover:text-white/80 hover:ring-2 hover:ring-gray-500"
-                  }`}
+                      ? "border-transparent"
+                      : "cursor-pointer hover:ring-2 hover:ring-gray-500",
+                  )}
                   readOnly={!isEditing}
                   autoFocus={isEditing}
                   maxLength={30}
@@ -130,42 +139,46 @@ export default function WhiteboardHeader({ id }: Props) {
               ) : null}
             </div>
             <div className="flex items-center gap-4">
-              <div className="min-w-[32px]">
+              {/* Fixed width container to prevent layout shift */}
+              <div className="flex w-10 justify-center">
                 {whiteboard?.isPublic && (
-                  <button
+                  <Button
                     onClick={handleShare}
-                    className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded transition-colors hover:bg-gray-700"
                     title="Share whiteboard"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
                   >
-                    <Share2 className="h-5 w-5" />
-                  </button>
+                    <Share2 className="h-4 w-4" />
+                  </Button>
                 )}
               </div>
-              {whiteboard?.isPublic &&
-              user &&
-              whiteboard.ownerId !== user.externalId ? (
-                <button
-                  onClick={() => copyWhiteboard(id)}
-                  disabled={isCopying}
-                  className="h-8 min-w-[110px] cursor-pointer rounded bg-blue-500 px-4 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Copy
-                </button>
-              ) : whiteboard?.isPublic ? (
-                <button
-                  onClick={handlePublishToggle}
-                  className="h-8 min-w-[110px] cursor-pointer rounded bg-blue-500 px-4 text-white hover:bg-blue-600"
-                >
-                  Unpublish
-                </button>
-              ) : (
-                <button
-                  onClick={handlePublishToggle}
-                  className="h-8 min-w-[110px] cursor-pointer rounded bg-blue-500 px-4 text-white hover:bg-blue-600"
-                >
-                  Publish
-                </button>
-              )}
+
+              <Button
+                onClick={
+                  whiteboard?.isPublic &&
+                  user &&
+                  whiteboard.ownerId !== user.externalId
+                    ? () => copyWhiteboard(id)
+                    : handlePublishToggle
+                }
+                disabled={Boolean(
+                  whiteboard?.isPublic &&
+                    user &&
+                    whiteboard.ownerId !== user.externalId &&
+                    isCopying,
+                )}
+                className="min-w-[110px]"
+                size="sm"
+              >
+                {whiteboard?.isPublic &&
+                user &&
+                whiteboard.ownerId !== user.externalId
+                  ? "Copy"
+                  : whiteboard?.isPublic
+                    ? "Unpublish"
+                    : "Publish"}
+              </Button>
 
               <Suspense
                 fallback={
