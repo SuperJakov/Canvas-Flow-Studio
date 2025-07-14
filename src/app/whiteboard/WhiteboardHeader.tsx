@@ -23,7 +23,26 @@ export default function WhiteboardHeader({ id }: Props) {
   const [title, setTitle] = useState("");
   const whiteboard = useConvexQuery(api.whiteboards.getWhiteboard, { id });
   const user = useConvexQuery(api.users.current);
-  const editWhiteboardMutation = useMutation(api.whiteboards.editWhiteboard);
+
+  const editWhiteboardMutation = useMutation(
+    api.whiteboards.editWhiteboard,
+  ).withOptimisticUpdate((localStore, args) => {
+    const { id, title } = args;
+    const currentWhiteboard = localStore.getQuery(
+      api.whiteboards.getWhiteboard,
+      { id },
+    );
+    if (!currentWhiteboard) return;
+    localStore.setQuery(
+      api.whiteboards.getWhiteboard,
+      { id },
+      {
+        ...currentWhiteboard,
+        title,
+      },
+    );
+  });
+
   const setPublicStatusMutation = useMutation(
     api.whiteboards.setPublicStatus,
   ).withOptimisticUpdate((localStore, args) => {
@@ -42,6 +61,7 @@ export default function WhiteboardHeader({ id }: Props) {
       },
     );
   });
+
   const { copyWhiteboard, isCopying, CopyingOverlay } = useCopyWhiteboard();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,18 +126,23 @@ export default function WhiteboardHeader({ id }: Props) {
           backgroundColor: `color-mix(in oklch, var(--background) 80%, transparent)`,
         }}
       >
-        <div className="container mx-auto h-full px-4 sm:px-6 lg:px-8">
-          <div className="flex h-full items-center justify-between">
-            <div className="flex items-center">
+        <div className="mx-auto h-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Grid layout for consistent spacing */}
+          <div className="grid h-full grid-cols-3 items-center gap-4">
+            {/* Left section - Navigation */}
+            <div className="flex justify-start">
               <Link
                 href="/whiteboards"
                 className="flex items-center gap-1 hover:underline"
               >
-                <ChevronsLeft />
-                <span>Whiteboards</span>
+                <ChevronsLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Whiteboards</span>
+                <span className="sm:hidden">Back</span>
               </Link>
             </div>
-            <div>
+
+            {/* Center section - Title */}
+            <div className="flex justify-center">
               {whiteboard ? (
                 <Input
                   value={isEditing ? title : (whiteboard?.title ?? "Untitled")}
@@ -127,20 +152,29 @@ export default function WhiteboardHeader({ id }: Props) {
                   onClick={startEditing}
                   onFocus={startEditing}
                   className={cn(
-                    "field-sizing-content h-auto max-w-[30vw] min-w-40 px-2 py-0.5 text-center",
+                    "h-auto w-auto min-w-[100px] px-2 py-0.5 text-center",
                     isEditing
                       ? "border-transparent"
                       : "cursor-pointer hover:ring-2 hover:ring-gray-500",
                   )}
+                  style={{
+                    width: isEditing
+                      ? `${Math.max(100, Math.min(300, (title.length || 1) * 8.5))}px`
+                      : `${Math.max(100, Math.min(300, (whiteboard?.title ?? "Untitled").length * 8.5))}px`,
+                  }}
                   readOnly={!isEditing}
                   autoFocus={isEditing}
                   maxLength={30}
                 />
-              ) : null}
+              ) : (
+                <div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
+              )}
             </div>
-            <div className="flex items-center gap-4">
-              {/* Fixed width container to prevent layout shift */}
-              <div className="flex w-10 justify-center">
+
+            {/* Right section - Actions */}
+            <div className="flex items-center justify-end gap-2 sm:gap-3 md:gap-4">
+              {/* Share button with consistent width */}
+              <div className="flex w-8 justify-center">
                 {whiteboard?.isPublic && (
                   <Button
                     onClick={handleShare}
@@ -154,6 +188,7 @@ export default function WhiteboardHeader({ id }: Props) {
                 )}
               </div>
 
+              {/* Publish/Copy button */}
               <Button
                 onClick={
                   whiteboard?.isPublic &&
@@ -180,6 +215,7 @@ export default function WhiteboardHeader({ id }: Props) {
                     : "Publish"}
               </Button>
 
+              {/* User button */}
               <Suspense
                 fallback={
                   <div
