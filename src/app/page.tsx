@@ -10,6 +10,7 @@ import Footer from "./_components/HomePage/Footer";
 import CanvasPreviewSection from "./_components/HomePage/CanvasPreviewSection";
 import DemoVideoSection from "./_components/HomePage/DemoVideoSection";
 import FeaturesSection from "./_components/HomePage/FeaturesSection";
+import CTASection from "./_components/HomePage/CTASection";
 
 export default function HomePage() {
   return (
@@ -130,27 +131,7 @@ export default function HomePage() {
       <DocumentationSection />
 
       {/* CTA Section */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-purple-500/30 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 p-8 shadow-xl">
-          <div className="text-center">
-            <h2 className="mb-4 text-3xl font-bold">
-              Ready to Build Your AI Workflow?
-            </h2>
-            <p className="mb-8 text-xl text-gray-300">
-              Start creating powerful AI automations in minutes, no coding
-              required.
-            </p>
-            <Link href="/whiteboard">
-              <Button
-                className="mx-auto flex w-full items-center justify-center rounded-lg px-8 py-4 font-medium shadow-lg transition-all hover:shadow-xl"
-                size="xl"
-              >
-                Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CTASection />
 
       {/* Footer */}
       <Footer />
