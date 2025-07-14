@@ -16,7 +16,7 @@ const NODE_CONFIGS = [
   {
     key: "textEditor",
     icon: Type,
-    color: "bg-blue-900/50 hover:bg-blue-800/50 border-gray-700",
+    color: "bg-blue-900/50 hover:bg-blue-800/50 border-[var(--border)]",
     title: "Text Node",
     tooltip: (
       <>
@@ -28,7 +28,7 @@ const NODE_CONFIGS = [
   {
     key: "image",
     icon: ImageIcon,
-    color: "bg-purple-900/50 hover:bg-purple-800/50 border-gray-700",
+    color: "bg-purple-900/50 hover:bg-purple-800/50 border-[var(--border)]",
     title: "Image Node",
     tooltip: (
       <>
@@ -40,7 +40,7 @@ const NODE_CONFIGS = [
   {
     key: "instruction",
     icon: Wand2,
-    color: "bg-yellow-900/50 hover:bg-yellow-800/50 border-gray-700",
+    color: "bg-yellow-900/50 hover:bg-yellow-800/50 border-[var(--border)]",
     title: "Instruction Node",
     tooltip: (
       <>
@@ -52,7 +52,7 @@ const NODE_CONFIGS = [
   {
     key: "comment",
     icon: MessageSquare,
-    color: "bg-orange-900/50 hover:bg-orange-800/50 border-gray-700",
+    color: "bg-orange-900/50 hover:bg-orange-800/50 border-[var(--border)]",
     title: "Comment Node",
     tooltip: (
       <>
@@ -64,7 +64,7 @@ const NODE_CONFIGS = [
   {
     key: "speech",
     icon: Volume2,
-    color: "bg-green-900/50 hover:bg-green-800/50 border-gray-700",
+    color: "bg-green-900/50 hover:bg-green-800/50 border-[var(--border)]",
     title: "Speech Node",
     tooltip: (
       <>
@@ -76,7 +76,7 @@ const NODE_CONFIGS = [
   {
     key: "websiteNode",
     icon: Globe,
-    color: "bg-pink-900/50 hover:bg-pink-800/50 border-gray-700",
+    color: "bg-pink-900/50 hover:bg-pink-800/50 border-[var(--border)]",
     title: "Website Node",
     tooltip: (
       <>
@@ -88,7 +88,7 @@ const NODE_CONFIGS = [
   {
     key: "weatherNode",
     icon: Cloud,
-    color: "bg-cyan-900/50 hover:bg-cyan-800/50 border-gray-700",
+    color: "bg-cyan-900/50 hover:bg-cyan-800/50 border-[var(--border)]",
     title: "Weather Node",
     tooltip: (
       <>
@@ -100,7 +100,7 @@ const NODE_CONFIGS = [
   {
     key: "timerNode",
     icon: Timer,
-    color: "bg-indigo-900/50 hover:bg-indigo-800/50 border-gray-700",
+    color: "bg-indigo-900/50 hover:bg-indigo-800/50 border-[var(--border)]",
     title: "Timer Node",
     tooltip: (
       <>
@@ -112,7 +112,7 @@ const NODE_CONFIGS = [
   {
     key: "dataFetchNode",
     icon: ArrowDownUp,
-    color: "bg-rose-900/50 hover:bg-rose-800/50 border-gray-700",
+    color: "bg-rose-900/50 hover:bg-rose-800/50 border-[var(--border)]",
     title: "Data Fetch Node",
     tooltip: (
       <>
@@ -156,8 +156,8 @@ function SidebarItem({
       >
         <Icon size={16} />
       </div>
-      <div className="pointer-events-none absolute top-0 left-full z-50 ml-2 w-48 scale-95 rounded bg-gray-800 p-2 opacity-0 shadow-lg transition-all group-hover:scale-100 group-hover:opacity-100">
-        <p className="text-xs text-gray-300">{tooltip}</p>
+      <div className="pointer-events-none absolute top-0 left-full z-50 ml-2 w-48 scale-95 rounded bg-[var(--popover)] p-2 opacity-0 shadow-lg transition-all group-hover:scale-100 group-hover:opacity-100">
+        <p className="text-xs text-[var(--popover-foreground)]">{tooltip}</p>
       </div>
     </div>
   );
@@ -180,7 +180,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-1/2 left-0 z-40 flex h-[80vh] w-16 -translate-y-1/2 flex-col rounded-r-lg bg-gray-900 p-2 shadow-[2px_0_15px_rgba(255,255,255,0.05)]">
+    <aside className="fixed top-1/2 left-0 z-40 flex h-[80vh] w-16 -translate-y-1/2 flex-col rounded-r-lg bg-[var(--background)] p-2 shadow-[var(--shadow-2xl)]">
       <div className="flex flex-1 flex-col items-center justify-center space-y-3">
         {NODE_CONFIGS.map((node) => (
           <SidebarItem
