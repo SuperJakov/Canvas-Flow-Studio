@@ -17,6 +17,8 @@ import type { Doc } from "convex/_generated/dataModel";
 import Link from "next/link";
 import JSZip from "jszip";
 import { useConvexQuery } from "~/helpers/convex";
+import { Button } from "~/components/ui/button";
+import { Progress } from "~/components/ui/progress";
 
 const formatDate = (timestamp: bigint | number | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -224,12 +226,12 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 pt-16 text-white">
+    <div className="min-h-screen pt-16">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Image Gallery</h1>
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-[var(--muted-foreground)]">
               {allImages.length} {allImages.length === 1 ? "image" : "images"}
             </p>
           </div>
@@ -237,37 +239,30 @@ export default function GalleryPage() {
           {/* Download All Button */}
           {allImages.length > 0 && (
             <div className="flex flex-col items-end space-y-2">
-              <button
-                onClick={handleDownloadAll}
-                disabled={downloadingAll}
-                className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
+              <Button onClick={handleDownloadAll} disabled={downloadingAll}>
                 {downloadingAll ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <Archive size={18} />
                 )}
                 Download All ({allImages.length})
-              </button>
+              </Button>
 
               {/* Progress Bar */}
               {downloadProgress && (
                 <div className="w-64">
-                  <div className="h-2 overflow-hidden rounded-full bg-gray-700">
-                    <div
-                      className="h-full bg-purple-500 transition-all duration-300 ease-out"
-                      style={{
-                        width: `${Math.round((downloadProgress.current / downloadProgress.total) * 100)}%`,
-                      }}
-                    />
-                  </div>
+                  <Progress
+                    value={Math.round(
+                      (downloadProgress.current / downloadProgress.total) * 100,
+                    )}
+                  />
                 </div>
               )}
             </div>
           )}
         </div>
 
-        <div className="rounded-lg bg-gray-800 p-6">
+        <div className="rounded-lg bg-[var(--card)] p-6">
           {allImages.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-4 py-16">
               <Images size={40} className="text-gray-400" />
@@ -306,7 +301,7 @@ export default function GalleryPage() {
                             );
                           }}
                           disabled={downloadingImages.has(image._id)}
-                          className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
                           title={
                             downloadingImages.has(image._id)
                               ? "Downloading..."
@@ -322,7 +317,7 @@ export default function GalleryPage() {
                       </>
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <p className="text-gray-400">Image not available</p>
+                        <p>Image not available</p>
                       </div>
                     )}
                   </div>
@@ -363,44 +358,42 @@ export default function GalleryPage() {
           </div>
 
           {/* Right sidebar with image details */}
-          <div className="flex w-80 flex-col bg-gray-800 p-6">
+          <div className="flex w-80 flex-col bg-[var(--card)] p-6">
             <h3 className="mb-4 text-xl font-bold">Image Details</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--muted-foreground)]">
                   Created
                 </label>
-                <p className="text-white">
-                  {formatDate(fullscreenImage._creationTime)}
-                </p>
+                <p>{formatDate(fullscreenImage._creationTime)}</p>
               </div>
 
               {fullscreenImage.whiteboardId && (
                 <div>
-                  <label className="text-sm font-medium text-gray-400">
+                  <label className="text-sm font-medium text-[var(--muted-foreground)]">
                     Whiteboard
                   </label>
                   <Link href={`/whiteboard/${fullscreenImage.whiteboardId}`}>
-                    <button className="mt-2 flex cursor-pointer items-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
+                    <Button className="mt-2 flex items-center gap-2">
                       <ExternalLink size={16} />
                       View in Whiteboard
-                    </button>
+                    </Button>
                   </Link>
                 </div>
               )}
 
               <div>
-                <label className="text-sm font-medium text-gray-400">
+                <label className="text-sm font-medium text-[var(--muted-foreground)]">
                   Prompt
                 </label>
-                <p className="mt-1 rounded bg-gray-700 p-3 text-sm text-white">
-                  {"Prompt goes here"}
+                <p className="mt-1 rounded bg-[var(--secondary)] p-3 text-sm text-[var(--secondary-foreground)]">
+                  Prompt goes here
                 </p>
               </div>
 
               <div className="border-t border-gray-700 pt-4">
-                <button
+                <Button
                   onClick={() =>
                     fullscreenImage.imageUrl &&
                     handleDownload(
@@ -410,7 +403,7 @@ export default function GalleryPage() {
                     )
                   }
                   disabled={downloadingImages.has(fullscreenImage._id)}
-                  className="flex cursor-pointer items-center gap-2 rounded bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                  className="mt-2 flex items-center gap-2"
                 >
                   {downloadingImages.has(fullscreenImage._id) ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -418,7 +411,7 @@ export default function GalleryPage() {
                     <Download size={16} />
                   )}
                   Download Image
-                </button>
+                </Button>
               </div>
             </div>
           </div>
