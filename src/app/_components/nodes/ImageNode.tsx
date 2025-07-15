@@ -51,51 +51,53 @@ import {
 } from "~/app/whiteboard/nodeActionRegistry";
 import { useConvexQuery } from "~/helpers/convex";
 
+// Images
+import AutoCatImage from "public/auto_cat.png";
+import AnimeCatImage from "public/anime_cat.png";
+import PixelArtCatImage from "public/pixelart_cat.png";
+import CyberpunkCatImage from "public/cyberpunk_cat.png";
+import Model3dCatImage from "public/3d_cat.png";
+import LowPolyCatImage from "public/lowpoly_cat.png";
+import LineArtCatImage from "public/lineart_cat.png";
+import WatercolorCatImage from "public/watercolor_cat.png";
+import PopArtCatImage from "public/popart_cat.png";
+import SurrealCatImage from "public/surreal_cat.png";
+
 export const IMAGE_STYLES = [
-  { name: "Auto", icon: Wand2, id: "auto", imageUrl: "/auto_cat.png" },
-  { name: "Anime", icon: Tv2, id: "anime", imageUrl: "/anime_cat.png" },
+  { name: "Auto", icon: Wand2, id: "auto", imageUrl: AutoCatImage },
+  { name: "Anime", icon: Tv2, id: "anime", imageUrl: AnimeCatImage },
   {
     name: "Pixel Art",
     icon: Grid,
     id: "pixel-art",
-    imageUrl: "/pixelart_cat.png",
+    imageUrl: PixelArtCatImage,
   },
   {
     name: "Cyberpunk",
     icon: CircuitBoard,
     id: "cyberpunk",
-    imageUrl: "/cyberpunk_cat.png",
+    imageUrl: CyberpunkCatImage,
   },
-  {
-    name: "3D Model",
-    icon: Box,
-    id: "3d-model",
-    imageUrl: "/3d_cat.png",
-  },
-  {
-    name: "Low Poly",
-    icon: Gem,
-    id: "low-poly",
-    imageUrl: "/lowpoly_cat.png",
-  },
+  { name: "3D Model", icon: Box, id: "3d-model", imageUrl: Model3dCatImage },
+  { name: "Low Poly", icon: Gem, id: "low-poly", imageUrl: LowPolyCatImage },
   {
     name: "Line Art",
     icon: PenTool,
     id: "line-art",
-    imageUrl: "/lineart_cat.png",
+    imageUrl: LineArtCatImage,
   },
   {
     name: "Watercolor",
     icon: Paintbrush2,
     id: "watercolor",
-    imageUrl: "/watercolor_cat.png",
+    imageUrl: WatercolorCatImage,
   },
-  { name: "Pop Art", icon: Shapes, id: "pop-art", imageUrl: "/popart_cat.png" },
+  { name: "Pop Art", icon: Shapes, id: "pop-art", imageUrl: PopArtCatImage },
   {
     name: "Surrealism",
     icon: Eye,
     id: "surrealism",
-    imageUrl: "/surreal_cat.png",
+    imageUrl: SurrealCatImage,
   },
 ] as const;
 
@@ -341,6 +343,7 @@ export default function ImageNode({
                     alt={style.name}
                     width={64}
                     height={64}
+                    placeholder="blur"
                   />
                 ) : (
                   <div className="h-16 w-16 rounded-full bg-gray-300"></div>
