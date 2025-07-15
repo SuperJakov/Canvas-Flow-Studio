@@ -1,7 +1,7 @@
-import { v } from "convex/values";
+import { type Infer, v } from "convex/values";
 import { action, query } from "./_generated/server";
 import { internalMutation } from "./functions";
-import { TextEditorNodeData } from "./schema";
+import { Style, TextEditorNodeData } from "./schema";
 import { AzureOpenAI } from "openai";
 import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
 import { api, components, internal } from "./_generated/api";
@@ -100,9 +100,34 @@ async function fetchAsBase64(url: string): Promise<string> {
   return arrayBufferToBase64(arrayBuf);
 }
 
+export type StyleType = Infer<typeof Style>;
+
+const systemPrompts: Record<StyleType, string> = {
+  auto: "",
+  anime:
+    "anime aesthetic with expressive eyes, smooth colors with shaded effects, and clean lines",
+  "pixel-art":
+    "pixel art style using a limited color palette and visible, crisp square pixels with a retro 8-bit or 16-bit video game aesthetic",
+  cyberpunk:
+    "cyberpunk style with glowing neon lights, towering architecture, and rain-slicked streets in a high-tech, gritty atmosphere",
+  "3d-model":
+    "3D rendered style with clean geometry, smooth surfaces, and dynamic lighting with realistic shadows",
+  "low-poly":
+    "low poly art style with visible flat-shaded polygons in a clean, geometric aesthetic",
+  "line-art":
+    "minimalist line art using only clean black lines on a white background with no color or shading",
+  watercolor:
+    "watercolor painting style with soft, translucent layers of color that bleed together",
+  "pop-art":
+    "Pop Art style with bold, vibrant colors and thick graphic outlines inspired by 1960s comic books",
+  surrealism:
+    "surrealist style depicting dream-like scenes with illogical juxtapositions rendered in polished detail",
+};
+
 async function generateAIImage(
   identity: UserIdentity,
   textContents: string[],
+  style: StyleType,
   inputImageBase64?: string,
 ): Promise<string> {
   const previewImageUrl = process.env.PREVIEW_IMAGE_URL;
@@ -116,14 +141,27 @@ async function generateAIImage(
   }
 
   const client = getClient();
+  const getStyledPrompt = (basePrompt: string, style: StyleType = "auto") => {
+    const stylePrompt = systemPrompts[style] ?? systemPrompts.auto;
+    return stylePrompt ? `${stylePrompt}\n\n${basePrompt}` : basePrompt;
+  };
+
+  const styleDescription = systemPrompts[style] ?? "";
+
   const prompt = inputImageBase64
     ? `Edit the provided image based on the following instructions:
-  ${textContents.map((text) => `- ${text}`).join("\n")}
-Ensure these additions are clearly represented and cohesively integrated into the existing scene. Maintain a consistent visual style that enhances clarity and appeal.`
-    : `Create a visually engaging image that includes the following elements:
-  ${textContents.map((text) => `- ${text}`).join("\n")}
-  Ensure the elements are clearly represented and cohesively integrated into the scene. Use a consistent visual style that enhances clarity and appeal.`;
-  console.log("Using prompt to generate/edit an image:", prompt);
+${textContents.map((text) => `- ${text}`).join("\n")}
+${styleDescription ? `Apply a ${styleDescription}.` : ""}
+Ensure these additions are clearly represented and cohesively integrated into the existing scene.`
+    : `Create an image that includes the following elements:
+${textContents.map((text) => `- ${text}`).join("\n")}
+${styleDescription ? `Use a ${styleDescription}.` : "Use a visually engaging style."}
+Ensure all elements are clearly represented and cohesively integrated.`;
+
+  // Apply the style to the prompt (assuming you have a 'selectedStyle' variable)
+  const styledPrompt = getStyledPrompt(prompt, style);
+  console.log("Using prompt to generate/edit an image:", styledPrompt);
+
   let openAiResponse;
 
   if (inputImageBase64) {
@@ -194,8 +232,9 @@ export const generateAndStoreImage = action({
     ),
     nodeId: v.string(),
     whiteboardId: v.id("whiteboards"),
+    style: Style,
   },
-  handler: async (ctx, { sourceNodes, nodeId, whiteboardId }) => {
+  handler: async (ctx, { sourceNodes, nodeId, whiteboardId, style }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
@@ -235,6 +274,7 @@ export const generateAndStoreImage = action({
     const base64OfImage = await generateAIImage(
       identity,
       textContents,
+      style,
       inputImageBase64,
     );
 

@@ -51,7 +51,7 @@ import {
 } from "~/app/whiteboard/nodeActionRegistry";
 import { useConvexQuery } from "~/helpers/convex";
 
-const IMAGE_STYLES = [
+export const IMAGE_STYLES = [
   { name: "Auto", icon: Wand2, id: "auto", imageUrl: "/auto_cat.png" },
   { name: "Anime", icon: Tv2, id: "anime", imageUrl: "/anime_cat.png" },
   {
@@ -137,10 +137,9 @@ export default function ImageNode({
 
   const [isImageLoading, setIsImageLoading] = useState(false);
 
-  const [selectedStyle, setSelectedStyle] = useState("auto");
-
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
+  const selectedStyle = data.style;
   const openBanner = useCallback((feature: string) => {
     setBannerFeature(feature);
     setIsBannerOpen(true);
@@ -320,7 +319,13 @@ export default function ImageNode({
               <button
                 key={style.id}
                 onClick={() => {
-                  setSelectedStyle(style.id);
+                  updateNodeData({
+                    nodeType: "image",
+                    nodeId: id,
+                    updatedData: {
+                      style: style.id,
+                    },
+                  });
                   setIsPopoverOpen(false);
                 }}
                 className={`flex cursor-pointer flex-col items-center rounded p-2 transition-colors ${

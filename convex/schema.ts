@@ -19,12 +19,26 @@ const TextEditorSchema = v.object({
   height: v.optional(v.number()),
 });
 
+export const Style = v.union(
+  v.literal("auto"),
+  v.literal("anime"),
+  v.literal("pixel-art"),
+  v.literal("cyberpunk"),
+  v.literal("3d-model"),
+  v.literal("low-poly"),
+  v.literal("line-art"),
+  v.literal("watercolor"),
+  v.literal("pop-art"),
+  v.literal("surrealism"),
+);
+
 const ImageNodeSchema = v.object({
   id: v.string(),
   type: v.literal("image"),
   data: v.object({
     imageUrl: v.union(v.string(), v.null()),
     isLocked: v.boolean(),
+    style: Style,
   }),
   position: v.object({
     x: v.number(),

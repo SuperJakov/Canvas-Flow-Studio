@@ -134,3 +134,30 @@ export const removeIsRunningState = migrations.define({
 export const runRemoveIsRunningState = migrations.runner(
   internal.migrations.removeIsRunningState,
 );
+
+export const setStyleToAuto = migrations.define({
+  table: "whiteboards",
+  migrateOne: async (ctx, doc) => {
+    const updatedNodes = doc.nodes.map((node) => {
+      if (node.type === "image") {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            style: "auto" as const,
+          },
+        };
+      }
+      return node;
+    });
+
+    // Update the document with the modified nodes array
+    await ctx.db.patch(doc._id, {
+      nodes: updatedNodes,
+    });
+  },
+});
+
+export const runSetStyleToAuto = migrations.runner(
+  internal.migrations.setStyleToAuto,
+);

@@ -237,6 +237,7 @@ async function executeImageNode(
       nodeId: currentNode.id,
       sourceNodes,
       whiteboardId,
+      style: currentNode.data.style,
     });
   } finally {
     console.groupEnd();
@@ -458,6 +459,7 @@ function getDefaultNodeData(nodeType: AppNode["type"]) {
         imageUrl: null,
         isLocked: false,
         internal: { isRunning: false },
+        style: "auto",
       } satisfies ImageNodeData;
 
     case "speech":

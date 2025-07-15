@@ -434,11 +434,11 @@ export default function Whiteboard({ id }: Props) {
             position,
             data: {
               isLocked: false,
-
               imageUrl: null,
               internal: {
                 isRunning: false,
               },
+              style: "auto",
             },
           };
           break;

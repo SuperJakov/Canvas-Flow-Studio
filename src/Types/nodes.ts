@@ -1,6 +1,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { api } from "../../convex/_generated/api";
 import type { ReactAction } from "convex/react";
+import type { IMAGE_STYLES } from "~/app/_components/nodes/ImageNode";
 
 export type CommentNodeData = {
   text: string;
@@ -17,6 +18,8 @@ export type TextEditorNodeData = {
   };
 };
 
+type Style = (typeof IMAGE_STYLES)[number]["id"];
+
 export type ImageNodeData = {
   imageUrl: string | null;
   isLocked: boolean;
@@ -25,6 +28,7 @@ export type ImageNodeData = {
     isRunning: boolean;
     isRateLimited?: boolean;
   };
+  style: Style;
 };
 
 export type InstructionNodeData = {
