@@ -23,6 +23,7 @@ import { useConvexQuery } from "~/helpers/convex";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
+import CTASection from "../_components/homepage/CTASection";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -455,30 +456,7 @@ export default function PricingPage() {
 
         <FAQ />
 
-        {!auth.isAuthenticated && (
-          <section className="px-4 py-16 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-5xl rounded-3xl border border-purple-500/30 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 p-10 shadow-2xl backdrop-blur-md">
-              <div className="flex flex-col items-center text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600">
-                  <Sparkles className="h-7 w-7 text-white" />
-                </div>
-                <h2 className="mb-4 text-3xl font-bold text-white">
-                  Ready to Build Powerful AI Workflows?
-                </h2>
-                <p className="mb-8 max-w-2xl text-xl text-gray-300">
-                  Start with our generous free tier and upgrade when you&apos;re
-                  ready to scale.
-                </p>
-                <SignUpButton>
-                  <span className="flex cursor-pointer items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-8 py-3.5 font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl">
-                    Start Building for Free
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </span>
-                </SignUpButton>
-              </div>
-            </div>
-          </section>
-        )}
+        {!auth.isAuthenticated && <CTASection />}
       </div>
     </div>
   );
