@@ -1,15 +1,15 @@
 "use client";
 
 import "@xyflow/react/dist/style.css";
-import TemplatesSection from "./_components/HomePage/TemplatesSection";
-import DocumentationSection from "./_components/HomePage/DocumentationSection";
-import Footer from "./_components/HomePage/Footer";
-import CanvasPreviewSection from "./_components/HomePage/CanvasPreviewSection";
-import DemoVideoSection from "./_components/HomePage/DemoVideoSection";
-import FeaturesSection from "./_components/HomePage/FeaturesSection";
-import CTASection from "./_components/HomePage/CTASection";
-import HowItWorksSection from "./_components/HomePage/HowItWorksSection";
-import HeroSection from "./_components/HomePage/HeroSection";
+import TemplatesSection from "./_components/homepage/TemplatesSection";
+import DocumentationSection from "./_components/homepage/DocumentationSection";
+import Footer from "./_components/homepage/Footer";
+import CanvasPreviewSection from "./_components/homepage/CanvasPreviewSection";
+import DemoVideoSection from "./_components/homepage/DemoVideoSection";
+import FeaturesSection from "./_components/homepage/FeaturesSection";
+import CTASection from "./_components/homepage/CTASection";
+import HowItWorksSection from "./_components/homepage/HowItWorksSection";
+import HeroSection from "./_components/homepage/HeroSection";
 
 export default function HomePage() {
   return (
