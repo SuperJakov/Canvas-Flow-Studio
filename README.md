@@ -193,7 +193,7 @@ Our team will review all model recommendations and prioritize based on user dema
 - [x] Image nodes
 - [x] Image editing using instruction node
 - [ ] Image model selection
-- [ ] Image style selection
+- [x] Image style selection
 - [x] Speech node
 - [ ] Speech style selection
 
