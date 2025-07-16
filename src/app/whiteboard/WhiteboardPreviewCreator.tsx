@@ -173,6 +173,7 @@ export default function WhiteboardPreviewCreator() {
             height: `${IMAGE_HEIGHT}px`,
             transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
           },
+          cacheBust: true,
         });
         await uploadImage(imageDataUrl);
       } catch (error) {
