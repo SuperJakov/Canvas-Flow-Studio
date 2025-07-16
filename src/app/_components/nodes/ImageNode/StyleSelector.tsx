@@ -1,6 +1,7 @@
 import Image from "next/image";
-import { Popover, PopoverContent } from "~/components/ui/popover";
+import { PopoverContent } from "~/components/ui/popover";
 import { IMAGE_STYLES, type Style } from "./constants";
+import { useEffect, useRef } from "react";
 
 interface StyleSelectorProps {
   isOpen: boolean;
@@ -11,10 +12,26 @@ interface StyleSelectorProps {
 
 export function StyleSelector({
   isOpen,
-  onOpenChange,
   selectedStyle,
   onStyleChange,
 }: StyleSelectorProps) {
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // Scroll selected item into view whenever the popover opens
+  useEffect(() => {
+    if (!isOpen || !selectedStyle) return;
+
+    // Wait one tick for the popover to be fully painted
+    const timer = requestAnimationFrame(() => {
+      const selectedEl = popoverRef.current?.querySelector(
+        `[data-style-id="${selectedStyle}"]`,
+      );
+      selectedEl?.scrollIntoView({ behavior: "instant", block: "center" });
+    });
+
+    return () => cancelAnimationFrame(timer);
+  }, [isOpen, selectedStyle]);
+
   return (
     <PopoverContent
       side="top"
@@ -22,10 +39,11 @@ export function StyleSelector({
       sideOffset={10}
       className="nowheel nopan nodrag h-64 w-96 overflow-y-auto p-0"
     >
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <div ref={popoverRef} className="grid grid-cols-3 gap-4 p-4">
         {IMAGE_STYLES.map((style) => (
           <button
             key={style.id}
+            data-style-id={style.id}
             onClick={() => onStyleChange(style.id)}
             className={`flex cursor-pointer flex-col items-center rounded p-2 transition-colors ${
               selectedStyle === style.id
@@ -43,7 +61,7 @@ export function StyleSelector({
                 placeholder="blur"
               />
             ) : (
-              <div className="h-16 w-16 rounded-full bg-gray-300"></div>
+              <div className="h-16 w-16 rounded-full bg-gray-300" />
             )}
             <span className="mt-2 text-sm">{style.name}</span>
           </button>
