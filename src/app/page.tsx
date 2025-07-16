@@ -1,5 +1,3 @@
-"use client";
-
 import "@xyflow/react/dist/style.css";
 import TemplatesSection from "./_components/homepage/TemplatesSection";
 import DocumentationSection from "./_components/homepage/DocumentationSection";
