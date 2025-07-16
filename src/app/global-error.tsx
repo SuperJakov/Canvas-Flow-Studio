@@ -1,12 +1,12 @@
 "use client"; // Error boundaries must be Client Components
 
-import { useEffect } from "react";
-import { AlertTriangle, Home } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, Home, RefreshCw, MessageSquare } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
 import * as Sentry from "@sentry/nextjs";
 
-// This is error component for root layout
 export default function Error({
   error,
   reset,
@@ -14,34 +14,67 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [eventId, setEventId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
   useEffect(() => {
-    Sentry.captureException(error);
+    const id = Sentry.captureException(error);
+    setEventId(id);
   }, [error]);
 
+  const handleSendFeedback = async () => {
+    if (!feedback.trim()) return;
+    setSubmitting(true);
+
+    Sentry.captureFeedback({
+      message: feedback,
+      associatedEventId: eventId ?? undefined,
+      url: window.location.href,
+    });
+
+    setSubmitted(true);
+    setSubmitting(false);
+    setTimeout(() => setShowForm(false), 2000);
+  };
+
   return (
-    <div className="dark flex min-h-screen items-center justify-center bg-[var(--background)] px-4">
-      <Card className="mx-auto max-w-lg shadow-[var(--shadow-2xl)]">
-        <CardContent className="p-8 text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-[var(--destructive)] to-orange-500 shadow-[var(--shadow-lg)]">
-            <AlertTriangle className="h-8 w-8 text-white" />
+    <div className="bg-background dark flex min-h-screen items-center justify-center px-4">
+      <Card className="mx-auto w-full max-w-md border-0 shadow-lg">
+        <CardContent className="p-8">
+          {/* Simplified icon without gradient background */}
+          <div className="mb-6 flex justify-center">
+            <div className="bg-destructive/10 rounded-full p-3">
+              <AlertTriangle className="text-destructive h-6 w-6" />
+            </div>
           </div>
-          <h2 className="mb-4 text-3xl font-bold">
-            <span className="bg-gradient-to-r from-orange-400 via-[var(--destructive)] to-pink-500 bg-clip-text text-transparent">
-              Something went wrong!
-            </span>
+
+          {/* Simplified heading without gradient text */}
+          <h2 className="mb-3 text-center text-2xl font-semibold">
+            Oops! Something went wrong
           </h2>
-          <p className="mb-8 text-[var(--muted-foreground)]">
-            An unexpected error occurred. We&#39;ve logged the issue and our
-            team is looking into it. You can try to reload the page or return to
-            the homepage.
+
+          <p className="text-muted-foreground mb-6 text-center text-sm">
+            We&apos;ve encountered an error. You can try refreshing the page or
+            return home.
           </p>
 
-          {/* Displaying a simplified error message in development for easier debugging */}
-          <pre className="mb-8 w-full overflow-auto rounded-md bg-[var(--muted)] p-4 text-left text-sm text-[var(--destructive)]">
-            <code>{error.message}</code>
-          </pre>
+          {/* Collapsible error details for development */}
+          {process.env.NODE_ENV === "development" && (
+            <details className="mb-6">
+              <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-xs">
+                Show error details
+              </summary>
+              <pre className="bg-muted mt-2 overflow-auto rounded-md p-3 text-xs">
+                <code>{error.message}</code>
+              </pre>
+            </details>
+          )}
 
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+          {/* Primary actions */}
+          <div className="flex gap-3">
             <Button
               onClick={() => {
                 if (reset && typeof reset === "function") {
@@ -50,21 +83,68 @@ export default function Error({
                   window.location.reload();
                 }
               }}
-              className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
+              className="flex-1"
+              size="sm"
             >
+              <RefreshCw className="mr-2 h-4 w-4" />
               Try again
             </Button>
-            {/* We need to use <a> because <Link> doesn't work in global-error.tsx */}
-            <Button asChild variant="secondary">
+
+            <Button asChild variant="outline" size="sm" className="flex-1">
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a
-                href="/"
-                className="bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:bg-[var(--secondary)]/80"
-              >
-                <Home className="mr-2 h-5 w-5" />
-                Go to Homepage
+              <a href="/">
+                <Home className="mr-2 h-4 w-4" />
+                Go home
               </a>
             </Button>
+          </div>
+
+          {/* Feedback section - more subtle */}
+          <div className="mt-6 flex w-full items-center justify-center border-t pt-6">
+            {!showForm && !submitted && (
+              <Button onClick={() => setShowForm(true)} variant="ghost">
+                <MessageSquare className="h-4 w-4" />
+                Help us improve
+              </Button>
+            )}
+
+            {showForm && !submitted && (
+              <div className="space-y-3">
+                <Textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="What were you trying to do?"
+                  className="min-h-[80px] resize-none text-sm"
+                  rows={3}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSendFeedback}
+                    disabled={submitting || !feedback.trim()}
+                    size="sm"
+                    className="flex-1"
+                  >
+                    {submitting ? "Sending..." : "Send"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowForm(false);
+                      setFeedback("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {submitted && (
+              <p className="text-center text-sm text-green-600">
+                ✓ Thank you for your feedback
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
