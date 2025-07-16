@@ -179,19 +179,19 @@ function WhiteboardCard({
                   ref={setPopperElement}
                   style={styles.popper}
                   {...attributes.popper}
-                  className="z-10 w-36 rounded-lg border border-[var(--border)] bg-[var(--popover)] text-[var(--popover-foreground)] shadow-lg ring-1 ring-[var(--border)]"
+                  className="z-10 w-36 rounded-lg bg-[var(--popover)] text-[var(--popover-foreground)] shadow-lg ring-1 ring-[var(--border)]"
                 >
-                  <div className="py-1">
+                  <div className="py-0">
                     <Button
                       onClick={handleRenameClick}
-                      className="w-full justify-start rounded-none px-3 py-2 text-sm hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
+                      className="w-full justify-start rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
                       variant="ghost"
                     >
                       Rename
                     </Button>
                     <Button
                       onClick={handleDeleteClick}
-                      className="w-full justify-start rounded-none px-3 py-2 text-sm hover:bg-red-500 hover:text-white"
+                      className="w-full justify-start rounded-none rounded-br-lg rounded-bl-lg px-3 py-2 text-sm hover:bg-red-500 hover:text-white"
                       disabled={deletingId === whiteboard._id}
                       variant="ghost"
                     >
@@ -426,7 +426,6 @@ export default function WhiteboardsClient() {
                   onClick={handleCreateWhiteboard}
                   className="rounded-lg px-6 py-3 font-medium shadow-sm transition-all hover:shadow-md"
                   disabled={isLimitReached}
-                  size="lg"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Create
