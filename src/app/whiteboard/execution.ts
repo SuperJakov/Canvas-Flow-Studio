@@ -375,13 +375,9 @@ async function executeInstructionNode(
   );
 
   try {
-    // Get the instruction text from thisNode
     const instruction = thisNode.data.text;
 
-    // Get connected source nodes
-    const connectedSourceNodes = getConnectedSourceNodes(get, thisNode.id);
-
-    // Extract node types from connected nodes
+    const connectedSourceNodes = collectSourceNodes(get, thisNode.id);
     const inputNodeTypes = connectedSourceNodes
       .filter(
         (node) =>
@@ -391,13 +387,18 @@ async function executeInstructionNode(
       )
       .map((node) => node.type);
 
+    const imageSource = connectedSourceNodes.find(
+      (node) => node.type === "image",
+    );
+
     console.log("Instruction:", instruction);
     console.log("Connected node types:", inputNodeTypes);
-    console.log(thisNode.data);
+
     const { detectOutputNodeTypeAction } = thisNode.data?.internal ?? {};
     if (!detectOutputNodeTypeAction) {
       throw new Error("detectOutputNodeTypeAction is undefined");
     }
+
     const outputNodeTypeRaw = await detectOutputNodeTypeAction({
       instruction,
       inputNodeTypes,
@@ -406,27 +407,30 @@ async function executeInstructionNode(
     // Normalize output node type to match expected casing
     const outputNodeType =
       outputNodeTypeRaw === "texteditor" ? "textEditor" : outputNodeTypeRaw;
-    // Create a node with the specified type with y+300 from thisNode
-    const currentNodes = get(nodesAtom);
     const newNodeId = uuidv4();
 
-    // Create the new node based on the detected output type
+    // Determine style if output is image and image source exists
+    const styleToUse =
+      outputNodeType === "image" && imageSource
+        ? imageSource.data.style
+        : "auto";
+
     const newNode = {
       id: newNodeId,
       type: outputNodeType,
       position: {
         x: thisNode.position.x,
-        y: thisNode.position.y + 300, // Position 300 pixels below
+        y: thisNode.position.y + 300,
       },
-      data: getDefaultNodeData(outputNodeType),
+      data: {
+        ...getDefaultNodeData(outputNodeType),
+        ...(outputNodeType === "image" && { style: styleToUse }),
+      },
     } as AppNode;
 
-    // Add the new node to the nodes array
-    const updatedNodes = [...currentNodes, newNode];
+    const updatedNodes = [...get(nodesAtom), newNode];
     set(nodesAtom, updatedNodes);
 
-    // Create an edge connecting the instruction node to the new node
-    const currentEdges = get(edgesAtom);
     const newEdge: AppEdge = {
       id: `edge-${thisNode.id}-${newNodeId}`,
       source: thisNode.id,
@@ -434,7 +438,7 @@ async function executeInstructionNode(
       type: "default",
     };
 
-    const updatedEdges = [...currentEdges, newEdge];
+    const updatedEdges = [...get(edgesAtom), newEdge];
     set(edgesAtom, updatedEdges);
 
     console.log(`Created new ${outputNodeType} node with ID: ${newNodeId}`);
