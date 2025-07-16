@@ -141,10 +141,6 @@ async function generateAIImage(
   }
 
   const client = getClient();
-  const getStyledPrompt = (basePrompt: string, style: StyleType = "auto") => {
-    const stylePrompt = systemPrompts[style] ?? systemPrompts.auto;
-    return stylePrompt ? `${stylePrompt}\n\n${basePrompt}` : basePrompt;
-  };
 
   const styleDescription = systemPrompts[style] ?? "";
 
@@ -158,9 +154,7 @@ ${textContents.map((text) => `- ${text}`).join("\n")}
 ${styleDescription ? `Use a ${styleDescription}.` : "Use a visually engaging style."}
 Ensure all elements are clearly represented and cohesively integrated.`;
 
-  // Apply the style to the prompt (assuming you have a 'selectedStyle' variable)
-  const styledPrompt = getStyledPrompt(prompt, style);
-  console.log("Using prompt to generate/edit an image:", styledPrompt);
+  console.log("Using prompt to generate/edit an image:", prompt);
 
   let openAiResponse;
 
