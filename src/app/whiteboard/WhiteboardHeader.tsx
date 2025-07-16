@@ -8,7 +8,7 @@ import { Authenticated, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useConvexQuery } from "~/helpers/convex";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -107,10 +107,6 @@ export default function WhiteboardHeader({ id }: Props) {
       toast.success("Copied to clipboard!", {
         duration: 2000,
         position: "top-center",
-        style: {
-          background: "#1f2937",
-          color: "#fff",
-        },
       });
     } catch (err) {
       console.error("Failed to copy:", err);
