@@ -1,5 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import tseslint from "typescript-eslint";
+import reactCompiler from "eslint-plugin-react-compiler";
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
@@ -17,6 +18,7 @@ export default tseslint.config(
       ...tseslint.configs.recommendedTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
     ],
+    plugins: { "react-compiler": reactCompiler },
     rules: {
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
@@ -33,6 +35,8 @@ export default tseslint.config(
         "error",
         { checksVoidReturn: { attributes: false } },
       ],
+      // React Compiler rule
+      "react-compiler/react-compiler": "error",
     },
   },
   {

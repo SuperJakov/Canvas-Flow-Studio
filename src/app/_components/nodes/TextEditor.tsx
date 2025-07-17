@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, type ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 import { Handle, NodeResizer, Position, type NodeProps } from "@xyflow/react";
 import type { TextEditorNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
@@ -51,19 +51,16 @@ export default function TextEditorNode({
     });
   }
 
-  const onChange = useCallback(
-    (evt: ChangeEvent<HTMLTextAreaElement>) => {
-      if (evt.target.value.length > 10000 || isLocked) {
-        return;
-      }
-      updateNodeData({
-        nodeId: id,
-        nodeType: "textEditor",
-        updatedData: { text: evt.target.value },
-      });
-    },
-    [id, updateNodeData, isLocked],
-  );
+  const onChange = (evt: ChangeEvent<HTMLTextAreaElement>) => {
+    if (evt.target.value.length > 10000 || isLocked) {
+      return;
+    }
+    updateNodeData({
+      nodeId: id,
+      nodeType: "textEditor",
+      updatedData: { text: evt.target.value },
+    });
+  };
 
   const containerClasses = `
   flex h-full flex-col overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2

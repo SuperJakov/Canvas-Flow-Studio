@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import { useAction } from "convex/react";
@@ -63,14 +57,14 @@ export default function ImageNode({
   const whiteboardId = params?.id as string | undefined;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const openBanner = useCallback((feature: string) => {
+  const openBanner = (feature: string) => {
     setBannerFeature(feature);
     setIsBannerOpen(true);
-  }, []);
+  };
 
-  const closeBanner = useCallback(() => {
+  const closeBanner = () => {
     setIsBannerOpen(false);
-  }, []);
+  };
 
   const hoursUntilReset = retryAfterSeconds
     ? Math.ceil(retryAfterSeconds / 3600 / 1000)
@@ -106,15 +100,15 @@ export default function ImageNode({
 
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
-  const toggleLock = useCallback(() => {
+  const toggleLock = () => {
     updateNodeData({
       nodeId: id,
       updatedData: { isLocked: !isLocked },
       nodeType: "image",
     });
-  }, [id, isLocked, updateNodeData]);
+  };
 
-  const toggleRunning = useCallback(() => {
+  const toggleRunning = () => {
     if (isRunning) {
       updateNodeData({
         nodeId: id,
@@ -129,17 +123,9 @@ export default function ImageNode({
     } else {
       console.log("Node cannot run: no incoming connections");
     }
-  }, [
-    id,
-    isRunning,
-    hasIncomingConnections,
-    isRateLimited,
-    updateNodeData,
-    executeNode,
-    openBanner,
-  ]);
+  };
 
-  const handleDownload = useCallback(async () => {
+  const handleDownload = async () => {
     if (!url || isDownloading) return;
 
     setIsDownloading(true);
@@ -161,61 +147,57 @@ export default function ImageNode({
     } finally {
       setIsDownloading(false);
     }
-  }, [url, id, isDownloading]);
+  };
 
-  const handleUpload = useCallback(() => {
+  const handleUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
       fileInputRef.current.click();
     }
-  }, []);
+  };
 
-  const handleFileChange = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      if (!whiteboardId) {
-        console.error("No whiteboardId found in route params");
-        return;
-      }
-      setIsUploading(true);
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        await uploadAndStoreImageAction({
-          file: arrayBuffer,
-          nodeId: id,
-          whiteboardId: whiteboardId as Id<"whiteboards">,
-        });
-      } catch (err) {
-        console.error("Failed to upload image:", err);
-      } finally {
-        setIsUploading(false);
-      }
-    },
-    [id, uploadAndStoreImageAction, whiteboardId],
-  );
-
-  const handleImageLoad = useCallback(() => {
-    setIsImageLoading(false);
-  }, []);
-
-  const handleImageError = useCallback(() => {
-    setIsImageLoading(false);
-  }, []);
-
-  const handleStyleChange = useCallback(
-    (styleId: Style) => {
-      updateNodeData({
-        nodeType: "image",
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!whiteboardId) {
+      console.error("No whiteboardId found in route params");
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      await uploadAndStoreImageAction({
+        file: arrayBuffer,
         nodeId: id,
-        updatedData: {
-          style: styleId,
-        },
+        whiteboardId: whiteboardId as Id<"whiteboards">,
       });
-      setIsPopoverOpen(false);
-    },
-    [id, updateNodeData],
-  );
+    } catch (err) {
+      console.error("Failed to upload image:", err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleImageLoad = () => {
+    setIsImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setIsImageLoading(false);
+  };
+
+  const handleStyleChange = (styleId: Style) => {
+    updateNodeData({
+      nodeType: "image",
+      nodeId: id,
+      updatedData: {
+        style: styleId,
+      },
+    });
+    setIsPopoverOpen(false);
+  };
 
   if (!whiteboardId) {
     throw new Error(

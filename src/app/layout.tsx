@@ -6,6 +6,7 @@ import Providers from "./_components/providers";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Header } from "./_components/Header";
 import { Toaster } from "~/components/ui/sonner";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "AI Flow Studio",
@@ -29,11 +30,11 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <ConvexAuthNextjsServerProvider>
         <Providers>
-          {process.env.REACT_SCAN === "true" && (
-            <script
-              async
+          {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
+            <Script
+              src="https://unpkg.com/react-scan/dist/auto.global.js"
+              strategy="afterInteractive"
               crossOrigin="anonymous"
-              src="//unpkg.com/react-scan/dist/auto.global.js"
             />
           )}
           <body className="dark">

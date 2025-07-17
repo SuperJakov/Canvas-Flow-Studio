@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAtom } from "jotai";
 import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import {
@@ -279,14 +279,14 @@ export default function SpeechNode({
   const [isConverting, setIsConverting] = useState(false);
   const [conversionError, setConversionError] = useState<string | null>(null);
 
-  const openBanner = useCallback((feature: string) => {
+  const openBanner = (feature: string) => {
     setBannerFeature(feature);
     setIsBannerOpen(true);
-  }, []);
+  };
 
-  const closeBanner = useCallback(() => {
+  const closeBanner = () => {
     setIsBannerOpen(false);
-  }, []);
+  };
 
   const hoursUntilReset = retryAfterSeconds
     ? Math.ceil(retryAfterSeconds / 3600 / 1000)
@@ -357,15 +357,15 @@ export default function SpeechNode({
     };
   }, [speechUrl]);
 
-  const toggleLock = useCallback(() => {
+  const toggleLock = () => {
     updateNodeData({
       nodeId: id,
       updatedData: { isLocked: !isLocked },
       nodeType: "speech",
     });
-  }, [id, isLocked, updateNodeData]);
+  };
 
-  const toggleRunning = useCallback(() => {
+  const toggleRunning = () => {
     if (isRunning) {
       updateNodeData({
         nodeId: id,
@@ -380,17 +380,9 @@ export default function SpeechNode({
     } else {
       console.log("Node cannot run: no incoming connections");
     }
-  }, [
-    id,
-    isRunning,
-    hasIncomingConnections,
-    isRateLimited,
-    updateNodeData,
-    executeNode,
-    openBanner,
-  ]);
+  };
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = () => {
     if (!speechData || isDownloading) return;
 
     setIsDownloading(true);
@@ -406,7 +398,7 @@ export default function SpeechNode({
     } finally {
       setIsDownloading(false);
     }
-  }, [speechData, id, isDownloading]);
+  };
 
   if (!whiteboardId) {
     throw new Error(

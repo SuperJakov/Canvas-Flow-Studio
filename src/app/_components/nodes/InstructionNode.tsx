@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useLayoutEffect, type ChangeEvent } from "react";
+import { useLayoutEffect, type ChangeEvent } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { InstructionNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
@@ -65,19 +65,16 @@ export default function InstructionNode({
     });
   }
 
-  const onChange = useCallback(
-    (evt: ChangeEvent<HTMLTextAreaElement>) => {
-      if (evt.target.value.length > 10000 || isLocked) {
-        return;
-      }
-      updateNodeData({
-        nodeId: id,
-        nodeType: "instruction",
-        updatedData: { text: evt.target.value },
-      });
-    },
-    [id, updateNodeData, isLocked],
-  );
+  const onChange = (evt: ChangeEvent<HTMLTextAreaElement>) => {
+    if (evt.target.value.length > 10000 || isLocked) {
+      return;
+    }
+    updateNodeData({
+      nodeId: id,
+      nodeType: "instruction",
+      updatedData: { text: evt.target.value },
+    });
+  };
 
   const containerClasses = `overflow-hidden rounded-lg bg-orange-200 shadow-sm outline-2 ${
     selected ? "outline-orange-600" : "outline-gray-200"

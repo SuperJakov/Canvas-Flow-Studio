@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, type ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 import { type NodeProps, NodeResizer } from "@xyflow/react";
 import type { CommentNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
@@ -14,27 +14,24 @@ export default function CommentNode({
   const { text, isLocked } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
 
-  const toggleLock = useCallback(() => {
+  const toggleLock = () => {
     updateNodeData({
       nodeId: id,
       nodeType: "comment",
       updatedData: { isLocked: !isLocked },
     });
-  }, [id, updateNodeData, isLocked]);
+  };
 
-  const onChange = useCallback(
-    (evt: ChangeEvent<HTMLTextAreaElement>) => {
-      if (evt.target.value.length > 10000 || isLocked) {
-        return;
-      }
-      updateNodeData({
-        nodeId: id,
-        nodeType: "comment",
-        updatedData: { text: evt.target.value },
-      });
-    },
-    [id, updateNodeData, isLocked],
-  );
+  const onChange = (evt: ChangeEvent<HTMLTextAreaElement>) => {
+    if (evt.target.value.length > 10000 || isLocked) {
+      return;
+    }
+    updateNodeData({
+      nodeId: id,
+      nodeType: "comment",
+      updatedData: { text: evt.target.value },
+    });
+  };
 
   return (
     // The main container now uses flexbox to manage the layout and must have h-full

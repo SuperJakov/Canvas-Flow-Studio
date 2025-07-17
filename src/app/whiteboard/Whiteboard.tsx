@@ -1,11 +1,5 @@
 "use client";
-import {
-  useCallback,
-  type DragEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type DragEvent, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   applyEdgeChanges,
@@ -235,32 +229,29 @@ export default function Whiteboard({ id }: Props) {
     }
   }, [edges, setEdges, nodes]);
 
-  const onNodesChange = useCallback(
-    (changes: NodeChange<AppNode>[]) => {
-      if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard
+  const onNodesChange = (changes: NodeChange<AppNode>[]) => {
+    if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard
 
-      // Handle z-index changes
-      const updatedNodes = applyNodeChanges(changes, nodes);
+    // Handle z-index changes
+    const updatedNodes = applyNodeChanges(changes, nodes);
 
-      // Update z-indices based on selection
-      const selectedNodes = updatedNodes.filter((node) => node.selected);
-      if (selectedNodes.length > 0) {
-        const maxZIndex = Math.max(
-          ...updatedNodes.map((node) => node.zIndex ?? 0),
-        );
-        const updatedNodesWithZIndex = updatedNodes.map((node) => {
-          if (node.selected) {
-            return { ...node, zIndex: maxZIndex + 1 };
-          }
-          return node;
-        });
-        setNodes(updatedNodesWithZIndex);
-      } else {
-        setNodes(updatedNodes);
-      }
-    },
-    [setNodes, isSharedWhiteboard, nodes],
-  );
+    // Update z-indices based on selection
+    const selectedNodes = updatedNodes.filter((node) => node.selected);
+    if (selectedNodes.length > 0) {
+      const maxZIndex = Math.max(
+        ...updatedNodes.map((node) => node.zIndex ?? 0),
+      );
+      const updatedNodesWithZIndex = updatedNodes.map((node) => {
+        if (node.selected) {
+          return { ...node, zIndex: maxZIndex + 1 };
+        }
+        return node;
+      });
+      setNodes(updatedNodesWithZIndex);
+    } else {
+      setNodes(updatedNodes);
+    }
+  };
 
   // Add keyboard shortcut handler for z-index manipulation
   useEffect(() => {
@@ -368,145 +359,125 @@ export default function Whiteboard({ id }: Props) {
     });
   }, [nodes, setNodes]);
 
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => {
-      if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
-      setEdges((eds) =>
-        applyEdgeChanges(changes, eds).map((e) => ({ ...e, type: "default" })),
-      );
-    },
-    [setEdges, isSharedWhiteboard],
-  );
+  const onEdgesChange = (changes: EdgeChange[]) => {
+    if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
+    setEdges((eds) =>
+      applyEdgeChanges(changes, eds).map((e) => ({ ...e, type: "default" })),
+    );
+  };
 
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      if (isSharedWhiteboard) return; // Disable connections for shared whiteboard
-      // Prevent connecting a node to itself
-      if (connection.source === connection.target) return;
-      setEdges((eds) =>
-        addEdge({ ...connection, id: uuidv4(), type: "default" }, eds),
-      );
-    },
-    [setEdges, isSharedWhiteboard],
-  );
+  const onConnect = (connection: Connection) => {
+    if (isSharedWhiteboard) return; // Disable connections for shared whiteboard
+    // Prevent connecting a node to itself
+    if (connection.source === connection.target) return;
+    setEdges((eds) =>
+      addEdge({ ...connection, id: uuidv4(), type: "default" }, eds),
+    );
+  };
 
-  const openBanner = useCallback((feature: string) => {
+  const openBanner = (feature: string) => {
     setBannerFeature(feature);
     setIsBannerOpen(true);
-  }, []);
+  };
 
-  const closeBanner = useCallback(() => {
+  const closeBanner = () => {
     setIsBannerOpen(false);
-  }, []);
+  };
 
-  const onDrop = useCallback(
-    (event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      if (!dndType) return;
-      if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
-      if (!nodeCountLimit?.maxNodeCount) return;
-      if (nodeCountLimit.maxNodeCount < nodes.length + 1)
-        return openBanner("Higher limits");
-      console.log(nodeCountLimit.maxNodeCount);
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+  const onDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (!dndType) return;
+    if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
+    if (!nodeCountLimit?.maxNodeCount) return;
+    if (nodeCountLimit.maxNodeCount < nodes.length + 1)
+      return openBanner("Higher limits");
+    console.log(nodeCountLimit.maxNodeCount);
+    const position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
 
-      let newNode: AppNode | undefined;
-      const newNodeId = uuidv4();
+    let newNode: AppNode | undefined;
+    const newNodeId = uuidv4();
 
-      switch (dndType) {
-        case "textEditor":
-          newNode = {
-            id: newNodeId,
-            type: dndType,
-            position,
-            data: { text: "", isLocked: false, internal: { isRunning: false } },
-            width: 280,
-            height: 180,
-          };
-          break;
-        case "image":
-          newNode = {
-            id: newNodeId,
-            type: dndType,
-            position,
-            data: {
-              isLocked: false,
-              imageUrl: null,
-              internal: {
-                isRunning: false,
-              },
-              style: "auto",
+    switch (dndType) {
+      case "textEditor":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: { text: "", isLocked: false, internal: { isRunning: false } },
+          width: 280,
+          height: 180,
+        };
+        break;
+      case "image":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            imageUrl: null,
+            internal: {
+              isRunning: false,
             },
-          };
-          break;
-        case "comment":
-          newNode = {
-            id: newNodeId,
-            type: dndType,
-            position,
-            data: {
-              isLocked: false,
-              text: "",
+            style: "auto",
+          },
+        };
+        break;
+      case "comment":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            text: "",
+          },
+        };
+        break;
+      case "speech":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            internal: {
+              isRunning: false,
             },
-          };
-          break;
-        case "speech":
-          newNode = {
-            id: newNodeId,
-            type: dndType,
-            position,
-            data: {
-              isLocked: false,
-              internal: {
-                isRunning: false,
-              },
+          },
+        };
+        break;
+      case "instruction":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            text: "",
+            internal: {
+              isRunning: false,
             },
-          };
-          break;
-        case "instruction":
-          newNode = {
-            id: newNodeId,
-            type: dndType,
-            position,
-            data: {
-              isLocked: false,
-              text: "",
-              internal: {
-                isRunning: false,
-              },
-            },
-          };
-          break;
-        default:
-          console.error(`Unknown node type on drag & drop: ${dndType}`);
-          return;
-      }
-      if (newNode) {
-        setNodes((prevNodes) => prevNodes.concat(newNode));
-      }
-    },
-    [
-      dndType,
-      isSharedWhiteboard,
-      nodeCountLimit,
-      nodes.length,
-      openBanner,
-      screenToFlowPosition,
-      setNodes,
-    ],
-  );
+          },
+        };
+        break;
+      default:
+        console.error(`Unknown node type on drag & drop: ${dndType}`);
+        return;
+    }
+    if (newNode) {
+      setNodes((prevNodes) => prevNodes.concat(newNode));
+    }
+  };
 
-  const onDragOver = useCallback(
-    (event: DragEvent<HTMLDivElement>) => {
-      if (isSharedWhiteboard) return; // Disable drag over for shared whiteboard
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-    },
-    [isSharedWhiteboard],
-  );
+  const onDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (isSharedWhiteboard) return; // Disable drag over for shared whiteboard
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
 
   if (id && whiteboardData === undefined) {
     return <Loading />;
