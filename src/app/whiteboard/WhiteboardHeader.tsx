@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { ChevronsLeft, Share2 } from "lucide-react";
@@ -13,6 +13,15 @@ import { useConvexQuery } from "~/helpers/convex";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { cn } from "~/lib/utils";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "~/components/ui/dialog";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -21,8 +30,11 @@ type Props = {
 export default function WhiteboardHeader({ id }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
   const whiteboard = useConvexQuery(api.whiteboards.getWhiteboard, { id });
   const user = useConvexQuery(api.users.current);
+
+  const shareInput = useRef<HTMLInputElement>(null);
 
   const editWhiteboardMutation = useMutation(
     api.whiteboards.editWhiteboard,
@@ -101,7 +113,7 @@ export default function WhiteboardHeader({ id }: Props) {
     });
   };
 
-  const handleShare = async () => {
+  const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       toast.success("Copied to clipboard!", {
@@ -111,8 +123,21 @@ export default function WhiteboardHeader({ id }: Props) {
     } catch (err) {
       console.error("Failed to copy:", err);
       toast.error("Failed to copy to clipboard");
+    } finally {
+      setShareOpen(false);
     }
   };
+
+  const selectShareInput = () => {
+    if (!shareInput.current) return;
+    shareInput.current.select();
+  };
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    // Pre-select the content when the dialog opens
+    selectShareInput();
+  }, [shareOpen]);
 
   return (
     <>
@@ -173,7 +198,7 @@ export default function WhiteboardHeader({ id }: Props) {
               <div className="flex w-8 justify-center">
                 {whiteboard?.isPublic && (
                   <Button
-                    onClick={handleShare}
+                    onClick={() => setShareOpen(true)}
                     title="Share whiteboard"
                     variant="ghost"
                     size="sm"
@@ -228,6 +253,40 @@ export default function WhiteboardHeader({ id }: Props) {
           </div>
         </div>
       </header>
+      {/* Share Dialog */}
+      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share this whiteboard</DialogTitle>
+            <DialogDescription>
+              Anyone who has this link will be able to view this.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex items-center space-x-2">
+            <Input
+              id="share-url-input"
+              value={typeof window !== "undefined" ? window.location.href : ""}
+              readOnly
+              className="flex-1"
+              onFocus={selectShareInput} // selects all text on focus
+              onClick={selectShareInput}
+              ref={shareInput}
+            />
+            <Button size="sm" onClick={copyLink}>
+              Copy
+            </Button>
+          </div>
+
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <CopyingOverlay />
     </>
   );

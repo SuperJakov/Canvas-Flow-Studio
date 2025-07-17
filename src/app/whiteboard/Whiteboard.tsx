@@ -30,6 +30,7 @@ import WhiteboardPreviewCreator from "./WhiteboardPreviewCreator";
 import Portal from "../_components/Portal";
 import UpgradeBanner from "./UpgradeBanner";
 import { useConvexQuery } from "~/helpers/convex";
+import { deepEqual } from "fast-equals";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -37,6 +38,15 @@ type Props = {
 
 function checkIfNodeExists(nodes: AppNode[], nodeId: string) {
   return nodes.some((node) => node.id === nodeId);
+}
+
+function stripInternal(node: AppNode) {
+  if ("internal" in node.data) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { internal, ...nodeDataWithoutInternal } = node.data;
+    return { ...node, data: nodeDataWithoutInternal };
+  }
+  return { ...node };
 }
 
 export default function Whiteboard({ id }: Props) {
@@ -107,62 +117,14 @@ export default function Whiteboard({ id }: Props) {
 
       console.time("Preparation time");
       const nodesToSave = currentNodes.map((n) => {
-        if (n.type === "image") {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { internal, ...nodeDataWithoutInternal } = n.data;
-          return {
-            id: n.id,
-            type: n.type,
-            position: n.position,
-            data: nodeDataWithoutInternal,
-            zIndex: n.zIndex,
-          };
-        }
-        if (n.type === "comment") {
-          return {
-            id: n.id,
-            type: n.type,
-            position: n.position,
-            data: n.data,
-            width: n.width,
-            height: n.height,
-            zIndex: n.zIndex,
-          };
-        }
-        if (n.type === "speech") {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { internal, ...nodeDataWithoutInternal } = n.data;
-
-          return {
-            id: n.id,
-            type: n.type,
-            position: n.position,
-            data: nodeDataWithoutInternal,
-            zIndex: n.zIndex,
-          };
-        }
-        if (n.type === "instruction") {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { internal, ...nodeDataWithoutInternal } = n.data;
-          return {
-            id: n.id,
-            type: n.type,
-            position: n.position,
-            data: nodeDataWithoutInternal,
-            zIndex: n.zIndex,
-          };
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { internal, ...nodeDataWithoutInternal } = n.data;
+        const node = stripInternal(n);
         return {
-          id: n.id,
-          type: n.type,
-          position: n.position,
-          data: nodeDataWithoutInternal,
-          zIndex: n.zIndex,
-          width: n.width,
-          height: n.height,
-        };
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data,
+          zIndex: node.zIndex,
+        } as AppNode;
       });
 
       const edgesToSave = currentEdges.map((e) => ({
@@ -205,10 +167,8 @@ export default function Whiteboard({ id }: Props) {
     // Initialize lastSavedRef if not set yet.
     lastSavedRef.current ??= { nodes, edges };
 
-    const hasNodesChanged =
-      JSON.stringify(nodes) !== JSON.stringify(lastSavedRef.current?.nodes);
-    const hasEdgesChanged =
-      JSON.stringify(edges) !== JSON.stringify(lastSavedRef.current?.edges);
+    const hasNodesChanged = deepEqual(nodes, lastSavedRef.current?.nodes);
+    const hasEdgesChanged = deepEqual(edges, lastSavedRef.current?.edges);
 
     if (hasNodesChanged || hasEdgesChanged) {
       void debouncedSaveRef.current(nodes, edges);
@@ -358,6 +318,14 @@ export default function Whiteboard({ id }: Props) {
       return prevNodes.map((node) => ({ ...node, zIndex: idToZ[node.id] }));
     });
   }, [nodes, setNodes]);
+
+  // Sharing
+  useEffect(() => {
+    if (!isSharedWhiteboard) return;
+    // Subscribe to real updates if this is a shared whiteboard
+    setNodes(whiteboardData.nodes);
+    setEdges(whiteboardData.edges);
+  }, [isSharedWhiteboard, setEdges, setNodes, whiteboardData]);
 
   const onEdgesChange = (changes: EdgeChange[]) => {
     if (isSharedWhiteboard) return; // Disable edge changes for shared whiteboard
@@ -523,7 +491,7 @@ export default function Whiteboard({ id }: Props) {
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
         <SharingPopup id={id} />
-        <WhiteboardPreviewCreator />
+        <WhiteboardPreviewCreator id={id} />
       </ReactFlow>
     </>
   );

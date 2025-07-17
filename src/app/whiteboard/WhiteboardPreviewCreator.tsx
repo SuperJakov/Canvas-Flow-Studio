@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { currentWhiteboardIdAtom, edgesAtom, nodesAtom } from "./atoms";
+import { useConvexQuery } from "~/helpers/convex";
 
 // Define constants for the generated image dimensions
 const IMAGE_WIDTH = 1365;
@@ -43,16 +44,28 @@ function dataURLtoBlob(dataUrl: string): Blob {
   return new Blob([u8arr], { type: mime });
 }
 
+type Props = {
+  id: string;
+};
+
 /**
  * A headless React component responsible for automatically generating and uploading
  * a preview image of a whiteboard whenever its content changes.
  */
-export default function WhiteboardPreviewCreator() {
+export default function WhiteboardPreviewCreator({ id }: Props) {
   const { getNodesBounds } = useReactFlow();
   const [nodes] = useAtom(nodesAtom);
   const [edges] = useAtom(edgesAtom);
   const [whiteboardId] = useAtom(currentWhiteboardIdAtom);
   const uploadPreviewImage = useMutation(api.whiteboards.uploadPreviewImage);
+  const whiteboardData = useConvexQuery(
+    api.whiteboards.getWhiteboard,
+    id ? { id } : "skip",
+  );
+  const user = useConvexQuery(api.users.current);
+
+  const isSharedWhiteboard =
+    whiteboardData?.isPublic && whiteboardData?.ownerId !== user?.externalId;
 
   // Convex mutation to get a secure URL for uploading the preview image.
   const generatePreviewUploadUrl = useMutation(
@@ -137,7 +150,7 @@ export default function WhiteboardPreviewCreator() {
    * or the whiteboardId changes.
    */
   useEffect(() => {
-    if (!whiteboardId) {
+    if (!whiteboardId || isSharedWhiteboard) {
       return undefined;
     }
 
@@ -197,7 +210,14 @@ export default function WhiteboardPreviewCreator() {
         clearTimeout(debounceTimeout.current);
       }
     };
-  }, [whiteboardId, nodes, edges, uploadImage, getNodesBounds]);
+  }, [
+    whiteboardId,
+    nodes,
+    edges,
+    uploadImage,
+    getNodesBounds,
+    isSharedWhiteboard,
+  ]);
 
   // This component does not render any UI itself.
   return null;
