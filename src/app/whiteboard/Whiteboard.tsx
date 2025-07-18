@@ -49,6 +49,17 @@ function stripInternal(node: AppNode) {
   return { ...node };
 }
 
+function normalizeZIndices(nodes: AppNode[]) {
+  // time O(n), space O(n)
+  const maxZIndex = Math.max(...nodes.map((node) => node.zIndex ?? 0));
+  return nodes.map((node) => {
+    if (node.selected) {
+      return { ...node, zIndex: maxZIndex + 1 };
+    }
+    return node;
+  });
+}
+
 export default function Whiteboard({ id }: Props) {
   const whiteboardData = useConvexQuery(
     api.whiteboards.getWhiteboard,
@@ -197,19 +208,10 @@ export default function Whiteboard({ id }: Props) {
     // Update z-indices based on selection
     const selectedNodes = updatedNodes.filter((node) => node.selected);
     if (selectedNodes.length > 0) {
-      const maxZIndex = Math.max(
-        ...updatedNodes.map((node) => node.zIndex ?? 0),
-      );
-      const updatedNodesWithZIndex = updatedNodes.map((node) => {
-        if (node.selected) {
-          return { ...node, zIndex: maxZIndex + 1 };
-        }
-        return node;
-      });
-      setNodes(updatedNodesWithZIndex);
-    } else {
-      setNodes(updatedNodes);
+      setNodes(normalizeZIndices(updatedNodes));
+      return;
     }
+    setNodes(updatedNodes);
   };
 
   // Add keyboard shortcut handler for z-index manipulation
@@ -292,31 +294,6 @@ export default function Whiteboard({ id }: Props) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [nodes, setNodes, isSharedWhiteboard]);
-
-  useEffect(() => {
-    setNodes((prevNodes) => {
-      // Check if normalization is needed
-      const sorted = [...prevNodes].sort(
-        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
-      );
-      const needsNormalization = sorted.some(
-        (node, index) => (node.zIndex ?? 0) !== index + 1,
-      );
-
-      if (!needsNormalization) {
-        return prevNodes; // No changes needed
-      }
-
-      // Normalize z-indices to sequential values (1, 2, 3, 4...)
-      sorted.forEach((node, index) => {
-        node.zIndex = index + 1;
-      });
-
-      // Return nodes in original order with normalized z-indices
-      const idToZ = Object.fromEntries(sorted.map((n) => [n.id, n.zIndex]));
-      return prevNodes.map((node) => ({ ...node, zIndex: idToZ[node.id] }));
-    });
-  }, [nodes, setNodes]);
 
   // Sharing
   useEffect(() => {
