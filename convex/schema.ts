@@ -194,6 +194,12 @@ export const imageLogFields = {
     v.literal("1024x1536"),
     v.literal("1536x1024"),
   ),
+  inputTokenDetails: v.optional(
+    v.object({
+      imageTokens: v.optional(v.number()),
+      textTokens: v.optional(v.number()),
+    }),
+  ),
 };
 
 const imageLogs = defineTable(imageLogFields)

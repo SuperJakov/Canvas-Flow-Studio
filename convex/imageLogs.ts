@@ -37,6 +37,19 @@ type ImageLog = Doc<"imageLogs">;
 
 // Helper: compute USD cost for a single log entry
 function costUsdForLog(log: ImageLog): number {
+  if (log.inputTokenDetails?.textTokens) {
+    // Newer implementation
+    let price = 0;
+    price += log.inputTokenDetails.textTokens * PRICE_PER_TEXT_INPUT_TOKEN;
+    price += outputTokens[log.quality][log.resolution] * PRICE_PER_OUTPUT_TOKEN;
+
+    // Image edit
+    price +=
+      (log.inputTokenDetails.imageTokens ?? 0) * PRICE_PER_IMAGE_INPUT_TOKEN;
+
+    return price;
+  }
+
   let price = 0;
   // Base output token cost
   const outputCost =

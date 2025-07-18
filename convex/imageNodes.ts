@@ -129,7 +129,7 @@ async function generateAIImage(
   textContents: string[],
   style: StyleType,
   inputImageBase64?: string,
-): Promise<string> {
+) {
   const previewImageUrl = process.env.PREVIEW_IMAGE_URL;
   if (previewImageUrl) {
     const response = await fetch(previewImageUrl);
@@ -137,7 +137,7 @@ async function generateAIImage(
       throw new Error(`Failed to fetch preview image: ${response.statusText}`);
     }
     const arrayBuf = await response.arrayBuffer();
-    return arrayBufferToBase64(arrayBuf);
+    return { base64OfImage: arrayBufferToBase64(arrayBuf) };
   }
 
   const client = getClient();
@@ -216,7 +216,13 @@ Ensure all elements are clearly represented and cohesively integrated.`;
   }
 
   if (!base64OfImage) throw new Error("Image generation didn't return base-64");
-  return base64OfImage;
+  return {
+    base64OfImage,
+    inputTokenDetails: {
+      textTokens: openAiResponse.usage?.input_tokens_details.text_tokens,
+      imageTokens: openAiResponse.usage?.input_tokens_details.image_tokens,
+    },
+  };
 }
 
 export const generateAndStoreImage = action({
@@ -265,7 +271,7 @@ export const generateAndStoreImage = action({
       throw new Error("Ambiguous request: more than one image supplied.");
     }
 
-    const base64OfImage = await generateAIImage(
+    const { base64OfImage, inputTokenDetails } = await generateAIImage(
       identity,
       textContents,
       style,
@@ -293,6 +299,7 @@ export const generateAndStoreImage = action({
       prompt: textContents.join("\n"),
       quality: "low",
       resolution: "1024x1024",
+      inputTokenDetails,
     });
   },
 });
