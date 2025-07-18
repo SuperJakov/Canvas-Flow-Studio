@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build --turbopack",
-    "check": "next lint && tsc --noEmit",
+    "check": "next lint && tsgo --noEmit",
     "dev": "next dev --turbo",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -13,7 +13,7 @@
     "lint:fix": "next lint --fix",
     "preview": "pnpm build && pnpm start",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "^2.4.5",
@@ -68,6 +68,7 @@
     "@types/node": "^24.0.14",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@typescript/native-preview": "7.0.0-dev.20250718.1",
     "eslint": "^9.31.0",
     "eslint-config-next": "^15.4.1",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
