@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
     ppr: true,
+    typedRoutes: true,
   },
   images: {
     remotePatterns: [
