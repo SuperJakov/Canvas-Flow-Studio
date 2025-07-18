@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    /* Base Options */
+    /* Base Options: */
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
@@ -18,19 +18,15 @@
     "lib": ["dom", "dom.iterable", "ES2022"],
     "noEmit": true,
     "module": "ESNext",
-    "moduleResolution": "node", // switched from "bundler"
+    "moduleResolution": "bundler",
     "jsx": "preserve",
     "plugins": [{ "name": "next" }],
     "incremental": true,
 
-    /* Base directory for non-relative imports */
-    "baseUrl": ".", // ensure "." is the root
-    "rootDir": "src", // optional: if all code lives under src/
-
     /* Path Aliases */
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"],
-      "*": ["./*"]
+      "~/*": ["./src/*"]
     }
   },
   "include": [
@@ -39,8 +35,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts",
-    "images.d.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

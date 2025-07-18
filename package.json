@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build --turbopack",
-    "check": "next lint && tsgo --noEmit",
+    "check": "next lint && tsc --noEmit",
     "dev": "next dev --turbo",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -13,7 +13,7 @@
     "lint:fix": "next lint --fix",
     "preview": "pnpm build && pnpm start",
     "start": "next start",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "^2.4.5",
