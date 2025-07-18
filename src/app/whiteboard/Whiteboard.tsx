@@ -1,5 +1,5 @@
 "use client";
-import { type DragEvent, useEffect, useRef, useState } from "react";
+import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   applyEdgeChanges,
@@ -35,10 +35,6 @@ import { deepEqual } from "fast-equals";
 type Props = {
   id: Id<"whiteboards">;
 };
-
-function checkIfNodeExists(nodes: AppNode[], nodeId: string) {
-  return nodes.some((node) => node.id === nodeId);
-}
 
 function stripInternal(node: AppNode) {
   if ("internal" in node.data) {
@@ -186,18 +182,21 @@ export default function Whiteboard({ id }: Props) {
     }
   }, [nodes, edges, whiteboardData, isSharedWhiteboard]);
 
+  const nodeIds = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes]);
   useEffect(() => {
-    for (const edge of edges) {
-      // Check if both source and target nodes exist, if not, remove the edge
-      const sourceNodeExists = checkIfNodeExists(nodes, edge.source);
-      const targetNodeExists = checkIfNodeExists(nodes, edge.target);
+    const orphanedEdges = edges.filter(
+      (edge) => !nodeIds.has(edge.source) || !nodeIds.has(edge.target),
+    );
 
-      if (!sourceNodeExists || !targetNodeExists) {
-        console.log("[Edge check] Removing edge with id:", edge.id);
-        setEdges((prevEdges) => prevEdges.filter((e) => e.id !== edge.id));
-      }
+    if (orphanedEdges.length > 0) {
+      console.log("Removing orphan edge...");
+      setEdges((prev) =>
+        prev.filter(
+          (edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target),
+        ),
+      );
     }
-  }, [edges, setEdges, nodes]);
+  }, [nodeIds, edges, setEdges]);
 
   const onNodesChange = (changes: NodeChange<AppNode>[]) => {
     if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard

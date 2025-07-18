@@ -288,6 +288,26 @@ export const copyPublicWhiteboard = mutation({
       throw new Error("Can only copy public whiteboards");
     }
 
+    const { maxWhiteboardCount, currentWhiteboardCount } = await ctx.runQuery(
+      api.whiteboards.getWhiteboardCountLimit,
+    );
+
+    if (currentWhiteboardCount + 1 > maxWhiteboardCount) {
+      throw new Error(
+        `You have reached the limit of ${maxWhiteboardCount} whiteboards for your plan. Please delete some whiteboards or upgrade your plan.`,
+      );
+    }
+
+    const { maxNodeCount } = await ctx.runQuery(
+      api.whiteboards.getNodeCountLimit,
+    );
+
+    if (sourceWhiteboard.nodes.length > maxNodeCount) {
+      throw new Error(
+        `Cannot copy whiteboard: it contains ${sourceWhiteboard.nodes.length} nodes, but your plan only allows ${maxNodeCount} nodes. Please upgrade your plan to copy this whiteboard.`,
+      );
+    }
+
     // --- Step 1: Prepare new node data and gather image mappings ---
 
     const newNodes = [];
