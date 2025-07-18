@@ -43,7 +43,7 @@ export default function ImageNode({
     api.imageNodes.getImageGenerationRateLimit,
   );
   const isRateLimited = imageGenRateLimit ? !imageGenRateLimit.ok : false;
-  const retryAfterSeconds = imageGenRateLimit?.retryAfter;
+  const retryAfterMs = imageGenRateLimit?.retryAfter;
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
   const [isDownloading, setIsDownloading] = useState(false);
@@ -66,8 +66,8 @@ export default function ImageNode({
     setIsBannerOpen(false);
   };
 
-  const hoursUntilReset = retryAfterSeconds
-    ? Math.ceil(retryAfterSeconds / 3600 / 1000)
+  const hoursUntilReset = retryAfterMs
+    ? Math.ceil(retryAfterMs / 3600 / 1000)
     : 0;
 
   const daysUntilReset =

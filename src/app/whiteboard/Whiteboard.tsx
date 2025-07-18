@@ -166,9 +166,8 @@ export default function Whiteboard({ id }: Props) {
 
     // Initialize lastSavedRef if not set yet.
     lastSavedRef.current ??= { nodes, edges };
-
-    const hasNodesChanged = deepEqual(nodes, lastSavedRef.current?.nodes);
-    const hasEdgesChanged = deepEqual(edges, lastSavedRef.current?.edges);
+    const hasNodesChanged = !deepEqual(nodes, lastSavedRef.current?.nodes);
+    const hasEdgesChanged = !deepEqual(edges, lastSavedRef.current?.edges);
 
     if (hasNodesChanged || hasEdgesChanged) {
       void debouncedSaveRef.current(nodes, edges);
