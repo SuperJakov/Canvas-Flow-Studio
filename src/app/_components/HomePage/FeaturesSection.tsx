@@ -13,7 +13,7 @@ export default function FeaturesSection() {
       </h2>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {/* Feature 1 */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+        <div className="bg-card rounded-xl border p-6 shadow-md transition hover:border-purple-700/50 hover:shadow-purple-900/20">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
             <Workflow className="h-6 w-6 text-white" />
           </div>
@@ -27,7 +27,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 2 */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+        <div className="bg-card rounded-xl border p-6 shadow-md transition hover:border-purple-700/50 hover:shadow-purple-900/20">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg">
             <Zap className="h-6 w-6 text-white" />
           </div>
@@ -39,7 +39,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 3 */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-[var(--shadow-md)] transition hover:border-purple-700/50 hover:shadow-purple-900/20">
+        <div className="bg-card rounded-xl border p-6 shadow-md transition hover:border-purple-700/50 hover:shadow-purple-900/20">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-pink-600 to-orange-600 shadow-lg">
             <Layers className="h-6 w-6 text-white" />
           </div>

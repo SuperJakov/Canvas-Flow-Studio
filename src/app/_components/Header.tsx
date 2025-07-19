@@ -126,7 +126,7 @@ export function Header() {
               <Button variant="link" asChild className="h-auto p-0 text-2xl">
                 <Link
                   href="/"
-                  className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
+                  className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
                   onClick={closeMenu}
                 >
                   Home
@@ -135,7 +135,7 @@ export function Header() {
               <Button variant="link" asChild className="h-auto p-0 text-2xl">
                 <Link
                   href="/pricing"
-                  className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
+                  className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
                   onClick={closeMenu}
                 >
                   Pricing
@@ -145,7 +145,7 @@ export function Header() {
                 <Button variant="link" asChild className="h-auto p-0 text-2xl">
                   <Link
                     href="/whiteboards"
-                    className="font-medium text-[var(--muted-foreground)] no-underline transition hover:text-[var(--foreground)]"
+                    className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
                     onClick={closeMenu}
                   >
                     Whiteboard
@@ -162,7 +162,7 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="h-12 border-[var(--border)] bg-transparent text-lg font-medium text-[var(--muted-foreground)] hover:border-[var(--border)]/80 hover:bg-[var(--accent)]/10 hover:text-[var(--foreground)]"
+                      className="h-12 border bg-transparent text-lg font-medium text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground"
                       onClick={closeMenu}
                     >
                       Sign In
@@ -171,7 +171,7 @@ export function Header() {
                   <SignUpButton mode="modal">
                     <Button
                       size="lg"
-                      className="h-12 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-lg font-medium text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
+                      className="h-12 bg-gradient-to-r from-primary to-secondary text-lg font-medium text-primary-foreground shadow-lg hover:scale-[1.02] hover:shadow-xl"
                       onClick={closeMenu}
                     >
                       Sign Up

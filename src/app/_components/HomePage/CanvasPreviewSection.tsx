@@ -6,7 +6,7 @@ const previewImage1Url = "/preview1.png";
 export default function CanvasPreviewSection() {
   return (
     <section className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] shadow-2xl shadow-purple-900/20">
+      <div className="overflow-hidden rounded-xl border-2 shadow-2xl shadow-purple-900/20">
         <div className="pointer-events-none relative h-[500px] w-full overflow-hidden">
           <ReactFlow
             nodes={[

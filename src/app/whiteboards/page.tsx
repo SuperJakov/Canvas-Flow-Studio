@@ -97,7 +97,7 @@ function WhiteboardCard({
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm transition-all duration-200 hover:border-[var(--accent)] hover:shadow-md">
+    <div className="group bg-card hover:border-accent relative overflow-hidden rounded-xl border shadow-sm transition-all duration-200 hover:shadow-md">
       <Link
         href={`/whiteboard/${whiteboard._id}`}
         onClick={(e) => {
@@ -111,7 +111,7 @@ function WhiteboardCard({
         aria-label={`Open whiteboard: ${whiteboard.title ?? "Untitled"}`}
       >
         <div className="relative">
-          <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-[var(--muted)] to-[var(--muted)]/50">
+          <div className="from-muted to-muted/50 relative aspect-[16/9] w-full bg-gradient-to-br">
             {whiteboard.previewUrl ? (
               <Image
                 src={whiteboard.previewUrl}
@@ -121,8 +121,8 @@ function WhiteboardCard({
                 className="object-cover transition-all duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--muted)] to-[var(--muted)]/50">
-                <div className="text-center text-[var(--muted-foreground)]">
+              <div className="from-muted to-muted/50 flex h-full w-full items-center justify-center bg-gradient-to-br">
+                <div className="text-muted-foreground text-center">
                   <Grid3X3 className="mx-auto mb-2 h-12 w-12 opacity-50" />
                   <p className="text-sm">No preview available</p>
                 </div>
@@ -158,7 +158,7 @@ function WhiteboardCard({
                   maxLength={30}
                 />
               ) : (
-                <h3 className="truncate text-base font-semibold text-[var(--foreground)]">
+                <h3 className="text-foreground truncate text-base font-semibold">
                   {whiteboard.title ?? "Untitled"}
                 </h3>
               )}
@@ -179,12 +179,12 @@ function WhiteboardCard({
                   ref={setPopperElement}
                   style={styles.popper}
                   {...attributes.popper}
-                  className="z-10 w-36 rounded-lg bg-[var(--popover)] text-[var(--popover-foreground)] shadow-lg ring-1 ring-[var(--border)]"
+                  className="bg-popover text-popover-foreground ring-border z-10 w-36 rounded-lg shadow-lg ring-1"
                 >
                   <div className="py-0">
                     <Button
                       onClick={handleRenameClick}
-                      className="w-full justify-start rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]"
+                      className="hover:bg-accent hover:text-accent-foreground w-full justify-start rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm"
                       variant="ghost"
                     >
                       Rename
@@ -202,8 +202,8 @@ function WhiteboardCard({
               )}
             </div>
           </div>
-          <p className="flex items-center gap-1 text-sm text-[var(--muted-foreground)]">
-            <span className="h-2 w-2 rounded-full bg-[var(--accent)]"></span>
+          <p className="text-muted-foreground flex items-center gap-1 text-sm">
+            <span className="bg-accent h-2 w-2 rounded-full"></span>
             Modified {formatDate(whiteboard.updatedAt)}
           </p>
         </div>
@@ -373,7 +373,7 @@ export default function WhiteboardsClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] pt-16 text-[var(--foreground)]">
+    <div className="bg-background text-foreground min-h-screen pt-16">
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Hero section */}
         <div className="mb-8">
@@ -382,13 +382,13 @@ export default function WhiteboardsClient() {
               <h1 className="mb-2 text-4xl font-bold tracking-tight">
                 Your Whiteboards
               </h1>
-              <p className="text-lg text-[var(--muted-foreground)]">
+              <p className="text-muted-foreground text-lg">
                 Create, organize, and collaborate on your ideas
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-[var(--muted)] px-3 py-2">
-                <span className="text-sm font-medium text-[var(--muted-foreground)]">
+              <div className="bg-muted rounded-lg px-3 py-2">
+                <span className="text-muted-foreground text-sm font-medium">
                   {whiteboardCountLimit.currentWhiteboardCount} of{" "}
                   {whiteboardCountLimit.maxWhiteboardCount === Infinity
                     ? "∞"
@@ -401,7 +401,7 @@ export default function WhiteboardsClient() {
 
         {/* Create new whiteboard section */}
         <div className="mb-8">
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+          <div className="bg-card rounded-xl border p-6 shadow-sm">
             <div className="mb-4">
               <h2 className="text-xl font-semibold">Create New Whiteboard</h2>
             </div>
@@ -417,7 +417,7 @@ export default function WhiteboardsClient() {
                       if (e.key === "Enter") void handleCreateWhiteboard();
                     }}
                     placeholder="Enter whiteboard name..."
-                    className="rounded-lg border-[var(--border)] bg-[var(--background)] py-3 pr-4 pl-4 text-base focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
+                    className="bg-background focus:border-accent focus:ring-accent rounded-lg border py-3 pr-4 pl-4 text-base focus:ring-1"
                     maxLength={30}
                     disabled={isLimitReached}
                   />
@@ -469,7 +469,7 @@ export default function WhiteboardsClient() {
         )}
 
         {/* Whiteboards grid */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
+        <div className="bg-card rounded-xl border p-6 shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <div className="mb-4">
               <Breadcrumb>
@@ -477,7 +477,7 @@ export default function WhiteboardsClient() {
                   <BreadcrumbItem>
                     <BreadcrumbLink
                       href="/whiteboards"
-                      className="text-xl text-[var(--muted-foreground)]"
+                      className="text-muted-foreground text-xl"
                     >
                       Whiteboards
                     </BreadcrumbLink>
@@ -486,7 +486,7 @@ export default function WhiteboardsClient() {
                   {/* <BreadcrumbSeparator />
 
                   <BreadcrumbItem>
-                    <BreadcrumbPage className="text-xl text-[var(--muted-foreground)]">
+                    <BreadcrumbPage className="text-xl text-muted-foreground">
                       Examples
                     </BreadcrumbPage>
                   </BreadcrumbItem> */}
@@ -494,7 +494,7 @@ export default function WhiteboardsClient() {
               </Breadcrumb>
             </div>
             {whiteboards && whiteboards.length > 0 && (
-              <p className="text-sm text-[var(--muted-foreground)]">
+              <p className="text-muted-foreground text-sm">
                 {whiteboards.length} whiteboard
                 {whiteboards.length !== 1 ? "s" : ""}
               </p>
@@ -503,13 +503,13 @@ export default function WhiteboardsClient() {
 
           {(whiteboards?.length ?? 0) === 0 ? (
             <div className="py-12 text-center">
-              <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[var(--muted)]">
-                <Grid3X3 className="h-12 w-12 text-[var(--muted-foreground)]" />
+              <div className="bg-muted mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full">
+                <Grid3X3 className="text-muted-foreground h-12 w-12" />
               </div>
-              <h3 className="mb-2 text-lg font-medium text-[var(--foreground)]">
+              <h3 className="text-foreground mb-2 text-lg font-medium">
                 No whiteboards yet
               </h3>
-              <p className="mx-auto max-w-md text-[var(--muted-foreground)]">
+              <p className="text-muted-foreground mx-auto max-w-md">
                 Create your first whiteboard to start brainstorming, sketching,
                 and collaborating on ideas.
               </p>

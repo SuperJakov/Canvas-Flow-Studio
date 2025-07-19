@@ -66,7 +66,7 @@ export default function UpgradeBanner({
     <>
       {/* Clean full-screen overlay with proper scrolling */}
       <div
-        className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[var(--background)]/90 px-4 py-4 backdrop-blur-sm duration-300"
+        className="animate-in fade-in bg-background/90 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-4 py-4 backdrop-blur-sm duration-300"
         onClick={onCloseAction}
       >
         {/* Main content card with responsive sizing */}
@@ -75,30 +75,29 @@ export default function UpgradeBanner({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Clean card container */}
-          <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-xl md:p-8">
+          <div className="bg-card relative rounded-2xl border p-4 shadow-xl md:p-8">
             {/* Close button with hover effect */}
             <button
               onClick={onCloseAction}
               aria-label="Close upgrade banner"
-              className="absolute top-4 right-4 rounded-full bg-[var(--muted)] p-2 text-[var(--muted-foreground)] transition-all hover:scale-110 hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
+              className="bg-muted text-muted-foreground hover:bg-secondary hover:text-foreground absolute top-4 right-4 rounded-full p-2 transition-all hover:scale-110"
             >
               <X className="h-4 w-4" />
             </button>
 
             {/* Clean header section */}
             <div className="mb-6 text-center">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--muted)]">
-                <Sparkles className="h-6 w-6 text-[var(--primary)]" />
+              <div className="bg-muted mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl">
+                <Sparkles className="text-primary h-6 w-6" />
               </div>
 
-              <h2 className="mb-4 text-2xl font-bold text-[var(--foreground)] sm:text-3xl lg:text-4xl">
-                Unlock{" "}
-                <span className="text-[var(--primary)]">{featureName}</span>
+              <h2 className="text-foreground mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">
+                Unlock <span className="text-primary">{featureName}</span>
               </h2>
 
-              <p className="mx-auto max-w-2xl text-base leading-relaxed text-[var(--muted-foreground)]">
+              <p className="text-muted-foreground mx-auto max-w-2xl text-base leading-relaxed">
                 You&apos;re currently on the{" "}
-                <span className="font-medium text-[var(--foreground)]">
+                <span className="text-foreground font-medium">
                   {userPlan} plan
                 </span>
                 . Choose a plan below to get higher limits and access to premium
@@ -119,16 +118,16 @@ export default function UpgradeBanner({
                     key={plan.name}
                     className={`relative flex flex-col rounded-xl border p-4 transition-all duration-300 ${
                       plan.popular && !isCurrentPlan
-                        ? "border-[var(--primary)]/30 bg-[var(--card)] hover:border-[var(--primary)]/50"
+                        ? "border-primary/30 bg-card hover:border-primary/50"
                         : isCurrentPlan
-                          ? "border-[var(--chart-3)]/50 bg-[var(--card)]"
-                          : "border-[var(--border)] bg-[var(--card)]/50 hover:border-[var(--accent)]/50"
+                          ? "bg-card border-[var(--chart-3)]/50"
+                          : "bg-card/50 hover:border-accent/50 border"
                     }`}
                   >
                     {/* Current plan badge */}
                     {isCurrentPlan && (
                       <div className="absolute -top-2 left-1/2 -translate-x-1/2 transform">
-                        <div className="flex items-center gap-1 rounded-full bg-[var(--chart-3)] px-2 py-1 text-xs font-medium text-[var(--primary-foreground)]">
+                        <div className="text-primary-foreground flex items-center gap-1 rounded-full bg-[var(--chart-3)] px-2 py-1 text-xs font-medium">
                           <CheckCircle2 className="h-3 w-3" />
                           Current Plan
                         </div>
@@ -138,7 +137,7 @@ export default function UpgradeBanner({
                     {/* Popular badge - only show if not current plan */}
                     {plan.popular && !isCurrentPlan && (
                       <div className="absolute -top-2 left-1/2 -translate-x-1/2 transform">
-                        <div className="rounded-full bg-[var(--primary)] px-2 py-1 text-xs font-medium text-[var(--primary-foreground)]">
+                        <div className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs font-medium">
                           Most Popular
                         </div>
                       </div>
@@ -147,17 +146,15 @@ export default function UpgradeBanner({
                     <div className="p-3">
                       {/* Compact plan header */}
                       <div className="mb-3 flex items-center">
-                        <div className="mr-2 rounded-lg border border-[var(--border)] bg-[var(--muted)] p-1.5">
+                        <div className="bg-muted mr-2 rounded-lg border p-1.5">
                           <IconComponent
-                            className={`h-4 w-4 ${isPlusCard ? "text-[var(--accent)]" : "text-[var(--primary)]"}`}
+                            className={`h-4 w-4 ${isPlusCard ? "text-accent" : "text-primary"}`}
                           />
                         </div>
                         <div>
                           <h3
                             className={`text-xl font-bold ${
-                              isPlusCard
-                                ? "text-[var(--accent)]"
-                                : "text-[var(--primary)]"
+                              isPlusCard ? "text-accent" : "text-primary"
                             }`}
                           >
                             {plan.name}
@@ -165,7 +162,7 @@ export default function UpgradeBanner({
                         </div>
                       </div>
 
-                      <p className="mb-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                      <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                         {plan.description}
                       </p>
 
@@ -176,9 +173,7 @@ export default function UpgradeBanner({
                             <div className="mr-2 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-[var(--chart-3)]/30 bg-[var(--chart-3)]/20">
                               <Check className="h-2.5 w-2.5 text-[var(--chart-3)]" />
                             </div>
-                            <span className="text-[var(--foreground)]">
-                              {feature}
-                            </span>
+                            <span className="text-foreground">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -187,7 +182,7 @@ export default function UpgradeBanner({
                       {isCurrentPlan ? (
                         <button
                           disabled
-                          className="flex w-full cursor-not-allowed items-center justify-center rounded-lg bg-[var(--muted)] px-4 py-2.5 text-sm font-medium text-[var(--muted-foreground)]"
+                          className="bg-muted text-muted-foreground flex w-full cursor-not-allowed items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium"
                         >
                           Current Plan
                         </button>
@@ -196,10 +191,10 @@ export default function UpgradeBanner({
                           href="/pricing"
                           className={`group relative flex w-full items-center justify-center overflow-hidden rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg transition-all hover:shadow-xl ${
                             isDowngrade
-                              ? "bg-[var(--destructive)] text-[var(--destructive-foreground)] hover:opacity-90"
+                              ? "bg-destructive text-destructive-foreground hover:opacity-90"
                               : isPlusCard
-                                ? "bg-[var(--accent)] text-[var(--accent-foreground)] hover:opacity-90"
-                                : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90"
+                                ? "bg-accent text-accent-foreground hover:opacity-90"
+                                : "bg-primary text-primary-foreground hover:opacity-90"
                           }`}
                         >
                           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
@@ -219,7 +214,7 @@ export default function UpgradeBanner({
 
             {/* Compact footer */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-[var(--muted-foreground)]">
+              <p className="text-muted-foreground text-sm">
                 Flexible billing • Cancel anytime
               </p>
             </div>

@@ -183,7 +183,7 @@ export default function PricingPage() {
           <Button asChild size="lg" className="w-full">
             <Link
               href="/whiteboard"
-              className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
+              className="from-primary to-secondary text-primary-foreground bg-gradient-to-r shadow-lg hover:scale-[1.02] hover:shadow-xl"
             >
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -198,8 +198,8 @@ export default function PricingPage() {
               className={cn(
                 "w-full",
                 plan.popular
-                  ? "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]"
-                  : "bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:bg-[var(--secondary)]/80",
+                  ? "from-primary to-secondary text-primary-foreground bg-gradient-to-r shadow-lg hover:scale-[1.02] hover:shadow-xl"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-lg hover:scale-[1.02]",
               )}
             >
               Sign Up to Upgrade
@@ -228,20 +228,20 @@ export default function PricingPage() {
       if (plan.popular) {
         return cn(
           baseClasses,
-          "bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]",
+          "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg hover:scale-[1.02] hover:shadow-xl",
         );
       }
 
       if (plan.name === currentTier) {
         return cn(
           baseClasses,
-          "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[var(--shadow-lg)] hover:scale-[1.02] hover:shadow-[var(--shadow-xl)]",
+          "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:scale-[1.02] hover:shadow-xl",
         );
       }
 
       return cn(
         baseClasses,
-        "bg-[var(--secondary)] text-[var(--secondary-foreground)] shadow-[var(--shadow-lg)] hover:bg-[var(--secondary)]/80 hover:scale-[1.02]",
+        "bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/80 hover:scale-[1.02]",
       );
     };
 
@@ -266,7 +266,7 @@ export default function PricingPage() {
     : null;
 
   return (
-    <div className="min-h-screen w-full bg-[var(--background)] text-[var(--foreground)]">
+    <div className="bg-background text-foreground min-h-screen w-full">
       <div className="min-h-screen">
         {/* Header */}
         <section className="container mx-auto px-4 pt-20 pb-16 sm:px-6 lg:px-8">
@@ -366,19 +366,19 @@ export default function PricingPage() {
             {plans.map((plan) => (
               <div
                 key={plan.name}
-                className={`group relative flex h-full flex-col rounded-3xl border border-[var(--border)] p-6 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl lg:p-8 ${
+                className={`group relative flex h-full flex-col rounded-3xl border p-6 shadow-xl backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-2xl lg:p-8 ${
                   plan.popular
-                    ? "bg-[var(--card)] ring-2 ring-[var(--primary)]/30 hover:ring-[var(--primary)]/50"
-                    : "bg-[var(--card)] hover:ring-1 hover:ring-[var(--secondary)]/30"
+                    ? "bg-card ring-primary/30 hover:ring-primary/50 ring-2"
+                    : "bg-card hover:ring-secondary/30 hover:ring-1"
                 } ${
                   plan.name === currentTier
-                    ? "bg-gradient-to-b from-green-900/20 to-[var(--card)] ring-2 ring-green-500/30"
+                    ? "to-card bg-gradient-to-b from-green-900/20 ring-2 ring-green-500/30"
                     : ""
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                    <div className="flex items-center rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] px-4 py-2 text-sm font-bold text-[var(--primary-foreground)] shadow-lg">
+                    <div className="from-primary to-secondary text-primary-foreground flex items-center rounded-full bg-gradient-to-r px-4 py-2 text-sm font-bold shadow-lg">
                       <Sparkles className="mr-2 h-4 w-4" />
                       Most Popular
                     </div>
@@ -393,20 +393,20 @@ export default function PricingPage() {
                   </div>
                 )}
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-[var(--card-foreground)]">
+                  <h3 className="text-card-foreground text-2xl font-bold">
                     {plan.name}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+                  <p className="text-muted-foreground mt-2 text-sm">
                     {plan.description}
                   </p>
                 </div>
-                <div className="mb-8 border-b border-[var(--border)] pb-6">
+                <div className="mb-8 pb-6">
                   <div className="flex items-end">
-                    <span className="text-5xl font-bold text-[var(--card-foreground)]">
+                    <span className="text-card-foreground text-5xl font-bold">
                       {plan.currency}
                       {plan.price}
                     </span>
-                    <span className="ml-2 text-[var(--muted-foreground)]">
+                    <span className="text-muted-foreground ml-2">
                       /{plan.period}
                     </span>
                   </div>
@@ -423,8 +423,8 @@ export default function PricingPage() {
                     color="green"
                   />
                   <div className="flex flex-col">
-                    <h4 className="mb-3 flex items-center text-sm font-semibold tracking-wider text-[var(--muted-foreground)] uppercase">
-                      <span className="mr-2 h-0.5 w-5 bg-[var(--primary)]"></span>
+                    <h4 className="text-muted-foreground mb-3 flex items-center text-sm font-semibold tracking-wider uppercase">
+                      <span className="bg-primary mr-2 h-0.5 w-5"></span>
                       Premium Features
                     </h4>
                     <ul className="flex-1 space-y-3">
@@ -433,10 +433,10 @@ export default function PricingPage() {
                           {feature.included ? (
                             <Check className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-[var(--chart-3)]/20 p-1 text-[var(--chart-3)]" />
                           ) : (
-                            <X className="mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full bg-[var(--destructive)]/20 p-1 text-[var(--destructive)]" />
+                            <X className="bg-destructive/20 text-destructive mt-1 mr-3 h-5 w-5 flex-shrink-0 rounded-full p-1" />
                           )}
                           <span
-                            className={`${feature.included ? "text-[var(--card-foreground)]" : "text-[var(--muted-foreground)]"}`}
+                            className={`${feature.included ? "text-card-foreground" : "text-muted-foreground"}`}
                           >
                             {feature.name}
                           </span>
@@ -449,7 +449,7 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center text-sm text-[var(--muted-foreground)]">
+          <div className="text-muted-foreground mt-8 text-center text-sm">
             *Unlimited access is subject to abuse guardrails.
           </div>
         </section>

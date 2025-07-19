@@ -21,7 +21,7 @@ export default function SharingPopup({ id }: Props) {
 
   return (
     <>
-      <div className="fixed right-4 bottom-4 z-50 rounded-lg bg-[var(--background)] p-6 shadow-lg">
+      <div className="fixed right-4 bottom-4 z-50 rounded-lg bg-background p-6 shadow-lg">
         <div className="mb-3 text-base">This is a shared whiteboard</div>
         <Button
           onClick={() => copyWhiteboard(id)}

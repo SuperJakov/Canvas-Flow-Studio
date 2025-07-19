@@ -141,7 +141,7 @@ export default function Error({
             )}
 
             {submitted && (
-              <p className="text-center text-sm text-[var(--accent)]">
+              <p className="text-center text-sm text-accent">
                 ✓ Thank you for your feedback
               </p>
             )}

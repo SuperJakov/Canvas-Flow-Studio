@@ -39,11 +39,11 @@ export default function FAQ() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold">
-            <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Frequently Asked Questions
             </span>
           </h2>
-          <p className="mt-3 text-[var(--muted-foreground)]">
+          <p className="mt-3 text-muted-foreground">
             Everything you need to know
           </p>
         </div>
@@ -52,11 +52,11 @@ export default function FAQ() {
           {faqItems.map((faq, idx) => (
             <Card
               key={idx}
-              className="gap-1 transition-all hover:bg-[var(--card)]/80 hover:shadow-[var(--shadow-md)]"
+              className="gap-1 transition-all hover:bg-card/80 hover:shadow-md"
             >
               <CardHeader className="pb-3">
                 <h3 className="flex items-center text-lg font-semibold">
-                  <span className="mr-3 h-2 w-2 rounded-full bg-[var(--primary)]"></span>
+                  <span className="mr-3 h-2 w-2 rounded-full bg-primary"></span>
                   {faq.question}
                 </h3>
               </CardHeader>

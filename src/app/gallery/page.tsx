@@ -231,7 +231,7 @@ export default function GalleryPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Image Gallery</h1>
-            <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+            <p className="text-muted-foreground mt-2 text-sm">
               {allImages.length} {allImages.length === 1 ? "image" : "images"}
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function GalleryPage() {
           )}
         </div>
 
-        <div className="rounded-lg bg-[var(--card)] p-6">
+        <div className="bg-card rounded-lg p-6">
           {allImages.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-4 py-16">
               <Images size={40} className="text-gray-400" />
@@ -301,7 +301,7 @@ export default function GalleryPage() {
                             );
                           }}
                           disabled={downloadingImages.has(image._id)}
-                          className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="bg-muted text-muted-foreground absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
                           title={
                             downloadingImages.has(image._id)
                               ? "Downloading..."
@@ -358,12 +358,12 @@ export default function GalleryPage() {
           </div>
 
           {/* Right sidebar with image details */}
-          <div className="flex w-80 flex-col bg-[var(--card)] p-6">
+          <div className="bg-card flex w-80 flex-col p-6">
             <h3 className="mb-4 text-xl font-bold">Image Details</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-[var(--muted-foreground)]">
+                <label className="text-muted-foreground text-sm font-medium">
                   Created
                 </label>
                 <p>{formatDate(fullscreenImage._creationTime)}</p>
@@ -371,7 +371,7 @@ export default function GalleryPage() {
 
               {fullscreenImage.whiteboardId && (
                 <div>
-                  <label className="text-sm font-medium text-[var(--muted-foreground)]">
+                  <label className="text-muted-foreground text-sm font-medium">
                     Whiteboard
                   </label>
                   <Link href={`/whiteboard/${fullscreenImage.whiteboardId}`}>
@@ -384,10 +384,10 @@ export default function GalleryPage() {
               )}
 
               <div>
-                <label className="text-sm font-medium text-[var(--muted-foreground)]">
+                <label className="text-muted-foreground text-sm font-medium">
                   Prompt
                 </label>
-                <p className="mt-1 rounded bg-[var(--secondary)] p-3 text-sm text-[var(--secondary-foreground)]">
+                <p className="bg-secondary text-secondary-foreground mt-1 rounded p-3 text-sm">
                   Prompt goes here
                 </p>
               </div>

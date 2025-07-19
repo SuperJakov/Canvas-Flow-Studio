@@ -12,7 +12,7 @@ export default function DemoVideoSection() {
           visual canvas
         </p>
 
-        <div className="overflow-hidden rounded-xl border-2 border-[var(--border)] bg-[var(--secondary)] shadow-2xl shadow-purple-900/20">
+        <div className="bg-secondary overflow-hidden rounded-xl border-2 shadow-2xl shadow-purple-900/20">
           <video className="w-full" autoPlay loop muted playsInline>
             <source src="/demo1.mp4" type="video/mp4" />
             Your browser does not support the video tag.
