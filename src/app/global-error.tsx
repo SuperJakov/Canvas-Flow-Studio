@@ -109,12 +109,12 @@ export default function Error({
             )}
 
             {showForm && !submitted && (
-              <div className="space-y-3">
+              <div className="w-full space-y-3">
                 <Textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="What were you trying to do?"
-                  className="min-h-[80px] resize-none text-sm"
+                  className="min-h-[80px] min-w-full resize-none text-sm"
                   rows={3}
                 />
                 <div className="flex gap-2">
@@ -141,7 +141,7 @@ export default function Error({
             )}
 
             {submitted && (
-              <p className="text-center text-sm text-green-600">
+              <p className="text-center text-sm text-[var(--accent)]">
                 ✓ Thank you for your feedback
               </p>
             )}

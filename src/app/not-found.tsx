@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MessageSquare } from "lucide-react";
+import { ArrowLeft, Home, MessageSquare, AlertCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { Card, CardContent } from "~/components/ui/card";
@@ -46,92 +46,98 @@ export default function NotFound() {
   return (
     <>
       <AuthLoading>
+        {/* This is a full screen loader */}
         <Loading />
       </AuthLoading>
-      <div className="min-h-screen bg-gradient-to-b text-[var(--foreground)]">
-        <div className="container mx-auto px-4 pt-32 pb-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl text-center">
-            <h1 className="mb-6 text-8xl font-bold">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                404
-              </span>
-            </h1>
-            <h2 className="mb-6 text-4xl font-bold">Page Not Found</h2>
-            <p className="mb-10 text-xl text-[var(--muted-foreground)]">
-              Oops! The page you&apos;re looking for doesn&apos;t exist or has
-              been moved.
+      <div className="bg-background dark flex min-h-screen items-center justify-center px-4">
+        <Card className="mx-auto w-full max-w-md border-0 p-0 shadow-lg">
+          <CardContent className="p-8">
+            {/* Simplified icon without gradient background */}
+            <div className="mb-6 flex justify-center">
+              <div className="bg-destructive/10 rounded-full p-3">
+                <AlertCircle className="text-destructive h-6 w-6" />
+              </div>
+            </div>
+
+            {/* Simplified heading without gradient text */}
+            <h2 className="mb-3 text-center text-2xl font-semibold">
+              Page Not Found
+            </h2>
+
+            <p className="text-muted-foreground mb-6 text-center text-sm">
+              The page you&apos;re looking for doesn&apos;t exist or has been
+              moved.
             </p>
-            <div className="mb-8 flex justify-center gap-4">
-              <Link href="/">
-                <Button size="xl">
-                  <ArrowLeft className="mr-2 h-5 w-5" />
-                  Back to Home
-                </Button>
-              </Link>
-              <Authenticated>
-                <Link href="/whiteboards">
-                  <Button size="xl" variant="secondary">
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                    Go to Whiteboards
-                  </Button>
+
+            {/* Primary actions */}
+            <div className="flex gap-3">
+              <Button asChild className="flex-1" size="sm">
+                <Link href="/">
+                  <Home className="mr-2 h-4 w-4" />
+                  Go home
                 </Link>
+              </Button>
+
+              <Authenticated>
+                <Button asChild variant="outline" size="sm" className="flex-1">
+                  <Link href="/whiteboards">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Whiteboards
+                  </Link>
+                </Button>
               </Authenticated>
             </div>
 
-            <Card className="mx-auto max-w-lg border-0 shadow-md">
-              <CardContent className="p-6">
-                {!showForm && !submitted && (
-                  <Button
-                    onClick={() => setShowForm(true)}
-                    variant="ghost"
-                    className="mx-auto"
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Help us improve
-                  </Button>
-                )}
+            {/* Feedback section - more subtle */}
+            <div className="mt-6 flex w-full items-center justify-center border-t pt-6">
+              {!showForm && !submitted && (
+                <Button onClick={() => setShowForm(true)} variant="ghost">
+                  <MessageSquare className="h-4 w-4" />
+                  Help us improve
+                </Button>
+              )}
 
-                {showForm && !submitted && (
-                  <div className="space-y-3">
-                    <Textarea
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
-                      placeholder="What were you trying to do?"
-                      className="min-h-[80px] resize-none text-sm"
-                      rows={3}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSendFeedback}
-                        disabled={submitting || !feedback.trim()}
-                        size="sm"
-                        className="flex-1"
-                      >
-                        {submitting ? "Sending..." : "Send"}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setShowForm(false);
-                          setFeedback("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+              {showForm && !submitted && (
+                <div className="w-full space-y-3">
+                  <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="What were you trying to do?"
+                    className="min-h-[80px] min-w-full resize-none text-sm"
+                    rows={3}
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSendFeedback}
+                      disabled={submitting || !feedback.trim()}
+                      size="sm"
+                      className="flex-1"
+                    >
+                      {submitting ? "Sending..." : "Send"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowForm(false);
+                        setFeedback("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
-                )}
+                </div>
+              )}
 
-                {submitted && (
-                  <p className="text-center text-sm text-green-600">
-                    ✓ Thank you for your feedback
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              {submitted && (
+                <p className="text-accent text-center text-sm">
+                  ✓ Thank you for your feedback
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
