@@ -35,13 +35,20 @@ type Props = {
   id: string;
 };
 
-function stripInternal(node: AppNode) {
+function stripInternal<T extends AppNode>(node: T): T {
   if ("internal" in node.data) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { internal, ...nodeDataWithoutInternal } = node.data;
-    return { ...node, data: nodeDataWithoutInternal };
+    return { ...node, data: nodeDataWithoutInternal } as T;
   }
-  return { ...node };
+  return node;
+}
+
+function stripNodeForDb<T extends AppNode>(node: T): T {
+  const { width, height, ...common } = node;
+  return "textEditor" === node.type || "comment" === node.type
+    ? ({ ...common, width, height } as T)
+    : (common as T);
 }
 
 function normalizeZIndices(nodes: AppNode[]) {
@@ -122,16 +129,10 @@ export default function Whiteboard({ id }: Props) {
       );
 
       console.time("Preparation time");
-      const nodesToSave = currentNodes.map((n) => {
-        const node = stripInternal(n);
-        return {
-          id: node.id,
-          type: node.type,
-          position: node.position,
-          data: node.data,
-          zIndex: node.zIndex,
-        } as AppNode;
-      });
+
+      const nodesToSave = currentNodes.map((n) =>
+        stripNodeForDb(stripInternal(n)),
+      );
 
       const edgesToSave = currentEdges.map((e) => ({
         id: e.id,
