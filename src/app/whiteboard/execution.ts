@@ -21,7 +21,6 @@ import {
   executionProgressAtom,
   currentWhiteboardIdAtom,
 } from "./atoms";
-import type { Id } from "convex/_generated/dataModel";
 import { v4 as uuidv4 } from "uuid";
 import { getImageAction, getSpeechAction } from "./nodeActionRegistry";
 
@@ -41,12 +40,12 @@ function getConnectedSourceNodes(get: Getter, targetNodeId: string) {
   );
 }
 
-function validateWhiteboardId(get: Getter): Id<"whiteboards"> {
+function validateWhiteboardId(get: Getter) {
   const whiteboardId = get(currentWhiteboardIdAtom);
   if (!whiteboardId) {
     throw new Error("whiteboardId not set");
   }
-  return whiteboardId as Id<"whiteboards">;
+  return whiteboardId;
 }
 
 function isNodeExecutable(node: AppNode): boolean {

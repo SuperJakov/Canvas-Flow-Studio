@@ -90,7 +90,7 @@ export default function WhiteboardPreviewCreator({ id }: Props) {
       }
       try {
         const uploadUrl = await generatePreviewUploadUrl({
-          whiteboardId: whiteboardId as Id<"whiteboards">,
+          whiteboardId: whiteboardId,
         });
         if (!uploadUrl) {
           throw new Error("Failed to get a pre-signed upload URL.");
@@ -128,8 +128,8 @@ export default function WhiteboardPreviewCreator({ id }: Props) {
           );
         }
         await uploadPreviewImage({
-          previewImageStorageId: responseJson.storageId as Id<"_storage">,
-          whiteboardId: whiteboardId as Id<"whiteboards">,
+          previewImageStorageId: responseJson.storageId as Id<"_storage">, // we can safely assert
+          whiteboardId: whiteboardId,
         });
         console.log(
           "[WhiteboardPreviewCreator] Successfully uploaded whiteboard preview.",

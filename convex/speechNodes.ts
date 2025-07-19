@@ -251,7 +251,7 @@ export const generateAndStoreSpeech = action({
       ),
     ),
     nodeId: v.string(),
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
   },
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId }) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -337,10 +337,16 @@ export const storeResult = internalMutation({
   args: {
     storageId: v.id("_storage"),
     nodeId: v.string(),
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
     speechText: v.string(),
   },
   handler: async (ctx, args) => {
+    const normalizedWhiteboardId = ctx.db.normalizeId(
+      "whiteboards",
+      args.whiteboardId,
+    );
+    if (!normalizedWhiteboardId)
+      throw new Error("Could not normalize whiteboard ID");
     // Find the node in the speechNodes table by nodeId
     const existing = await ctx.db
       .query("speechNodes")
@@ -363,7 +369,7 @@ export const storeResult = internalMutation({
         nodeId: args.nodeId,
         speechUrl,
         storageId: args.storageId,
-        whiteboardId: args.whiteboardId,
+        whiteboardId: normalizedWhiteboardId,
         speechText: args.speechText,
       });
     }

@@ -1,7 +1,6 @@
 "use client";
 import { useAtom } from "jotai";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { useEffect } from "react";
 import { currentWhiteboardIdAtom } from "./atoms";
 import { useConvexQuery } from "~/helpers/convex";
@@ -11,7 +10,7 @@ type Props = {
 };
 export default function TitleChanger({ id }: Props) {
   const whiteboard = useConvexQuery(api.whiteboards.getWhiteboard, {
-    id: id as Id<"whiteboards">,
+    id: id,
   });
   const rawTitle = whiteboard?.title ?? "Untitled";
   const title = rawTitle.length > 15 ? rawTitle.slice(0, 15) + "..." : rawTitle;

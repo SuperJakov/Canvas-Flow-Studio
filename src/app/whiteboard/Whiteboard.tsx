@@ -21,7 +21,6 @@ import { useDnD } from "./DnDContext";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import Link from "next/link";
 import { debounce } from "lodash";
 import Loading from "../loading";
@@ -33,7 +32,7 @@ import { useConvexQuery } from "~/helpers/convex";
 import { deepEqual } from "fast-equals";
 
 type Props = {
-  id: Id<"whiteboards">;
+  id: string;
 };
 
 function stripInternal(node: AppNode) {

@@ -72,10 +72,19 @@ function costUsdForLog(log: ImageLog): number {
 
 // Mutation: Log image generation or edit events
 export const logGeneration = internalMutation({
-  args: imageLogFields,
+  args: { ...imageLogFields, whiteboardId: v.string() },
   handler: async (ctx, args) => {
+    const normalizedWhiteboardId = ctx.db.normalizeId(
+      "whiteboards",
+      args.whiteboardId,
+    );
+    if (!normalizedWhiteboardId)
+      throw new Error("Could not normalize whiteboard Id");
     console.log("logGeneration called with args:", args);
-    await ctx.db.insert("imageLogs", args);
+    await ctx.db.insert("imageLogs", {
+      ...args,
+      whiteboardId: normalizedWhiteboardId,
+    });
     console.log("Inserted log into imageLogs");
   },
 });

@@ -1,11 +1,10 @@
 import { Button } from "~/components/ui/button";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { useCopyWhiteboard } from "./utils";
 import { useConvexQuery } from "~/helpers/convex";
 
 type Props = {
-  id: Id<"whiteboards">;
+  id: string;
 };
 
 export default function SharingPopup({ id }: Props) {

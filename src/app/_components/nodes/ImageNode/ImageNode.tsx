@@ -6,7 +6,6 @@ import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
 import { useAction } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
-import type { Id } from "../../../../../convex/_generated/dataModel";
 import { updateNodeDataAtom, executeNodeAtom } from "~/app/whiteboard/atoms";
 import type { ImageNodeType } from "~/Types/nodes";
 import { useConvexQuery } from "~/helpers/convex";
@@ -171,7 +170,7 @@ export default function ImageNode({
       await uploadAndStoreImageAction({
         file: arrayBuffer,
         nodeId: id,
-        whiteboardId: whiteboardId as Id<"whiteboards">,
+        whiteboardId: whiteboardId,
       });
     } catch (err) {
       console.error("Failed to upload image:", err);

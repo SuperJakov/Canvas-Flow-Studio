@@ -1,8 +1,7 @@
 import { api } from "../../../../convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import WhiteboardPage from "../WhiteboardPage";
-import type { Id } from "../../../../convex/_generated/dataModel";
 import { getConvexToken } from "~/helpers/getConvexToken";
 
 type Props = {
@@ -29,11 +28,14 @@ export default async function WhiteboardPageWithId({ params }: Props) {
     redirect("/");
   }
 
-  if (!whiteboard) {
-    console.log("Whiteboard not found:", id);
-    redirect("/whiteboard/404");
-  }
+  const normalizedId = await fetchQuery(api.whiteboards.normalizeWhiteboardId, {
+    whiteboardId: id,
+  });
 
+  if (!whiteboard || !normalizedId) {
+    console.log("Whiteboard not found:", id);
+    notFound();
+  }
   // Whiteboard id has been validated by the query
-  return <WhiteboardPage id={id as Id<"whiteboards">} />;
+  return <WhiteboardPage id={normalizedId} />;
 }

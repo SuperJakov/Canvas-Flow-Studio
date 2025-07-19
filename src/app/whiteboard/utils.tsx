@@ -1,6 +1,5 @@
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Loading from "../loading";
@@ -11,7 +10,7 @@ export function useCopyWhiteboard() {
   const [isCopying, setIsCopying] = useState(false);
   const router = useRouter();
 
-  const copyWhiteboard = async (sourceId: Id<"whiteboards">) => {
+  const copyWhiteboard = async (sourceId: string) => {
     try {
       setIsCopying(true);
       const newWhiteboardId = await copyMutation({ sourceId });

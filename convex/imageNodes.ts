@@ -231,7 +231,7 @@ export const generateAndStoreImage = action({
       v.union(TextEditorExecutionSchema, ImageNodeExecutionSchema),
     ),
     nodeId: v.string(),
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
     style: Style,
   },
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId, style }) => {
@@ -308,10 +308,18 @@ export const storeResult = internalMutation({
   args: {
     storageId: v.id("_storage"),
     nodeId: v.string(),
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
     authorId: v.string(),
   },
   handler: async (ctx, args) => {
+    const normalizedWhiteboardId = ctx.db.normalizeId(
+      "whiteboards",
+      args.whiteboardId,
+    );
+    if (!normalizedWhiteboardId) {
+      throw new Error("Could not normalize whiteboard id");
+    }
+
     // Find the node in the imageNodes table by nodeId
     const existing = await ctx.db
       .query("imageNodes")
@@ -330,7 +338,7 @@ export const storeResult = internalMutation({
         nodeId: args.nodeId,
         imageUrl,
         storageId: args.storageId,
-        whiteboardId: args.whiteboardId,
+        whiteboardId: normalizedWhiteboardId,
         authorExternalId: args.authorId,
       });
     }
@@ -341,7 +349,7 @@ export const uploadAndStoreImage = action({
   args: {
     file: v.bytes(),
     nodeId: v.string(),
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
   },
   handler: async (ctx, { file, nodeId, whiteboardId }) => {
     const identity = await ctx.auth.getUserIdentity();

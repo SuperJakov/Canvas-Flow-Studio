@@ -134,7 +134,7 @@ export const createWhiteboard = mutation({
 // --- Edit whiteboard ---
 export const editWhiteboard = mutation({
   args: {
-    id: v.id("whiteboards"),
+    id: v.string(),
     title: v.optional(v.string()),
     nodes: v.optional(v.array(AppNode)),
     edges: v.optional(v.array(AppEdge)),
@@ -143,7 +143,10 @@ export const editWhiteboard = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    const whiteboard = await ctx.db.get(id);
+    const normalizedId = ctx.db.normalizeId("whiteboards", id);
+    if (!normalizedId) throw new Error("Could not normalize ID.");
+
+    const whiteboard = await ctx.db.get(normalizedId);
     if (!whiteboard) throw new Error("Whiteboard not found");
 
     if (whiteboard.ownerId !== identity.subject) {
@@ -178,7 +181,7 @@ export const editWhiteboard = mutation({
       }
     }
 
-    await ctx.db.patch(id, {
+    await ctx.db.patch(normalizedId, {
       title: title ?? whiteboard.title ?? undefined,
       nodes: nodes ?? whiteboard.nodes,
       edges: edges ?? whiteboard.edges,
@@ -275,13 +278,16 @@ export const setPublicStatus = mutation({
 // --- Copy a public whiteboard ---
 export const copyPublicWhiteboard = mutation({
   args: {
-    sourceId: v.id("whiteboards"),
+    sourceId: v.string(),
   },
   handler: async (ctx, { sourceId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    const sourceWhiteboard = await ctx.db.get(sourceId);
+    const normalizedId = ctx.db.normalizeId("whiteboards", sourceId);
+    if (!normalizedId) throw new Error("Could not normalize ID");
+
+    const sourceWhiteboard = await ctx.db.get(normalizedId);
     if (!sourceWhiteboard) throw new Error("Source whiteboard not found");
 
     if (!sourceWhiteboard.isPublic) {
@@ -323,7 +329,7 @@ export const copyPublicWhiteboard = mutation({
         const originalImageRecord = await ctx.db
           .query("imageNodes")
           .withIndex("by_nodeId_and_whiteboardId", (q) =>
-            q.eq("nodeId", node.id).eq("whiteboardId", sourceId),
+            q.eq("nodeId", node.id).eq("whiteboardId", normalizedId),
           )
           .first();
 
@@ -388,15 +394,21 @@ export const copyPublicWhiteboard = mutation({
 
 export const generatePreviewUploadUrl = mutation({
   args: {
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
   },
   handler: async (ctx, { whiteboardId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
+    const normalizedWhiteboardId = ctx.db.normalizeId(
+      "whiteboards",
+      whiteboardId,
+    );
+    if (!normalizedWhiteboardId) {
+      throw new Error("Could not normalize whiteboard ID");
+    }
     const whiteboard = await ctx.db
       .query("whiteboards")
-      .withIndex("by_id", (q) => q.eq("_id", whiteboardId))
+      .withIndex("by_id", (q) => q.eq("_id", normalizedWhiteboardId))
       .first();
     if (!whiteboard) {
       throw new Error("Whiteboard not found");
@@ -413,16 +425,21 @@ export const generatePreviewUploadUrl = mutation({
 
 export const uploadPreviewImage = mutation({
   args: {
-    whiteboardId: v.id("whiteboards"),
+    whiteboardId: v.string(),
     previewImageStorageId: v.id("_storage"),
   },
   handler: async (ctx, { whiteboardId, previewImageStorageId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
+    const normalizedWhiteboardId = ctx.db.normalizeId(
+      "whiteboards",
+      whiteboardId,
+    );
+    if (!normalizedWhiteboardId)
+      throw new Error("Could not normalize whiteboard ID");
     const whiteboard = await ctx.db
       .query("whiteboards")
-      .withIndex("by_id", (q) => q.eq("_id", whiteboardId))
+      .withIndex("by_id", (q) => q.eq("_id", normalizedWhiteboardId))
       .first();
     if (!whiteboard) {
       throw new Error("Whiteboard not found");
@@ -446,7 +463,7 @@ export const uploadPreviewImage = mutation({
     }
 
     // Update the whiteboard with the new preview image storage ID
-    await ctx.db.patch(whiteboardId, {
+    await ctx.db.patch(normalizedWhiteboardId, {
       previewStorageId: previewImageStorageId,
       updatedAt: BigInt(Date.now()),
       previewUrl: previewImageUrl,
@@ -464,5 +481,16 @@ export const deletePreviewImage = internalMutation({
     // User has to be authenticated before calling this internal mutation
 
     await ctx.storage.delete(storageId);
+  },
+});
+
+// ! WARNING: Only call this when absolutely needed
+export const normalizeWhiteboardId = query({
+  args: {
+    whiteboardId: v.string(),
+  },
+  handler: async (ctx, { whiteboardId }) => {
+    const normalizedId = ctx.db.normalizeId("whiteboards", whiteboardId);
+    return normalizedId;
   },
 });
