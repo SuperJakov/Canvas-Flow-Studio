@@ -14,8 +14,8 @@ interface ImageNodeContentProps {
   isDownloading: boolean;
   isUploading: boolean;
   isRateLimited: boolean;
-  onDownload: () => void;
-  onUpload: () => void;
+  onDownload: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onUpload: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onImageLoad: () => void;
   onImageError: () => void;
   onOpenBanner: (feature: string) => void;

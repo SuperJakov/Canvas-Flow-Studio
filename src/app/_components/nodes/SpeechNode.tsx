@@ -357,7 +357,11 @@ export default function SpeechNode({
     };
   }, [speechUrl]);
 
-  const toggleLock = () => {
+  const toggleLock = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation();
+
     updateNodeData({
       nodeId: id,
       updatedData: { isLocked: !isLocked },
@@ -365,7 +369,11 @@ export default function SpeechNode({
     });
   };
 
-  const toggleRunning = () => {
+  const toggleRunning = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation();
+
     if (isRunning) {
       updateNodeData({
         nodeId: id,
@@ -382,8 +390,11 @@ export default function SpeechNode({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     if (!speechData || isDownloading) return;
+    event.stopPropagation();
 
     setIsDownloading(true);
     try {

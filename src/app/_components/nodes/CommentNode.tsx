@@ -14,7 +14,11 @@ export default function CommentNode({
   const { text, isLocked } = data;
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
 
-  const toggleLock = () => {
+  const toggleLock = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     updateNodeData({
       nodeId: id,
       nodeType: "comment",

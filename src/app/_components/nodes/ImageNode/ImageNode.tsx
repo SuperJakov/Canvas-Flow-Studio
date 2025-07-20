@@ -99,7 +99,11 @@ export default function ImageNode({
 
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
-  const toggleLock = () => {
+  const toggleLock = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     updateNodeData({
       nodeId: id,
       updatedData: { isLocked: !isLocked },
@@ -107,7 +111,11 @@ export default function ImageNode({
     });
   };
 
-  const toggleRunning = () => {
+  const toggleRunning = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     if (isRunning) {
       updateNodeData({
         nodeId: id,
@@ -124,8 +132,11 @@ export default function ImageNode({
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     if (!url || isDownloading) return;
+    event.stopPropagation(); // Prevent React Flow from interfering
 
     setIsDownloading(true);
     try {
@@ -148,7 +159,11 @@ export default function ImageNode({
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
       fileInputRef.current.click();
@@ -231,10 +246,10 @@ export default function ImageNode({
         />
 
         <div
-          className={`overflow-hidden rounded border-2 bg-purple-200 shadow-md ${
+          className={`overflow-hidden rounded bg-purple-200 shadow-md outline-2 ${
             isRateLimited
-              ? "border-red-500"
-              : `${selected ? "border-blue-500" : "border-white"}`
+              ? "outline-red-500"
+              : `${selected ? "outline-blue-600" : "outline-white"}`
           }`}
         >
           {isRateLimited ? (

@@ -40,7 +40,6 @@ export function StyleSelector({
       sideOffset={10}
       className="nowheel nopan nodrag h-64 w-96 overflow-y-auto p-0"
     >
-      {" "}
       <ScrollArea className="h-full w-full">
         <div ref={popoverRef} className="grid grid-cols-3 gap-4 p-4">
           {IMAGE_STYLES.map((style) => (

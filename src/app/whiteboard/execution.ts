@@ -48,7 +48,7 @@ function validateWhiteboardId(get: Getter) {
   return whiteboardId;
 }
 
-function isNodeExecutable(node: AppNode): boolean {
+export function isNodeExecutable(node: AppNode): boolean {
   return (
     !node.data.isLocked && !("isRunning" in node.data && node.data.isRunning)
   );

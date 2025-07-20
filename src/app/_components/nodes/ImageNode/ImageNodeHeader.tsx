@@ -15,9 +15,15 @@ interface ImageNodeHeaderProps {
   hasIncomingConnections: boolean;
   isRateLimited: boolean;
   selectedStyle?: string;
-  onToggleLock: () => void;
-  onToggleRunning: () => void;
-  onStylePopoverTrigger: () => void;
+  onToggleLock: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void;
+  onToggleRunning: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void;
+  onStylePopoverTrigger: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void;
 }
 
 export function ImageNodeHeader({

@@ -6,6 +6,7 @@ import { useAtom } from "jotai";
 import {
   edgesAtom,
   executeNodeAtom,
+  nodesAtom,
   updateNodeDataAtom,
 } from "~/app/whiteboard/atoms";
 import {
@@ -16,6 +17,7 @@ import {
   Play,
   Square,
 } from "lucide-react";
+import { isNodeExecutable as isNodeExecutableFn } from "~/app/whiteboard/execution";
 
 export default function TextEditorNode({
   data,
@@ -27,10 +29,19 @@ export default function TextEditorNode({
 
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
+  const [nodes] = useAtom(nodesAtom);
   const [edges] = useAtom(edgesAtom);
   const hasOutgoingConnections = edges.some((edge) => edge.source === id);
 
-  function toggleRunning() {
+  const thisNode = nodes.find((node) => node.id === id);
+  if (!thisNode) return null;
+  const isNodeExecutable = isNodeExecutableFn(thisNode);
+
+  function toggleRunning(
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     if (!isRunning === true) {
       void executeNode({
         nodeId: id,
@@ -43,7 +54,9 @@ export default function TextEditorNode({
     });
   }
 
-  function toggleLock() {
+  function toggleLock(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.stopPropagation(); // Prevent React Flow from interfering
+
     updateNodeData({
       nodeId: id,
       nodeType: "textEditor",
@@ -63,9 +76,12 @@ export default function TextEditorNode({
   };
 
   const containerClasses = `
-  flex h-full flex-col overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2
-  ${selected ? "outline-blue-600" : "outline-gray-200"}
-`;
+    flex h-full flex-col overflow-hidden rounded-lg bg-blue-200 shadow-sm outline-2
+    ${selected ? "outline-blue-600" : "outline-gray-200"}
+  `;
+
+  const runButtonEnabled = hasOutgoingConnections && isNodeExecutable;
+
   return (
     <div className={containerClasses}>
       {/* Connection handles */}
@@ -99,20 +115,26 @@ export default function TextEditorNode({
 
           {/* Run / stop */}
           <button
-            className={`nodrag cursor-pointer rounded p-1 ${
-              hasOutgoingConnections
-                ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
+            className={`nodrag rounded p-1 ${
+              runButtonEnabled
+                ? "cursor-pointer text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
                 : "cursor-not-allowed text-gray-400"
             }`}
             onClick={toggleRunning}
             title={
-              hasOutgoingConnections ? "Run node" : "Cannot run: no connections"
+              !isNodeExecutable
+                ? "Cannot run: node not executable"
+                : !hasOutgoingConnections
+                  ? "Cannot run: no connections"
+                  : isRunning
+                    ? "Stop node"
+                    : "Run node"
             }
-            disabled={!hasOutgoingConnections}
+            disabled={!runButtonEnabled}
           >
             {isRunning ? (
               <Square size={18} />
-            ) : hasOutgoingConnections ? (
+            ) : runButtonEnabled ? (
               <Play size={18} fill="currentColor" />
             ) : (
               <AlertCircle size={18} />
