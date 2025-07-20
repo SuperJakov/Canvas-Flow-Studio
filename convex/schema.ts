@@ -71,8 +71,8 @@ const CommentNodeSchema = v.object({
     x: v.number(),
     y: v.number(),
   }),
-  width: v.optional(v.union(v.number())),
-  height: v.optional(v.union(v.number())),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
   zIndex: v.optional(v.number()),
 });
 

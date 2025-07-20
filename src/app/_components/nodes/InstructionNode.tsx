@@ -38,7 +38,9 @@ export default function InstructionNode({
     api.instructionNodes.detectOutputNodeType,
   );
 
-  const isRateLimited = !instructionUseRateLimit?.ok;
+  const isRateLimited = instructionUseRateLimit
+    ? !instructionUseRateLimit.ok
+    : false;
   const retryAfterMs = instructionUseRateLimit?.retryAfter ?? 0;
 
   const [isBannerOpen, setIsBannerOpen] = useState(false);
@@ -108,11 +110,8 @@ export default function InstructionNode({
     });
   };
 
-  /* ------------------------------------------------------------------ */
-  /* Layout                                                             */
-  /* ------------------------------------------------------------------ */
   const outlineColor =
-    selected && !isRateLimited ? "outline-orange-600" : "outline-gray-200";
+    selected && !isRateLimited ? "outline-blue-600" : "outline-gray-200";
   const containerClasses = `overflow-hidden rounded-lg bg-orange-200 shadow-sm outline-2 ${outlineColor}`;
 
   return (

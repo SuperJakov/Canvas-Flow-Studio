@@ -45,10 +45,32 @@ function stripInternal<T extends AppNode>(node: T): T {
 }
 
 function stripNodeForDb<T extends AppNode>(node: T): T {
-  const { width, height, ...common } = node;
-  return "textEditor" === node.type || "comment" === node.type
-    ? ({ ...common, width, height } as T)
-    : (common as T);
+  const common = {
+    id: node.id,
+    type: node.type,
+    data: node.data,
+    position: node.position,
+    zIndex: node.zIndex,
+  } as const;
+
+  // Only include width/height for nodes that are resizable
+  if (node.type === "textEditor" || node.type === "comment") {
+    const nodeWithDimensions = node as Extract<
+      T,
+      { width?: number; height?: number }
+    >;
+    return {
+      ...common,
+      ...(nodeWithDimensions.width !== undefined && {
+        width: nodeWithDimensions.width,
+      }),
+      ...(nodeWithDimensions.height !== undefined && {
+        height: nodeWithDimensions.height,
+      }),
+    } as T;
+  }
+
+  return common as T;
 }
 
 function normalizeZIndices(nodes: AppNode[]) {

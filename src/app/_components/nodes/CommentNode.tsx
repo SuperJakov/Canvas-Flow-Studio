@@ -36,7 +36,7 @@ export default function CommentNode({
   return (
     // The main container now uses flexbox to manage the layout and must have h-full
     <div
-      className={`flex h-full flex-col overflow-hidden rounded border-2 border-orange-300 bg-orange-100 shadow-md outline-2 ${
+      className={`flex h-full flex-col overflow-hidden rounded bg-orange-100 shadow-md outline-2 ${
         selected ? "outline-blue-600" : "outline-gray-200"
       }`}
     >
@@ -57,14 +57,14 @@ export default function CommentNode({
         </div>
         <button
           onClick={toggleLock}
-          className="cursor-pointer rounded p-1 hover:bg-black/10"
+          className="cursor-pointer rounded p-1 text-black hover:bg-black/10"
           title={isLocked ? "Unlock Comment" : "Lock Comment"}
         >
           {isLocked ? <Lock size={16} /> : <LockOpen size={16} />}
         </button>
       </div>
 
-      <div className="flex-grow bg-orange-200 p-2">
+      <div className="flex-grow bg-orange-200">
         <textarea
           className="nodrag custom-scrollbar h-full w-full resize-none rounded bg-transparent p-2 text-lg font-bold text-black outline-none"
           value={text}
