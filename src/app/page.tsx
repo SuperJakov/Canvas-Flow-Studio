@@ -11,7 +11,7 @@ import HeroSection from "./_components/homepage/HeroSection";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background bg-gradient-to-b text-foreground">
+    <div className="bg-background text-foreground min-h-screen bg-gradient-to-b">
       {/* Hero Section */}
       <HeroSection />
 

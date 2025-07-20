@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
-import { usePopper } from "react-popper";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import Loading from "../loading";
@@ -22,6 +21,11 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
 } from "~/components/ui/breadcrumb";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 
 const formatDate = (timestamp: bigint | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -53,47 +57,34 @@ function WhiteboardCard({
   onRedirect: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [referenceElement, setReferenceElement] =
-    useState<HTMLButtonElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLDivElement | null>(
-    null,
-  );
-  const { styles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: "bottom-end",
-    modifiers: [{ name: "offset", options: { offset: [0, 8] } }],
-  });
 
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (
-        menuOpen &&
-        popperElement &&
-        !popperElement.contains(event.target as Node) &&
-        referenceElement &&
-        !referenceElement.contains(event.target as Node)
-      ) {
-        setMenuOpen(false);
-      }
+    if (!menuOpen) return;
+
+    const handleScroll = () => {
+      setMenuOpen(false);
     };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [menuOpen, popperElement, referenceElement]);
+
+    // Listen for scroll events on window and any scrollable parent
+    window.addEventListener("scroll", handleScroll, true);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [menuOpen]);
 
   const handleRenameClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setMenuOpen(false);
     onStartEditing(whiteboard._id, whiteboard.title ?? "Untitled");
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setMenuOpen(false);
     onDelete(whiteboard._id);
-  };
-
-  const handleMenuToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setMenuOpen((prev) => !prev);
   };
 
   return (
@@ -164,42 +155,42 @@ function WhiteboardCard({
               )}
             </div>
             <div className="no-link relative flex-shrink-0">
-              <Button
-                ref={setReferenceElement}
-                onClick={handleMenuToggle}
-                className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100"
-                aria-label="More options"
-                variant="ghost"
-                size="sm"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-              {menuOpen && (
-                <div
-                  ref={setPopperElement}
-                  style={styles.popper}
-                  {...attributes.popper}
-                  className="bg-popover text-popover-foreground ring-border z-10 w-36 rounded-lg shadow-lg ring-1"
+              <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label="More options"
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-36 rounded-lg border-none p-0"
+                  align="end"
+                  side="top"
+                  sideOffset={8}
                 >
                   <div className="py-0">
                     <Button
                       onClick={handleRenameClick}
-                      className="hover:bg-accent hover:text-accent-foreground w-full justify-start rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm"
+                      className="hover:bg-accent hover:text-accent-foreground w-full justify-start rounded-none rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm"
                       variant="ghost"
                     >
                       Rename
                     </Button>
                     <Button
                       onClick={handleDeleteClick}
-                      className="w-full justify-start rounded-none rounded-br-lg rounded-bl-lg px-3 py-2 text-sm hover:bg-red-500 hover:text-white"
+                      className="hover:text-accent-foreground w-full justify-start rounded-none rounded-br-lg rounded-bl-lg px-3 py-2 text-sm"
                       disabled={deletingId === whiteboard._id}
                       variant="ghost"
                     >
                       {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
                     </Button>
                   </div>
-                </div>
-              )}
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <p className="text-muted-foreground flex items-center gap-1 text-sm">

@@ -26,7 +26,7 @@ export default function Footer() {
 
       <Separator />
 
-      <p className="pt-4 text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground pt-4 text-center text-sm">
         © {new Date().getFullYear()} AI Flow Studio. All rights reserved.
       </p>
     </footer>

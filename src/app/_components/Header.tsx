@@ -126,7 +126,7 @@ export function Header() {
               <Button variant="link" asChild className="h-auto p-0 text-2xl">
                 <Link
                   href="/"
-                  className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
                   onClick={closeMenu}
                 >
                   Home
@@ -135,7 +135,7 @@ export function Header() {
               <Button variant="link" asChild className="h-auto p-0 text-2xl">
                 <Link
                   href="/pricing"
-                  className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
                   onClick={closeMenu}
                 >
                   Pricing
@@ -145,7 +145,7 @@ export function Header() {
                 <Button variant="link" asChild className="h-auto p-0 text-2xl">
                   <Link
                     href="/whiteboards"
-                    className="font-medium text-muted-foreground no-underline transition hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
                     onClick={closeMenu}
                   >
                     Whiteboard
@@ -162,7 +162,7 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="h-12 border bg-transparent text-lg font-medium text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground"
+                      className="text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground h-12 border bg-transparent text-lg font-medium"
                       onClick={closeMenu}
                     >
                       Sign In
@@ -171,7 +171,7 @@ export function Header() {
                   <SignUpButton mode="modal">
                     <Button
                       size="lg"
-                      className="h-12 bg-gradient-to-r from-primary to-secondary text-lg font-medium text-primary-foreground shadow-lg hover:scale-[1.02] hover:shadow-xl"
+                      className="from-primary to-secondary text-primary-foreground h-12 bg-gradient-to-r text-lg font-medium shadow-lg hover:scale-[1.02] hover:shadow-xl"
                       onClick={closeMenu}
                     >
                       Sign Up
