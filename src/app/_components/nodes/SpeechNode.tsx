@@ -26,6 +26,7 @@ import {
   unregisterImageAction,
 } from "~/app/whiteboard/nodeActionRegistry";
 import { useConvexQuery } from "~/helpers/convex";
+import { Progress } from "~/components/ui/progress";
 
 function pcmToWavBlob(pcmData: Uint8Array, sampleRate = 24000): Blob {
   const numChannels = 1;
@@ -227,11 +228,13 @@ function CustomAudioPlayer({
         <div
           ref={progressBarRef}
           onMouseDown={handleMouseDownOnBar}
-          className="group h-2 w-full cursor-pointer rounded-full bg-gray-600"
+          className="group cursor-pointer"
         >
-          <div
-            className="h-full rounded-full bg-green-400"
-            style={{ width: `${progressPercentage}%` }}
+          <Progress
+            value={progressPercentage}
+            className={`h-2 w-full bg-gray-600 [&>div]:bg-green-400 ${
+              isScrubbing ? "[&>div]:!transition-none" : ""
+            }`}
           />
         </div>
         <div className="flex justify-between font-mono text-xs text-gray-400">
