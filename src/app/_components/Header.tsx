@@ -4,17 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { DiscordIcon } from "~/components/icons";
 
 export function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
+  const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
 
-  // Don't render the header on the whiteboard page
-  if (pathname === "/whiteboard" || pathname.startsWith("/whiteboard/")) {
-    return null;
-  }
+  // Timeout refs for delayed closing
+  const productTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const communityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -23,6 +32,54 @@ export function Header() {
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
+
+  // Close dropdowns when scrolling
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsProductDropdownOpen(false);
+      setIsCommunityDropdownOpen(false);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Product dropdown handlers with useCallback to prevent recreation
+  const handleProductMouseEnter = useCallback(() => {
+    if (productTimeoutRef.current) {
+      clearTimeout(productTimeoutRef.current);
+      productTimeoutRef.current = null;
+    }
+    setIsCommunityDropdownOpen(false);
+    setIsProductDropdownOpen(true);
+  }, []);
+
+  const handleProductMouseLeave = useCallback(() => {
+    productTimeoutRef.current = setTimeout(() => {
+      setIsProductDropdownOpen(false);
+    }, 250);
+  }, []);
+
+  // Community dropdown handlers with useCallback to prevent recreation
+  const handleCommunityMouseEnter = useCallback(() => {
+    if (communityTimeoutRef.current) {
+      clearTimeout(communityTimeoutRef.current);
+      communityTimeoutRef.current = null;
+    }
+    setIsProductDropdownOpen(false);
+    setIsCommunityDropdownOpen(true);
+  }, []);
+
+  const handleCommunityMouseLeave = useCallback(() => {
+    communityTimeoutRef.current = setTimeout(() => {
+      setIsCommunityDropdownOpen(false);
+    }, 250);
+  }, []);
+
+  // Don't render the header on the whiteboard page
+  if (pathname === "/whiteboard" || pathname.startsWith("/whiteboard/")) {
+    return null;
+  }
 
   return (
     <>
@@ -35,40 +92,162 @@ export function Header() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
-            <div className="flex items-center">
+            {/* Left side - App name and navigation */}
+            <div className="flex items-center space-x-8">
               <Link href="/" onClick={closeMenu}>
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
-                  AI Flow Studio
+                  AFS
                 </span>
               </Link>
-            </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden items-center space-x-8 md:flex">
-              <Link
-                href="/"
-                className="text-gray-300 transition hover:text-white"
-              >
-                Home
-              </Link>
-              <Link
-                href="/pricing"
-                className="text-gray-300 transition hover:text-white"
-              >
-                Pricing
-              </Link>
-              <Authenticated>
+              {/* Desktop Navigation */}
+              <nav className="hidden items-center space-x-6 lg:flex">
+                {/* Product Dropdown */}
+                <div
+                  onMouseEnter={handleProductMouseEnter}
+                  onMouseLeave={handleProductMouseLeave}
+                >
+                  <DropdownMenu
+                    open={isProductDropdownOpen}
+                    onOpenChange={(open) => {
+                      // Only allow manual control, prevent automatic closing
+                      if (!open && productTimeoutRef.current) {
+                        // If there's a timeout running, don't close immediately
+                        return;
+                      }
+                      setIsProductDropdownOpen(open);
+                    }}
+                    modal={false}
+                  >
+                    <DropdownMenuTrigger asChild>
+                      <div className="flex cursor-pointer items-center space-x-1 text-gray-300 transition hover:text-white">
+                        <span>Product</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-80 p-0"
+                      align="start"
+                      onPointerDownOutside={(e) => {
+                        // Allow scrolling by not preventing default
+                        const target = e.target as Element;
+                        if (
+                          !target.closest("[data-radix-dropdown-menu-content]")
+                        ) {
+                          setIsProductDropdownOpen(false);
+                        }
+                      }}
+                    >
+                      <DropdownMenuItem
+                        asChild
+                        className="text-foreground bg-background cursor-pointer p-4"
+                      >
+                        <Link href="/whiteboard" className="flex items-start">
+                          {/* Left side - Logo placeholder */}
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+                            <span className="text-sm font-bold text-white">
+                              AFS
+                            </span>
+                          </div>
+                          {/* Right side - Product info */}
+                          <div className="flex-1">
+                            <h3 className="mb-1 font-bold">AI Flow Studio</h3>
+                            <p className="text-muted-foreground text-sm">
+                              Visual canvas
+                            </p>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
                 <Link
-                  href="/whiteboards"
+                  href="/pricing"
                   className="text-gray-300 transition hover:text-white"
                 >
-                  Whiteboard
+                  Pricing
                 </Link>
-              </Authenticated>
-            </nav>
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden min-h-[40px] min-w-[155px] items-center space-x-4 md:flex">
+                <Link
+                  href="/blog"
+                  className="text-gray-300 transition hover:text-white"
+                >
+                  Blog
+                </Link>
+
+                <Link
+                  href="/docs"
+                  className="text-gray-300 transition hover:text-white"
+                >
+                  Docs
+                </Link>
+
+                {/* Community Dropdown */}
+                <div
+                  onMouseEnter={handleCommunityMouseEnter}
+                  onMouseLeave={handleCommunityMouseLeave}
+                >
+                  <DropdownMenu
+                    open={isCommunityDropdownOpen}
+                    onOpenChange={(open) => {
+                      // Only allow manual control, prevent automatic closing
+                      if (!open && communityTimeoutRef.current) {
+                        // If there's a timeout running, don't close immediately
+                        return;
+                      }
+                      setIsCommunityDropdownOpen(open);
+                    }}
+                    modal={false}
+                  >
+                    <DropdownMenuTrigger asChild>
+                      <div className="flex cursor-pointer items-center space-x-1 text-gray-300 transition hover:text-white">
+                        <span>Community</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-80 p-0"
+                      align="start"
+                      onPointerDownOutside={(e) => {
+                        // Allow scrolling by not preventing default
+                        const target = e.target as Element;
+                        if (
+                          !target.closest("[data-radix-dropdown-menu-content]")
+                        ) {
+                          setIsCommunityDropdownOpen(false);
+                        }
+                      }}
+                    >
+                      <DropdownMenuItem asChild className="cursor-pointer p-4">
+                        <a
+                          href="https://discord.gg/your-discord-link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-start space-x-4"
+                        >
+                          {/* Left side - Discord icon */}
+                          <div className="flex h-10 w-10 items-center justify-center">
+                            <DiscordIcon width="28px" height="28px" />
+                          </div>
+
+                          {/* Right side - Discord info */}
+                          <div className="flex-1">
+                            <h3 className="mb-1 font-bold">Discord</h3>
+                            <p className="text-muted-foreground text-sm">
+                              Join our community
+                            </p>
+                          </div>
+                        </a>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </nav>
+            </div>
+
+            {/* Right side - Auth buttons */}
+            <div className="hidden min-h-[40px] min-w-[155px] items-center space-x-4 lg:flex">
               <Unauthenticated>
                 <SignInButton mode="modal">
                   <button className="text-gray-300 transition hover:text-white">
@@ -88,7 +267,7 @@ export function Header() {
 
             {/* Mobile Hamburger Button */}
             <button
-              className="flex cursor-pointer flex-col items-center justify-center space-y-1 md:hidden"
+              className="flex cursor-pointer flex-col items-center justify-center space-y-1 lg:hidden"
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >
@@ -115,24 +294,31 @@ export function Header() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 z-40 backdrop-blur-md md:hidden"
+          className="fixed inset-0 z-40 lg:hidden"
           style={{
             backgroundColor: `color-mix(in oklch, var(--background) 90%, transparent)`,
           }}
         >
-          <div className="flex h-full flex-col">
+          <div className="flex h-full flex-col backdrop-blur-md">
             {/* Navigation Links - Top Section */}
             <nav className="flex flex-1 flex-col items-start justify-center space-y-8 pt-20 pl-8">
-              <Button variant="link" asChild className="h-auto p-0 text-2xl">
-                <Link
-                  href="/"
-                  className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
-                  onClick={closeMenu}
-                >
-                  Home
-                </Link>
-              </Button>
-              <Button variant="link" asChild className="h-auto p-0 text-2xl">
+              {/* Product Section in Mobile */}
+              <div className="flex flex-col space-y-4">
+                <span className="text-muted-foreground text-lg font-medium">
+                  Product
+                </span>
+                <div className="pl-4">
+                  <Link
+                    href="/whiteboard"
+                    className="text-muted-foreground hover:text-foreground no-underline transition"
+                    onClick={closeMenu}
+                  >
+                    AI Flow Studio
+                  </Link>
+                </div>
+              </div>
+
+              <Button variant="link" asChild className="h-auto p-0 text-xl">
                 <Link
                   href="/pricing"
                   className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
@@ -141,17 +327,45 @@ export function Header() {
                   Pricing
                 </Link>
               </Button>
-              <Authenticated>
-                <Button variant="link" asChild className="h-auto p-0 text-2xl">
-                  <Link
-                    href="/whiteboards"
-                    className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
+
+              <Button variant="link" asChild className="h-auto p-0 text-xl">
+                <Link
+                  href="/blog"
+                  className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
+                  onClick={closeMenu}
+                >
+                  Blog
+                </Link>
+              </Button>
+
+              <Button variant="link" asChild className="h-auto p-0 text-xl">
+                <Link
+                  href="/docs"
+                  className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
+                  onClick={closeMenu}
+                >
+                  Docs
+                </Link>
+              </Button>
+
+              {/* Community Section in Mobile */}
+              <div className="flex flex-col space-y-4">
+                <span className="text-muted-foreground text-lg font-medium">
+                  Community
+                </span>
+                <div className="pl-4">
+                  <a
+                    href="https://discord.gg/your-discord-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground flex items-center space-x-2 no-underline transition"
                     onClick={closeMenu}
                   >
-                    Whiteboard
-                  </Link>
-                </Button>
-              </Authenticated>
+                    <DiscordIcon className="h-4 w-4" />
+                    <span>Discord</span>
+                  </a>
+                </div>
+              </div>
             </nav>
 
             {/* Auth Section - Bottom */}
