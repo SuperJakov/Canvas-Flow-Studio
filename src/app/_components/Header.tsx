@@ -14,6 +14,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { DiscordIcon } from "~/components/icons";
+import AppLogo from "public/AI Flow Studio logo.png";
+import Image from "next/image";
 
 export function Header() {
   const pathname = usePathname();
@@ -147,9 +149,11 @@ export function Header() {
                         <Link href="/whiteboard" className="flex items-start">
                           {/* Left side - Logo placeholder */}
                           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
-                            <span className="text-sm font-bold text-white">
-                              AFS
-                            </span>
+                            <Image
+                              src={AppLogo}
+                              alt="AI Flow Studio Logo"
+                              placeholder="blur"
+                            />
                           </div>
                           {/* Right side - Product info */}
                           <div className="flex-1">
