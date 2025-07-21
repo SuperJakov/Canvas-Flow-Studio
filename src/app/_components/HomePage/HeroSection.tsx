@@ -26,7 +26,7 @@ export default function HeroSection() {
             Drag. Drop. Build.
             <br />
             AI for{" "}
-            <span className="relative inline-block w-[240px] text-left">
+            <span className="relative inline-block w-[120px] text-left sm:w-[160px] md:w-[200px] lg:w-[240px]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentWordIndex}
