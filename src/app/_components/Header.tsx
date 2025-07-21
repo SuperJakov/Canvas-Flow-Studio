@@ -367,9 +367,9 @@ export function Header() {
             </nav>
 
             {/* Auth Section - Bottom */}
-            <div className="flex flex-col items-start space-y-6 px-8 pb-20">
+            <div className="flex flex-col items-start space-y-6 px-8 pt-8 pb-20">
               <Unauthenticated>
-                <div className="flex w-full flex-col gap-4 sm:flex-row">
+                <div className="flex w-full flex-col gap-4 lg:flex-row">
                   <SignInButton mode="modal">
                     <Button
                       variant="outline"
