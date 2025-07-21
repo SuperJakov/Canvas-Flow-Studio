@@ -25,6 +25,8 @@ export function Header() {
   const productTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const communityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const discordUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ?? "#";
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -221,7 +223,7 @@ export function Header() {
                     >
                       <DropdownMenuItem asChild className="cursor-pointer p-4">
                         <a
-                          href="https://discord.gg/your-discord-link"
+                          href={discordUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-start space-x-4"
@@ -250,14 +252,10 @@ export function Header() {
             <div className="hidden min-h-[40px] min-w-[155px] items-center space-x-4 lg:flex">
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <button className="text-gray-300 transition hover:text-white">
-                    Sign In
-                  </button>
+                  <Button variant="ghost">Sign In</Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <button className="cursor-pointer rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 font-medium text-white shadow-lg transition-all hover:from-blue-600 hover:to-purple-700 hover:shadow-xl">
-                    Sign Up
-                  </button>
+                  <Button>Sign Up</Button>
                 </SignUpButton>
               </Unauthenticated>
               <Authenticated>
@@ -355,7 +353,7 @@ export function Header() {
                 </span>
                 <div className="pl-4">
                   <a
-                    href="https://discord.gg/your-discord-link"
+                    href={discordUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-foreground flex items-center space-x-2 no-underline transition"
@@ -369,14 +367,14 @@ export function Header() {
             </nav>
 
             {/* Auth Section - Bottom */}
-            <div className="flex flex-col items-start space-y-6 pb-20 pl-8">
+            <div className="flex flex-col items-start space-y-6 px-8 pb-20">
               <Unauthenticated>
-                <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <div className="flex w-full flex-col gap-4 sm:flex-row">
                   <SignInButton mode="modal">
                     <Button
                       variant="outline"
                       size="lg"
-                      className="text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground h-12 border bg-transparent text-lg font-medium"
+                      className="text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground h-12 w-full border bg-transparent text-lg font-medium"
                       onClick={closeMenu}
                     >
                       Sign In
@@ -385,7 +383,7 @@ export function Header() {
                   <SignUpButton mode="modal">
                     <Button
                       size="lg"
-                      className="from-primary to-secondary text-primary-foreground h-12 bg-gradient-to-r text-lg font-medium shadow-lg hover:scale-[1.02] hover:shadow-xl"
+                      className="h-12 w-full text-lg font-medium"
                       onClick={closeMenu}
                     >
                       Sign Up
