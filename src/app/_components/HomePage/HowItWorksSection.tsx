@@ -5,7 +5,7 @@ export default function HowItWorksSection() {
       className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
     >
       <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-        <span className="from-primary to-accent bg-gradient-to-r bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent">
           How It Works
         </span>
       </h2>

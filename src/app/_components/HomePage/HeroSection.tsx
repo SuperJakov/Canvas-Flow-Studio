@@ -1,14 +1,48 @@
+"use client";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+
+const rotatingWords = ["ideas.", "projects.", "people."];
 
 export default function HeroSection() {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
+    }, 2000); // Change word every 2 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="container mx-auto px-4 pt-32 pb-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl text-center">
         <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
           <span className="bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent">
-            Your Visual Canvas for Building AI-Powered Automations
+            Drag. Drop. Build.
+            <br />
+            AI for{" "}
+            <span className="relative inline-block w-[240px] text-left">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentWordIndex}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                  }}
+                  className="inline-block bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent"
+                >
+                  {rotatingWords[currentWordIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </span>
         </h1>
         <p className="text-muted-foreground mb-10 text-xl">
