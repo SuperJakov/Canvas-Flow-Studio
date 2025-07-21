@@ -7,7 +7,7 @@ export default function HeroSection() {
     <section className="container mx-auto px-4 pt-32 pb-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl text-center">
         <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
-          <span className="from-[var(--chart-1)] via-[var(--chart-3)] bg-gradient-to-r to-[var(--chart-5)] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent">
             Your Visual Canvas for Building AI-Powered Automations
           </span>
         </h1>
