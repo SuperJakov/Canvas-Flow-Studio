@@ -2,7 +2,6 @@ import "@xyflow/react/dist/style.css";
 import TemplatesSection from "./_components/homepage/TemplatesSection";
 import DocumentationSection from "./_components/homepage/DocumentationSection";
 import Footer from "./_components/homepage/Footer";
-import CanvasPreviewSection from "./_components/homepage/CanvasPreviewSection";
 import DemoVideoSection from "./_components/homepage/DemoVideoSection";
 import FeaturesSection from "./_components/homepage/FeaturesSection";
 import CTASection from "./_components/homepage/CTASection";
@@ -16,7 +15,7 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Canvas Preview Section */}
-      <CanvasPreviewSection />
+      {/* <CanvasPreviewSection /> */}
 
       {/* Demo Video Section */}
       <DemoVideoSection />
