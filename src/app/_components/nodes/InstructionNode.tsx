@@ -74,7 +74,11 @@ export default function InstructionNode({
   const hasInGoingConnections = edges.some((edge) => edge.target === id);
   const canRunNode = hasInGoingConnections;
 
-  const toggleRunning = () => {
+  const toggleRunning = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation();
+
     if (isRateLimited) {
       openBanner();
       return;
@@ -92,7 +96,11 @@ export default function InstructionNode({
     });
   };
 
-  const toggleLock = () => {
+  const toggleLock = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation();
+
     updateNodeData({
       nodeId: id,
       nodeType: "instruction",
@@ -170,8 +178,12 @@ interface HeaderProps {
   isLocked: boolean;
   canRunNode: boolean;
   isRunning: boolean;
-  onToggleLock: () => void;
-  onToggleRunning: () => void;
+  onToggleLock: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void;
+  onToggleRunning: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({

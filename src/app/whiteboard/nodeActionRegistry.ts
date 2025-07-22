@@ -43,3 +43,23 @@ export function unregisterSpeechAction(nodeId: string) {
 export function getSpeechAction(nodeId: string) {
   return speechActionMap.get(nodeId);
 }
+
+const textActionMap = new Map<
+  string,
+  ReactAction<typeof api.textNodes.modifyText>
+>();
+
+export function registerTextAction(
+  nodeId: string,
+  fn: ReactAction<typeof api.textNodes.modifyText>,
+) {
+  textActionMap.set(nodeId, fn);
+}
+
+export function unregisterTextAction(nodeId: string) {
+  textActionMap.delete(nodeId);
+}
+
+export function getTextAction(nodeId: string) {
+  return textActionMap.get(nodeId);
+}

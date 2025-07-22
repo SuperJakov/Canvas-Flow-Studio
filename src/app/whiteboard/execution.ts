@@ -22,7 +22,11 @@ import {
   currentWhiteboardIdAtom,
 } from "./atoms";
 import { v4 as uuidv4 } from "uuid";
-import { getImageAction, getSpeechAction } from "./nodeActionRegistry";
+import {
+  getImageAction,
+  getSpeechAction,
+  getTextAction,
+} from "./nodeActionRegistry";
 
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,6 +60,77 @@ export function isNodeExecutable(node: AppNode): boolean {
 
 function isNodeRateLimited(node: ImageNodeType | SpeechNodeType): boolean {
   return node.data.internal?.isRateLimited ?? false;
+}
+
+async function executeGenerativeTextNode(
+  get: Getter,
+  set: Setter,
+  currentNode: TextEditorNodeType,
+  _targetNode: AppNode,
+) {
+  console.groupCollapsed(
+    `executeGenerativeTextNode: Executing generative text node ${currentNode.id}`,
+  );
+
+  try {
+    const modifyTextAction = getTextAction(currentNode.id);
+    if (!modifyTextAction) {
+      console.error(
+        "Generative text node executed before its callback was registered. Skipping.",
+      );
+      return;
+    }
+
+    const parentNodes = collectSourceNodes(get, currentNode.id);
+    const instructionParent = parentNodes.find((p) => p.type === "instruction");
+
+    if (!instructionParent) {
+      console.log(
+        `Text node ${currentNode.id} is not the output of an instruction. Skipping generative execution.`,
+      );
+      return;
+    }
+
+    const grandParentNodes = collectSourceNodes(get, instructionParent.id);
+    const textGrandParent = grandParentNodes.find(
+      (gp) => gp.type === "textEditor",
+    );
+
+    if (!textGrandParent) {
+      console.log(
+        `No text source found for the instruction node ${instructionParent.id}. Skipping generation.`,
+      );
+      return;
+    }
+
+    console.log(
+      `Running modifyTextAction for node ${currentNode.id} with instruction from ${instructionParent.id} and text from ${textGrandParent.id}`,
+    );
+
+    set(updateNodeDataAtom, {
+      nodeId: currentNode.id,
+      updatedData: {
+        internal: {
+          isRunning: true,
+        },
+      },
+      nodeType: "textEditor",
+    });
+
+    const result = await modifyTextAction({
+      instruction: instructionParent.data.text,
+      text: textGrandParent.data.text,
+    });
+    set(updateNodeDataAtom, {
+      nodeId: currentNode.id,
+      updatedData: { text: result },
+      nodeType: "textEditor",
+    });
+  } catch (error) {
+    console.error("Error executing generative text node:", error);
+  } finally {
+    console.groupEnd();
+  }
 }
 
 // Node execution implementations
@@ -593,6 +668,9 @@ async function executeCurrentNode(get: Getter, set: Setter, node: AppNode) {
     case "instruction":
       await executeInstructionNode(get, set, node, {} as AppNode);
       break;
+    case "textEditor":
+      await executeGenerativeTextNode(get, set, node, {} as AppNode);
+      break;
     default:
       throw new Error(`No executor found for node type: ${node.type}`);
   }
@@ -688,7 +766,8 @@ export async function executeNodeLogic(
       if (
         currentNode.type === "image" ||
         currentNode.type === "speech" ||
-        currentNode.type === "instruction"
+        currentNode.type === "instruction" ||
+        currentNode.type === "textEditor"
       ) {
         await executeCurrentNode(get, set, currentNode);
       }

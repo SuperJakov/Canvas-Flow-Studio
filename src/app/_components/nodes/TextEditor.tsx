@@ -1,5 +1,5 @@
 "use client";
-import { type ChangeEvent } from "react";
+import { useEffect, type ChangeEvent } from "react";
 import { Handle, NodeResizer, Position, type NodeProps } from "@xyflow/react";
 import type { TextEditorNodeType } from "~/Types/nodes";
 import { useAtom } from "jotai";
@@ -18,6 +18,12 @@ import {
   Square,
 } from "lucide-react";
 import { isNodeExecutable as isNodeExecutableFn } from "~/app/whiteboard/execution";
+import { api } from "../../../../convex/_generated/api";
+import { useAction } from "convex/react";
+import {
+  registerTextAction,
+  unregisterTextAction,
+} from "~/app/whiteboard/nodeActionRegistry";
 
 export default function TextEditorNode({
   data,
@@ -26,6 +32,7 @@ export default function TextEditorNode({
 }: NodeProps<TextEditorNodeType>) {
   const { isLocked, internal, text } = data;
   const isRunning = internal?.isRunning;
+  const modifyTextAction = useAction(api.textNodes.modifyText);
 
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
@@ -34,8 +41,14 @@ export default function TextEditorNode({
   const hasOutgoingConnections = edges.some((edge) => edge.source === id);
 
   const thisNode = nodes.find((node) => node.id === id);
-  if (!thisNode) return null;
-  const isNodeExecutable = isNodeExecutableFn(thisNode);
+  const isNodeExecutable = thisNode ? isNodeExecutableFn(thisNode) : false;
+
+  useEffect(() => {
+    registerTextAction(id, modifyTextAction);
+    return () => {
+      unregisterTextAction(id);
+    };
+  }, [id, modifyTextAction]);
 
   function toggleRunning(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,

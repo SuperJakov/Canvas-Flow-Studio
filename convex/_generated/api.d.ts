@@ -18,6 +18,7 @@ import type * as projects from "../projects.js";
 import type * as speechNodes from "../speechNodes.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as textNodes from "../textNodes.js";
 import type * as users from "../users.js";
 import type * as whiteboards from "../whiteboards.js";
 
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   speechNodes: typeof speechNodes;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;
+  textNodes: typeof textNodes;
   users: typeof users;
   whiteboards: typeof whiteboards;
 }>;
