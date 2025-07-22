@@ -116,7 +116,11 @@ const whiteboards = defineTable({
   isPublic: v.boolean(),
   previewUrl: v.optional(v.string()),
   previewStorageId: v.optional(v.id("_storage")),
-}).index("by_ownerId", ["ownerId"]);
+  projectId: v.optional(v.id("projects")),
+})
+  .index("by_ownerId", ["ownerId"])
+  .index("by_projectId", ["projectId"])
+  .index("by_projectId_and_ownerId", ["projectId", "ownerId"]);
 
 const imageNodes = defineTable({
   nodeId: v.string(),
@@ -207,6 +211,15 @@ const imageLogs = defineTable(imageLogFields)
   .index("by_whiteboard", ["whiteboardId"])
   .index("by_node", ["nodeId"]);
 
+const projects = defineTable({
+  userExternalId: v.string(),
+  name: v.optional(v.string()),
+  description: v.optional(v.string()),
+  parentProject: v.optional(v.id("projects")),
+})
+  .index("by_userId", ["userExternalId"])
+  .index("by_user_and_parent", ["userExternalId", "parentProject"]);
+
 const schema = defineSchema({
   users,
   subscriptions,
@@ -214,6 +227,7 @@ const schema = defineSchema({
   imageNodes,
   speechNodes,
   imageLogs,
+  projects,
 });
 
 export default schema;

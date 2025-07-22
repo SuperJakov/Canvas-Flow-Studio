@@ -99,8 +99,9 @@ export const getNodeCountLimit = query({
 export const createWhiteboard = mutation({
   args: {
     title: v.string(),
+    projectId: v.optional(v.id("projects")),
   },
-  handler: async (ctx, { title }) => {
+  handler: async (ctx, { title, projectId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
@@ -127,6 +128,7 @@ export const createWhiteboard = mutation({
       nodes: generateInitialNodes(),
       edges: [],
       isPublic: false,
+      projectId: projectId ?? undefined,
     });
   },
 });
@@ -210,14 +212,30 @@ export const deleteWhiteboard = mutation({
 
 // --- List all whiteboards for the current user ---
 export const listWhiteboards = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    projectId: v.optional(v.id("projects")),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    const userId = identity.subject;
+
+    if (args.projectId) {
+      // Use the composite index to efficiently query by both project and owner
+      return await ctx.db
+        .query("whiteboards")
+        .withIndex("by_projectId_and_ownerId", (q) =>
+          q.eq("projectId", args.projectId).eq("ownerId", userId),
+        )
+        .order("desc")
+        .collect();
+    }
+
+    // If no project specified, return all user's whiteboards
     return await ctx.db
       .query("whiteboards")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", identity.subject))
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
       .order("desc")
       .collect();
   },

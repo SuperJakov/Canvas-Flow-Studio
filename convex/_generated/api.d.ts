@@ -14,6 +14,7 @@ import type * as imageLogs from "../imageLogs.js";
 import type * as imageNodes from "../imageNodes.js";
 import type * as instructionNodes from "../instructionNodes.js";
 import type * as migrations from "../migrations.js";
+import type * as projects from "../projects.js";
 import type * as speechNodes from "../speechNodes.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   imageNodes: typeof imageNodes;
   instructionNodes: typeof instructionNodes;
   migrations: typeof migrations;
+  projects: typeof projects;
   speechNodes: typeof speechNodes;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;
