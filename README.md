@@ -224,6 +224,7 @@ Our team will review all model recommendations and prioritize based on user dema
 ### Analytics & Monitoring
 
 - [ ] Posthog for analytics
+- [x] Sentry for error handling and user feedback
 
 ### Collaboration Features
 
@@ -242,3 +243,8 @@ Our team will review all model recommendations and prioritize based on user dema
 
 - [ ] Get feedback from real users
 - [ ] Compete in Croatia
+
+## Where I left off
+
+- [] Add full support for text, image, comment and instruction nodes
+- [] Stable Stripe
