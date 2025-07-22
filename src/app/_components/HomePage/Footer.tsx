@@ -1,9 +1,15 @@
-import Link from "next/link";
-import { DiscordIcon } from "~/components/icons";
+"use client";
 import { Separator } from "~/components/ui/separator";
+import { ArrowUp } from "lucide-react";
+import { Button } from "~/components/ui/button";
 
 export default function Footer() {
-  const discordUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ?? "#";
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <footer className="px-4 py-12 sm:px-6 lg:px-8">
@@ -14,16 +20,11 @@ export default function Footer() {
           </h2>
           <p className="mt-1">Build AI-powered workflows visually.</p>
         </div>
-
-        <Link
-          href={discordUrl}
-          className="text-gray-400 transition hover:text-white"
-          aria-label="Discord"
-        >
-          <DiscordIcon />
-        </Link>
+        <Button onClick={scrollToTop} variant={"outline"}>
+          <span>Back to top</span>
+          <ArrowUp className="h-4 w-4" />
+        </Button>
       </div>
-
       <Separator />
 
       <p className="text-muted-foreground pt-4 text-center text-sm">
