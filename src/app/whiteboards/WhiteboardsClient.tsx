@@ -21,11 +21,6 @@ import UpgradeBanner from "../whiteboard/UpgradeBanner";
 import { useConvexQuery } from "~/helpers/convex";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 import ProjectBreadcrumb from "./_components/ProjectBreadcrumb";
 
 const formatDate = (timestamp: bigint | number | undefined | null): string => {
@@ -156,42 +151,41 @@ function WhiteboardCard({
               )}
             </div>
             <div className="no-link relative flex-shrink-0">
-              <Popover open={menuOpen} onOpenChange={setMenuOpen}>
-                <PopoverTrigger asChild>
+              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                <DropdownMenuTrigger asChild>
                   <Button
                     className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100"
                     aria-label="More options"
                     variant="ghost"
                     size="sm"
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <MoreVertical className="h-5 w-5" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-36 rounded-lg border-none p-0"
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-36 rounded-lg p-1"
                   align="end"
-                  side="top"
                   sideOffset={8}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                 >
-                  <div className="py-0">
-                    <Button
-                      onClick={handleRenameClick}
-                      className="hover:bg-accent hover:text-accent-foreground w-full justify-start rounded-none rounded-tl-lg rounded-tr-lg px-3 py-2 text-sm"
-                      variant="ghost"
-                    >
-                      Rename
-                    </Button>
-                    <Button
-                      onClick={handleDeleteClick}
-                      className="hover:text-accent-foreground w-full justify-start rounded-none rounded-br-lg rounded-bl-lg px-3 py-2 text-sm"
-                      disabled={deletingId === whiteboard._id}
-                      variant="ghost"
-                    >
-                      {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  <DropdownMenuItem
+                    onClick={handleRenameClick}
+                    className="cursor-pointer"
+                  >
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleDeleteClick}
+                    className="cursor-pointer text-red-500"
+                    disabled={deletingId === whiteboard._id}
+                  >
+                    {deletingId === whiteboard._id ? "Deleting..." : "Delete"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           <p className="text-muted-foreground flex items-center gap-1 text-sm">
@@ -314,7 +308,7 @@ function ProjectCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-0 transition-opacity group-hover:opacity-100"
+                  className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100"
                 >
                   <MoreVertical className="h-5 w-5" />
                 </Button>
@@ -329,12 +323,13 @@ function ProjectCard({
                     setIsEditing(true);
                     setIsDropdownOpen(false);
                   }}
+                  className="cursor-pointer"
                 >
-                  Edit
+                  Rename
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleDelete}
-                  className="text-red-500"
+                  className="cursor-pointer text-red-500"
                 >
                   Delete
                 </DropdownMenuItem>
@@ -464,11 +459,12 @@ export default function WhiteboardsClient({ projectIds }: Props) {
     setErrorMessage(null);
     try {
       setIsCreatingProject(true);
-      await convexCreateProject({
+      const newProjectId = await convexCreateProject({
         name,
         parentProject: lastProjectId,
       });
       setNewProjectName("");
+      router.push(`/whiteboards/${newProjectId}`);
     } catch (error) {
       console.error("Failed to create project:", error);
       setErrorMessage(
