@@ -14,7 +14,7 @@ export default function CTASection() {
             Start creating powerful AI automations in minutes, no coding
             required.
           </p>
-          <Link href="/whiteboard">
+          <Link href="/whiteboard" prefetch={true}>
             <Button
               className="bg-primary text-primary-foreground hover:bg-primary/90 mx-auto flex w-full items-center justify-center rounded-lg px-8 py-4 font-medium shadow-lg transition-all hover:shadow-xl"
               size="xl"

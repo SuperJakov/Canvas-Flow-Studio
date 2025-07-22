@@ -171,6 +171,7 @@ export function Header() {
                 <Link
                   href="/pricing"
                   className="text-gray-300 transition hover:text-white"
+                  prefetch={true}
                 >
                   Pricing
                 </Link>

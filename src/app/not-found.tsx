@@ -72,7 +72,7 @@ export default function NotFound() {
             {/* Primary actions */}
             <div className="flex gap-3">
               <Button asChild className="flex-1" size="sm">
-                <Link href="/">
+                <Link href="/" prefetch={true}>
                   <Home className="mr-2 h-4 w-4" />
                   Go home
                 </Link>
@@ -80,7 +80,7 @@ export default function NotFound() {
 
               <Authenticated>
                 <Button asChild variant="outline" size="sm" className="flex-1">
-                  <Link href="/whiteboards">
+                  <Link href="/whiteboards" prefetch={true}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Whiteboards
                   </Link>
