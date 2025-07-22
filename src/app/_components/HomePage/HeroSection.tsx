@@ -51,7 +51,7 @@ export default function HeroSection() {
         </p>
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <Button asChild size="xl">
-            <Link href="/whiteboard" prefetch={true}>
+            <Link href="/whiteboards" prefetch={true}>
               Start Creating
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
