@@ -4,12 +4,12 @@ import { IMAGE_STYLES, type Style } from "./constants";
 import { useEffect, useRef } from "react";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
-interface StyleSelectorProps {
+type StyleSelectorProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   selectedStyle?: Style;
   onStyleChange: (styleId: Style) => void;
-}
+};
 
 export function StyleSelector({
   isOpen,
@@ -46,7 +46,10 @@ export function StyleSelector({
             <button
               key={style.id}
               data-style-id={style.id}
-              onClick={() => onStyleChange(style.id)}
+              onClick={(e) => {
+                e.stopPropagation(); // Add this line
+                onStyleChange(style.id);
+              }}
               className={`flex cursor-pointer flex-col items-center rounded p-2 transition-colors ${
                 selectedStyle === style.id
                   ? "bg-primary text-primary-foreground"

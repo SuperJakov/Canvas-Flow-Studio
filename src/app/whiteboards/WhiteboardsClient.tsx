@@ -491,6 +491,7 @@ export default function WhiteboardsClient({ projectIds }: Props) {
     whiteboards === undefined ||
     projects === undefined ||
     isCreatingWhiteboard ||
+    isCreatingProject ||
     isRedirecting ||
     !whiteboardCountLimit
   ) {
