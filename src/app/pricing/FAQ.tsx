@@ -31,6 +31,11 @@ const faqItems = [
     answer:
       "We use Stripe for secure payment processing. All paid plans are subscription-based with automatic monthly billing. You can cancel anytime on this page.",
   },
+  {
+    question: "What are credits and how do they work?",
+    answer:
+      "Credits are the currency for AI operations like text, image, and speech generation. Each plan includes monthly credits, with higher quality models using more credits.",
+  },
 ];
 
 export default function FAQ() {
@@ -65,6 +70,9 @@ export default function FAQ() {
               </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="text-muted-foreground mt-8 text-center text-sm">
+          *Unlimited access is subject to abuse guardrails.
         </div>
       </div>
     </section>
