@@ -455,7 +455,8 @@ export default function WhiteboardsClient({ projectIds }: Props) {
         error instanceof Error ? error.message : "An unknown error occurred.",
       );
     } finally {
-      setIsCreatingProject(false);
+      // Don't set this because redirect will unset this
+      // setIsCreatingProject(false);
     }
   };
 
@@ -481,7 +482,8 @@ export default function WhiteboardsClient({ projectIds }: Props) {
         error instanceof Error ? error.message : "An unknown error occurred.",
       );
     } finally {
-      setIsCreatingWhiteboard(false);
+      // Don't set this because redirect will unset this
+      // setIsCreatingWhiteboard(false);
     }
   };
 
