@@ -73,12 +73,44 @@ function stripNodeForDb<T extends AppNode>(node: T): T {
   return common as T;
 }
 
-function normalizeZIndices(nodes: AppNode[]) {
-  // time O(n), space O(n)
-  const maxZIndex = Math.max(...nodes.map((node) => node.zIndex ?? 0));
+function bringSelectedNodesToFront(nodes: AppNode[]): AppNode[] {
+  const selectedNodes = nodes.filter((node) => node.selected);
+
+  // If no nodes are selected, return as-is
+  if (selectedNodes.length === 0) {
+    return nodes;
+  }
+
+  // Find the current maximum z-index
+  // const maxZIndex = Math.max(0, ...nodes.map((node) => node.zIndex ?? 0));
+
+  // Only update selected nodes that don't already have the highest z-indices
+  const selectedIds = new Set(selectedNodes.map((n) => n.id));
+  const highestZIndices = nodes
+    .filter((n) => !selectedIds.has(n.id))
+    .map((n) => n.zIndex ?? 0)
+    .sort((a, b) => b - a);
+
+  const minRequiredZIndex =
+    highestZIndices.length > 0 ? Math.max(...highestZIndices) + 1 : 1;
+
+  // Check if selected nodes already have higher z-indices than unselected
+  const needsUpdate = selectedNodes.some(
+    (node) => (node.zIndex ?? 0) < minRequiredZIndex,
+  );
+
+  if (!needsUpdate) {
+    return nodes;
+  }
+
+  // Update only the selected nodes that need higher z-indices
   return nodes.map((node) => {
     if (node.selected) {
-      return { ...node, zIndex: maxZIndex + 1 };
+      const currentIndex = selectedNodes.findIndex((n) => n.id === node.id);
+      return {
+        ...node,
+        zIndex: minRequiredZIndex + currentIndex,
+      };
     }
     return node;
   });
@@ -223,98 +255,21 @@ export default function Whiteboard({ id }: Props) {
   const onNodesChange = (changes: NodeChange<AppNode>[]) => {
     if (isSharedWhiteboard) return; // Disable node changes for shared whiteboard
 
-    // Handle z-index changes
+    // Apply the node changes first
     const updatedNodes = applyNodeChanges(changes, nodes);
 
-    // Update z-indices based on selection
-    const selectedNodes = updatedNodes.filter((node) => node.selected);
-    if (selectedNodes.length > 0) {
-      setNodes(normalizeZIndices(updatedNodes));
-      return;
+    // Only bring selected nodes to front if there are selection changes
+    const hasSelectionChanges = changes.some(
+      (change) => change.type === "select",
+    );
+
+    if (hasSelectionChanges) {
+      const nodesWithUpdatedZIndex = bringSelectedNodesToFront(updatedNodes);
+      setNodes(nodesWithUpdatedZIndex);
+    } else {
+      setNodes(updatedNodes);
     }
-    setNodes(updatedNodes);
   };
-
-  // Add keyboard shortcut handler for z-index manipulation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isSharedWhiteboard) return; // Disable keyboard shortcuts for shared whiteboard
-
-      const selectedNodes = nodes.filter((node) => node.selected);
-      if (selectedNodes.length === 0) return;
-
-      if (event.key === "[" || event.key === "]") {
-        event.preventDefault();
-        const moveUp = event.key === "]";
-
-        console.groupCollapsed(`Z-Index ${moveUp ? "Up" : "Down"} Operation`);
-        console.log(
-          "Before move:",
-          nodes.map((n) => ({
-            id: n.id,
-            zIndex: n.zIndex,
-            selected: n.selected,
-          })),
-        );
-
-        setNodes((prevNodes) => {
-          // Sort nodes by zIndex ascending
-          const sorted = [...prevNodes].sort(
-            (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
-          );
-          // Get selected node ids
-          const selectedIds = new Set(selectedNodes.map((n) => n.id));
-
-          // Find the indices of selected nodes in sorted order
-          const selectedIndices = sorted
-            .map((node, idx) => (selectedIds.has(node.id) ? idx : -1))
-            .filter((idx) => idx !== -1);
-
-          if (selectedIndices.length === 0) {
-            console.log("No selected nodes to move.");
-            console.groupEnd();
-            return prevNodes;
-          }
-
-          // If moving down ([), process from lowest to highest; if up (]), process from highest to lowest
-          const indicesToProcess = moveUp
-            ? [...selectedIndices].reverse()
-            : selectedIndices;
-
-          for (const idx of indicesToProcess) {
-            const node = sorted[idx];
-            const swapIdx = moveUp ? idx + 1 : idx - 1;
-            if (swapIdx < 0 || swapIdx >= sorted.length) continue; // Already at edge
-            const swapNode = sorted[swapIdx];
-            if (!node || !swapNode) continue;
-            // Don't swap with another selected node
-            if (selectedIds.has(swapNode.id)) continue;
-            // Swap z-indices
-            console.log(
-              `Swapping node ${node.id} (z: ${node.zIndex}) with node ${swapNode.id} (z: ${swapNode.zIndex})`,
-            );
-            const temp = swapNode.zIndex ?? 0;
-            swapNode.zIndex = node.zIndex ?? 0;
-            node.zIndex = temp;
-          }
-
-          // Return nodes in original order, but with updated z-indices
-          const idToZ = Object.fromEntries(sorted.map((n) => [n.id, n.zIndex]));
-          const afterMove = prevNodes.map((node) => ({
-            id: node.id,
-            zIndex: idToZ[node.id],
-            selected: node.selected,
-          }));
-          console.log("After move:", afterMove);
-          console.groupEnd();
-          return prevNodes.map((node) => ({ ...node, zIndex: idToZ[node.id] }));
-        });
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nodes, setNodes, isSharedWhiteboard]);
 
   // Sharing
   useEffect(() => {
@@ -354,6 +309,7 @@ export default function Whiteboard({ id }: Props) {
     if (!dndType) return;
     if (isSharedWhiteboard) return; // Disable dropping for shared whiteboard
     if (!nodeCountLimit?.maxNodeCount) return;
+
     if (nodeCountLimit.maxNodeCount < nodes.length + 1)
       return openBanner("Higher limits");
     console.log(nodeCountLimit.maxNodeCount);
@@ -365,6 +321,10 @@ export default function Whiteboard({ id }: Props) {
     let newNode: AppNode | undefined;
     const newNodeId = uuidv4();
 
+    // Calculate the highest z-index + 1 for the new node
+    const maxZIndex = Math.max(0, ...nodes.map((node) => node.zIndex ?? 0));
+    const newZIndex = maxZIndex + 1;
+
     switch (dndType) {
       case "textEditor":
         newNode = {
@@ -374,6 +334,7 @@ export default function Whiteboard({ id }: Props) {
           data: { text: "", isLocked: false, internal: { isRunning: false } },
           width: 280,
           height: 180,
+          zIndex: newZIndex,
         };
         break;
       case "image":
@@ -389,6 +350,7 @@ export default function Whiteboard({ id }: Props) {
             },
             style: "auto",
           },
+          zIndex: newZIndex,
         };
         break;
       case "comment":
@@ -400,6 +362,7 @@ export default function Whiteboard({ id }: Props) {
             isLocked: false,
             text: "",
           },
+          zIndex: newZIndex,
         };
         break;
       case "speech":
@@ -413,6 +376,7 @@ export default function Whiteboard({ id }: Props) {
               isRunning: false,
             },
           },
+          zIndex: newZIndex,
         };
         break;
       case "instruction":
@@ -427,6 +391,7 @@ export default function Whiteboard({ id }: Props) {
               isRunning: false,
             },
           },
+          zIndex: newZIndex,
         };
         break;
       default:
