@@ -35,7 +35,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative container mx-auto min-h-screen overflow-hidden px-4 pt-32 pb-24 sm:px-6 lg:px-8">
+        <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
       {/* Animated Background Elements Container */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/*

@@ -24,7 +24,8 @@ export default async function WhiteboardPageWithId({ params }: Props) {
       { token },
     );
   } catch (err) {
-    console.log("Invalid whiteboard ID format:", id, err);
+    // User does not have access to whiteboard
+    console.error("User does not have access to whiteboard", err);
     redirect("/");
   }
 
