@@ -83,7 +83,7 @@ export default function FeaturesSection() {
 
                 {/* Image placeholder */}
                 <div className="mb-4 h-48 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
-                  <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+                  <div className="text-muted-foreground flex h-full items-center justify-center text-sm select-none">
                     Feature Image
                   </div>
                 </div>
