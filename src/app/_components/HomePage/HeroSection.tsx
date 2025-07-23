@@ -2,7 +2,6 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-// Note: Assuming this path is correct for your project structure.
 import { Button } from "~/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useLayoutEffect } from "react";
@@ -16,6 +15,7 @@ export default function HeroSection() {
 
   // This is for preventing hydration mismatches.
   const [hasMounted, setHasMounted] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // This effect handles the rotation of words in the hero title.
   // It runs only on the client side after the component mounts.
@@ -29,13 +29,22 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
-  // To prevent hydration warnings
+  // To prevent hydration warnings and get window dimensions
   useLayoutEffect(() => {
     setHasMounted(true);
+
+    const updateDimensions = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateDimensions(); // Set initial dimensions
+    window.addEventListener("resize", updateDimensions);
+
+    return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
   return (
-        <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
       {/* Animated Background Elements Container */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/*
@@ -93,26 +102,27 @@ export default function HeroSection() {
             />
 
             {/* Floating Particles */}
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute h-1 w-1 rounded-full bg-[var(--chart-3)] opacity-30"
-                initial={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
-                }}
-                animate={{
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
-                }}
-                transition={{
-                  duration: Math.random() * 10 + 15,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "linear",
-                }}
-              />
-            ))}
+            {dimensions.width > 0 &&
+              Array.from({ length: 20 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute h-1 w-1 rounded-full bg-[var(--chart-3)] opacity-30"
+                  initial={{
+                    x: Math.random() * dimensions.width,
+                    y: Math.random() * dimensions.height,
+                  }}
+                  animate={{
+                    x: Math.random() * dimensions.width,
+                    y: Math.random() * dimensions.height,
+                  }}
+                  transition={{
+                    duration: Math.random() * 10 + 15,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "linear",
+                  }}
+                />
+              ))}
           </>
         )}
 
