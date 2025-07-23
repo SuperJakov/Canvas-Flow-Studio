@@ -542,7 +542,7 @@ export default function WhiteboardsClient({ projectIds }: Props) {
                   maxLength={30}
                 />
               </div>
-              <div className="flex w-full gap-2 sm:w-auto">
+              <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                 <Button
                   onClick={handleCreateProject}
                   disabled={isCreatingProject || !newItemName.trim()}
