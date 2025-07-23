@@ -31,8 +31,8 @@ export default function HowItWorksSection() {
 
         {/* Step 2 */}
         <div className="flex items-start gap-6">
-          <div className="bg-accent mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full shadow-lg">
-            <span className="text-accent-foreground font-bold select-none">
+          <div className="bg-chart-4 mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full shadow-lg">
+            <span className="text-primary-foreground font-bold select-none">
               2
             </span>
           </div>
