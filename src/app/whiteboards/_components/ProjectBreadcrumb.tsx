@@ -17,10 +17,12 @@ function ProjectBreadcrumb({ projectIds }: { projectIds?: Id<"projects">[] }) {
           <BreadcrumbLink href="/whiteboards">Whiteboards</BreadcrumbLink>
         </BreadcrumbItem>
         {projectIds?.map((projectId, index) => (
-          <ProjectBreadcrumbItem 
-            key={projectId} 
-            projectId={projectId} 
-            isLast={index === projectIds.length - 1} />
+          <ProjectBreadcrumbItem
+            key={projectId}
+            projectId={projectId}
+            isLast={index === projectIds.length - 1}
+            projectIds={projectIds}
+          />
         ))}
       </BreadcrumbList>
     </Breadcrumb>
