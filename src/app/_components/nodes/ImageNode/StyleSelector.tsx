@@ -50,7 +50,7 @@ export function StyleSelector({
               className={`flex cursor-pointer flex-col items-center rounded p-2 transition-colors ${
                 selectedStyle === style.id
                   ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
+                  : "hover:bg-accent"
               }`}
             >
               {style.imageUrl ? (

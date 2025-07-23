@@ -267,7 +267,10 @@ export default function ImageNode({
               selectedStyle={data.style}
               onToggleLock={toggleLock}
               onToggleRunning={toggleRunning}
-              onStylePopoverTrigger={() => setIsPopoverOpen(true)}
+              onStylePopoverTrigger={(e) => {
+                e.stopPropagation();
+                setIsPopoverOpen(true);
+              }}
             />
           )}
 
