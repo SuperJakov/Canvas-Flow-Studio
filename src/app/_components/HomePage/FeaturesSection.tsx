@@ -4,8 +4,12 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-import IntuitiveCanvas from "public/intuitive_canvas.png";
+// Feature images
 import Image from "next/image";
+import IntuitiveCanvas from "public/intuitive_canvas.png";
+import AIIntegration from "public/ai_model_integration.png";
+import ProcessChaining from "public/process_chaining.png";
+import SmartAutomation from "public/smart_automations.png";
 
 // Register plugins
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -97,26 +101,26 @@ export default function FeaturesSection() {
       title: "Intuitive Visual Canvas",
       description:
         "Drag and drop nodes onto the canvas and connect them to create complex AI workflows without writing code.",
-      gradient: "from-blue-600 to-purple-600",
+
       src: IntuitiveCanvas,
     },
     {
       title: "AI Model Integration",
       description:
         "Connect to state-of-the-art AI models for text generation, image creation, analysis, and more.",
-      gradient: "from-purple-600 to-pink-600",
+      src: AIIntegration,
     },
     {
       title: "Process Chaining",
       description:
         "Chain together multiple AI processes to create sophisticated automations and workflows.",
-      gradient: "from-pink-600 to-orange-600",
+      src: ProcessChaining,
     },
     {
       title: "Smart Automation",
       description:
         "Automate complex tasks with intelligent decision-making and adaptive AI responses.",
-      gradient: "from-orange-600 to-red-600",
+      src: SmartAutomation,
     },
   ];
 
@@ -143,16 +147,19 @@ export default function FeaturesSection() {
                 </div>
 
                 {feature.src ? (
-                  <div className="mb-4 h-48 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+                  <div className="mb-4 aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
                     <Image
                       src={feature.src}
                       alt={feature.title}
                       placeholder="blur"
                       loading="eager"
+                      className="h-full w-full object-cover"
+                      width={270}
+                      height={270}
                     />
                   </div>
                 ) : (
-                  <div className="mb-4 h-48 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
+                  <div className="mb-4 aspect-square rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
                     <div className="text-muted-foreground flex h-full items-center justify-center text-sm select-none">
                       Feature Image
                     </div>
