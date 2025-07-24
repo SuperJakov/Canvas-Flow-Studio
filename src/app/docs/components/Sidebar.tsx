@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, MessageSquare } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -93,6 +94,13 @@ export default function DocsSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <div className="mt-auto p-4">
+        <Button className="w-full" variant={"ghost"} id="feedback-button">
+          {/* Posthog will activate survey */}
+          <MessageSquare className="mr-2 h-4 w-4" />
+          Feedback
+        </Button>
+      </div>
     </Sidebar>
   );
 }
