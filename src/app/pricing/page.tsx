@@ -23,6 +23,14 @@ import { useConvexQuery } from "~/helpers/convex";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "~/components/ui/dialog";
 import CTASection from "../_components/homepage/CTASection";
 
 // Type guard to check if planInfo has subscription properties
@@ -48,6 +56,7 @@ export default function PricingPage() {
   const cancelSubscription = useAction(api.stripe.cancelSubscription);
   const reactivateSubscription = useAction(api.stripe.reactivateSubscription);
   const planInfo = useConvexQuery(api.users.getCurrentUserPlanInfo);
+  const [showDisabledDialog, setShowDisabledDialog] = useState(false);
 
   if (auth.isLoading || planInfo === undefined) {
     return <Loading />;
@@ -66,6 +75,8 @@ export default function PricingPage() {
 
   const handlePlanChange = async (planName: string) => {
     if (!auth.isAuthenticated) return;
+    if (process.env.NEXT_PUBLIC_IS_STRIPE_DISABLED === "true")
+      return setShowDisabledDialog(true);
     setLoadingTier(planName === "Reactivate" ? currentTier : planName);
 
     try {
@@ -458,6 +469,20 @@ export default function PricingPage() {
 
         {!auth.isAuthenticated && <CTASection />}
       </div>
+      <Dialog open={showDisabledDialog} onOpenChange={setShowDisabledDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Subscriptions Disabled</DialogTitle>
+            <DialogDescription>
+              We are not accepting new subscriptions at this time. Please check
+              back later.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowDisabledDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
