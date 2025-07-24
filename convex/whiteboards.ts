@@ -232,10 +232,12 @@ export const listWhiteboards = query({
         .collect();
     }
 
-    // If no project specified, return all user's whiteboards
+    // If no project specified, return all user's root whiteboards
     return await ctx.db
       .query("whiteboards")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+      .withIndex("by_projectId_and_ownerId", (q) =>
+        q.eq("projectId", undefined).eq("ownerId", userId),
+      )
       .order("desc")
       .collect();
   },

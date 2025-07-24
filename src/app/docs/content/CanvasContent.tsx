@@ -1,8 +1,9 @@
 "use client";
 
-import { LayoutGrid, Workflow, Zap, Delete } from "lucide-react";
+import { Delete } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
 
 export default function CanvasContent() {
   return (
@@ -13,17 +14,20 @@ export default function CanvasContent() {
         </span>
       </h2>
       <div>
-        <p className="mb-6">
-          The whiteboard canvas is your creative workspace for building AI
-          workflows. Let&apos;s explore its key components:
+        <p>
+          The whiteboard canvas is your creative place for building AI
+          whiteboards. Let&apos;s explore its key components:
         </p>
+
+        <Separator className="my-4" />
 
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <div className="inline-flex items-center gap-1">
-                <LayoutGrid className="h-6 w-6 text-blue-400" />
-                <CardTitle>Sidebar</CardTitle>
+                <CardTitle className="text-xl font-semibold">
+                  Sidebar
+                </CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -54,9 +58,10 @@ export default function CanvasContent() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <Workflow className="mb-2 h-6 w-6 text-purple-400" />
-              <CardTitle>Canvas Area</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-semibold">
+                Canvas Area
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -86,9 +91,10 @@ export default function CanvasContent() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <Zap className="mb-2 h-6 w-6 text-yellow-400" />
-              <CardTitle>Connections</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl font-semibold">
+                Connections
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -106,8 +112,10 @@ export default function CanvasContent() {
         </div>
 
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-xl">Canvas Controls</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl font-semibold">
+              Canvas Controls
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

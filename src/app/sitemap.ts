@@ -3,9 +3,10 @@ import { getBaseUrl } from "~/helpers/baseurl";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-const ROOT_ROUTES = ["/", "/pricing"] as const;
+const ROOT_ROUTES = ["/", "/docs", "/pricing"] as const;
 const PRIORITY_OVERRIDES: Record<string, number> = {
   "/": 1,
+  "/docs": 0.8,
   "/pricing": 0.7,
 };
 
