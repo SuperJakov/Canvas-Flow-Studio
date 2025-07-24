@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import AuthProvider from "./AuthProvider";
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { SidebarProvider } from "~/components/ui/sidebar";
 
 type Props = {
   children: ReactNode;

@@ -6,6 +6,9 @@ import { Separator } from "~/components/ui/separator";
 import type { ReactNode } from "react";
 import { Card, CardContent, CardTitle } from "~/components/ui/card";
 
+import screenshot from "public/firstflow_screenshot.png";
+import Image from "next/image";
+
 function Step({
   number,
   title,
@@ -45,9 +48,7 @@ export default function FirstFlowContent() {
             workflow:
           </p>
         </div>
-
         <Separator />
-
         <div className="space-y-6 pt-8 pb-8">
           <Step
             number={1}
@@ -122,7 +123,15 @@ export default function FirstFlowContent() {
             description="Click the run button on either image node or text node. It will generate an image using AI."
           />
         </div>
-
+        <Image
+          src={screenshot}
+          alt="Screenshot of results"
+          width={1920}
+          height={912}
+          placeholder="blur"
+          loading="eager"
+          className="mb-5 rounded-lg outline-2 outline-white"
+        />
         <Card>
           <CardContent className="flex flex-col gap-2">
             <CardTitle className="text-xl">Congratulations!</CardTitle>

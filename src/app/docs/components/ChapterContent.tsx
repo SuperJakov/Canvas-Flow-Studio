@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import TextNodeContent from "../content/TextNodeContent";
 
 interface ChapterContentProps {
   activeChapter: string;
@@ -108,35 +109,11 @@ function CoreConceptsContent({
     return <NodesConnectionsContent />;
   }
 
-  // Otherwise, render the specific section when they're created
-  return (
-    <>
-      {activeSection === "ai-models" && (
-        <section id="ai-models" className="mb-16 scroll-mt-16">
-          <h2 className="mb-4 text-2xl font-bold text-white">
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              AI Models
-            </span>
-          </h2>
-          <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6">
-            <p className="text-gray-300">AI Models content coming soon...</p>
-          </div>
-        </section>
-      )}
-      {activeSection === "data-flow" && (
-        <section id="data-flow" className="mb-16 scroll-mt-16">
-          <h2 className="mb-4 text-2xl font-bold text-white">
-            <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Data Flow
-            </span>
-          </h2>
-          <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6">
-            <p className="text-gray-300">Data Flow content coming soon...</p>
-          </div>
-        </section>
-      )}
-    </>
-  );
+  if (activeSection === "text-node") {
+    return <TextNodeContent />;
+  }
+
+  throw new Error(`Doc section not found: ${activeSection}`);
 }
 
 function AdvancedUsageContent({

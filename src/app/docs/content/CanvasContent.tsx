@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 export default function CanvasContent() {
   return (
-    <section id="canvas" className="scroll-mt-16">
+    <section id="canvas" className="mb-16 scroll-mt-16">
       <h2 className="mb-4 text-2xl font-bold">
         <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           Understanding the Canvas
@@ -131,7 +131,7 @@ export default function CanvasContent() {
                 <ul className="space-y-2">
                   <li>
                     <strong className="text-purple-400">Select</strong>: Click
-                    on a node or drag to select multiple
+                    on a node
                   </li>
                   <li>
                     <strong className="text-purple-400">Delete</strong>: Select
@@ -140,29 +140,11 @@ export default function CanvasContent() {
                       Backspace <Delete className="h-4 w-4" />
                     </div>
                   </li>
-                  <li>
-                    <strong className="text-purple-400">Copy/Paste</strong>:
-                    Ctrl+C / Ctrl+V (Cmd+C / Cmd+V on Mac)
-                  </li>
                 </ul>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <div className="bg-muted/50 rounded-md border border-purple-500/30 p-4">
-          <h4 className="mb-2 text-lg font-semibold">Best Practices</h4>
-          <ul className="list-disc space-y-2 pl-5">
-            <li>
-              Organize your nodes in a logical left-to-right flow for better
-              readability
-            </li>
-            <li>
-              Use Comment nodes to document complex parts of your workflow
-            </li>
-            <li>Break complex flows into smaller, manageable segments</li>
-          </ul>
-        </div>
       </div>
     </section>
   );

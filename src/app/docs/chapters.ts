@@ -16,8 +16,7 @@ export const chapters: DocChapter[] = [
     slug: "core-concepts",
     sections: [
       { title: "Nodes & Connections", slug: "nodes-connections" },
-      { title: "AI Models", slug: "ai-models" },
-      { title: "Data Flow", slug: "data-flow" },
+      { title: "Text Node", slug: "text-node" },
     ],
   },
   {
@@ -26,6 +25,7 @@ export const chapters: DocChapter[] = [
     sections: [
       { title: "Complex Workflows", slug: "complex-workflows" },
       { title: "Sharing", slug: "sharing" },
+      { title: "AI Models", slug: "ai-models" },
     ],
   },
 ];
