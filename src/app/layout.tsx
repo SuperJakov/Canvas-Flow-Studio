@@ -30,14 +30,14 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <ConvexAuthNextjsServerProvider>
         <Providers>
-          {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
-            <Script
-              src="https://unpkg.com/react-scan/dist/auto.global.js"
-              strategy="afterInteractive"
-              crossOrigin="anonymous"
-            />
-          )}
           <body className="dark">
+            {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
+              <Script
+                src="https://unpkg.com/react-scan/dist/auto.global.js"
+                strategy="afterInteractive"
+                crossOrigin="anonymous"
+              />
+            )}
             <Header />
             {children}
             <Toaster />

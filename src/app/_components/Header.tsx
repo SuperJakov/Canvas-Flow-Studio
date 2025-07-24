@@ -81,7 +81,11 @@ export function Header() {
   }, []);
 
   // Don't render the header on the whiteboard page
-  if (pathname === "/whiteboard" || pathname.startsWith("/whiteboard/")) {
+  if (
+    pathname === "/whiteboard" ||
+    pathname.startsWith("/whiteboard/") ||
+    pathname.startsWith("/docs")
+  ) {
     return null;
   }
 
