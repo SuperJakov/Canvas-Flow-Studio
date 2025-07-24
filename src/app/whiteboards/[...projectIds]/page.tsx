@@ -2,6 +2,8 @@ import { api } from "convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import WhiteboardsClient from "../WhiteboardsClient";
 import { redirect } from "next/navigation";
+import { getConvexToken } from "~/helpers/getConvexToken";
+import { RedirectToSignIn } from "@clerk/nextjs";
 
 type Props = {
   params: Promise<{
@@ -10,6 +12,9 @@ type Props = {
 };
 
 export default async function ProjectWhiteboardsPage({ params }: Props) {
+  const token = await getConvexToken();
+  if (!token) return <RedirectToSignIn signInFallbackRedirectUrl={"/"} />;
+
   const { projectIds } = await params;
   console.log(projectIds);
   try {
