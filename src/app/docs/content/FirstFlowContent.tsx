@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Delete, ImageIcon } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import type { ReactNode } from "react";
+import { Card, CardContent, CardTitle } from "~/components/ui/card";
 
 function Step({
   number,
@@ -37,7 +38,7 @@ export default function FirstFlowContent() {
           Creating Your First Flow
         </span>
       </h2>
-      <div className="rounded-lg p-6">
+      <div>
         <div className="mb-6">
           <p className="mb-4">
             Let&apos;s walk through the process of creating your first AI
@@ -122,17 +123,17 @@ export default function FirstFlowContent() {
           />
         </div>
 
-        <div className="bg-muted/50 rounded-md border border-blue-500/30 p-4">
-          <h4 className="mb-2 text-lg font-semibold text-white">
-            Congratulations!
-          </h4>
-          <p className="text-gray-300">
-            You&apos;ve just created your first AI whiteboard! This simple
-            example demonstrates the fundamental concept behind AI Flow Studio:
-            visually connecting nodes to create powerful automations without
-            coding.
-          </p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col gap-2">
+            <CardTitle className="text-xl">Congratulations!</CardTitle>
+            <p>
+              You&apos;ve just created your first AI whiteboard! This simple
+              example demonstrates the fundamental concept behind AI Flow
+              Studio: visually connecting nodes to create powerful automations
+              without coding.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

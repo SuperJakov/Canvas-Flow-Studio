@@ -1,6 +1,5 @@
 import {
   Wand2,
-  Type,
   Image as ImageIcon,
   MessageSquare,
   Volume2,
@@ -8,9 +7,11 @@ import {
   Cloud,
   Timer,
   ArrowDownUp,
+  Type,
 } from "lucide-react";
 import { useDnD } from "./DnDContext";
 import React from "react";
+import { Badge } from "~/components/ui/badge";
 
 const NODE_CONFIGS = [
   {
@@ -18,6 +19,8 @@ const NODE_CONFIGS = [
     icon: Type,
     color: "bg-blue-900/50 hover:bg-blue-800/50 border",
     title: "Text Node",
+    beta: false,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Text</span>: Create and edit text
@@ -30,6 +33,8 @@ const NODE_CONFIGS = [
     icon: ImageIcon,
     color: "bg-purple-900/50 hover:bg-purple-800/50 border",
     title: "Image Node",
+    beta: false,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Image</span>: Import, generate, or
@@ -42,10 +47,13 @@ const NODE_CONFIGS = [
     icon: Wand2,
     color: "bg-yellow-900/50 hover:bg-yellow-800/50 border",
     title: "Instruction Node",
+    beta: false,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Instruction</span>: Create AI-powered
-        transformations and automate content generation tasks.
+        transformations and automate content generation tasks.{" "}
+        <span className="text-muted-foreground">Beta version</span>
       </>
     ),
   },
@@ -54,6 +62,8 @@ const NODE_CONFIGS = [
     icon: MessageSquare,
     color: "bg-orange-900/50 hover:bg-orange-800/50 border",
     title: "Comment Node",
+    beta: false,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Comment</span>: Document your flow with
@@ -66,6 +76,8 @@ const NODE_CONFIGS = [
     icon: Volume2,
     color: "bg-green-900/50 hover:bg-green-800/50 border",
     title: "Speech Node",
+    beta: false,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Speech</span>: Generate natural-sounding
@@ -78,6 +90,8 @@ const NODE_CONFIGS = [
     icon: Globe,
     color: "bg-pink-900/50 hover:bg-pink-800/50 border",
     title: "Website Node",
+    beta: false,
+    disabled: true,
     tooltip: (
       <>
         <span className="font-semibold">Website</span>: Generate complete web
@@ -90,6 +104,8 @@ const NODE_CONFIGS = [
     icon: Cloud,
     color: "bg-cyan-900/50 hover:bg-cyan-800/50 border",
     title: "Weather Node",
+    beta: false,
+    disabled: true,
     tooltip: (
       <>
         <span className="font-semibold">Weather</span>: Fetch real-time weather
@@ -102,6 +118,8 @@ const NODE_CONFIGS = [
     icon: Timer,
     color: "bg-indigo-900/50 hover:bg-indigo-800/50 border",
     title: "Timer Node",
+    beta: false,
+    disabled: true,
     tooltip: (
       <>
         <span className="font-semibold">Timer</span>: Schedule node execution
@@ -114,6 +132,8 @@ const NODE_CONFIGS = [
     icon: ArrowDownUp,
     color: "bg-rose-900/50 hover:bg-rose-800/50 border",
     title: "Data Fetch Node",
+    beta: false,
+    disabled: true,
     tooltip: (
       <>
         <span className="font-semibold">Data Fetch</span>: Import data from APIs
@@ -129,6 +149,8 @@ type SidebarItemProps = {
   color: string;
   title: string;
   tooltip: React.ReactNode;
+  beta: boolean;
+  disabled: boolean;
   onDragStart: (
     event: React.DragEvent<HTMLDivElement>,
     nodeType: string,
@@ -142,20 +164,39 @@ function SidebarItem({
   color,
   title,
   tooltip,
+  beta,
+  disabled,
   onDragStart,
   onDragEnd,
 }: SidebarItemProps) {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    onDragStart(e, nodeType);
+  };
+
   return (
-    <div className="group relative">
+    <div className="group relative flex flex-col items-center">
       <div
-        className={`flex h-10 w-10 cursor-grab items-center justify-center rounded border ${color} p-2 text-white`}
-        draggable
-        onDragStart={(e) => onDragStart(e, nodeType)}
+        className={`flex h-10 w-10 items-center justify-center rounded border p-2 text-white ${
+          disabled
+            ? "cursor-not-allowed border bg-gray-500/50"
+            : `${color} cursor-grab`
+        }`}
+        draggable={!disabled}
+        onDragStart={handleDragStart}
         onDragEnd={onDragEnd}
         title={title}
       >
         <Icon size={16} />
       </div>
+      {beta && (
+        <Badge
+          variant="secondary"
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-500/50 px-1.5 py-0 text-xs text-white select-none"
+        >
+          Beta
+        </Badge>
+      )}
       <div className="bg-popover pointer-events-none absolute top-0 left-full z-50 ml-2 w-48 scale-95 rounded p-2 opacity-0 shadow-lg transition-all group-hover:scale-100 group-hover:opacity-100">
         <p className="text-popover-foreground text-xs">{tooltip}</p>
       </div>
@@ -190,6 +231,8 @@ export default function Sidebar() {
             color={node.color}
             title={node.title}
             tooltip={node.tooltip}
+            beta={node.beta}
+            disabled={node.disabled}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           />

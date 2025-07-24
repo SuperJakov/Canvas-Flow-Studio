@@ -9,7 +9,7 @@ export default function IntroductionContent() {
       <h2 className="mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
         Introduction
       </h2>
-      <div className="bg-background rounded-lg p-6">
+      <div>
         <p className="mb-5">Welcome to AI Flow Studio documentation!</p>
         <p className="mb-4">
           This section will help you understand what{" "}

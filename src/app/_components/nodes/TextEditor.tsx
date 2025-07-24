@@ -9,14 +9,7 @@ import {
   nodesAtom,
   updateNodeDataAtom,
 } from "~/app/whiteboard/atoms";
-import {
-  AlertCircle,
-  GripVertical,
-  Lock,
-  LockOpen,
-  Play,
-  Square,
-} from "lucide-react";
+import { AlertCircle, Lock, LockOpen, Play, Square, Type } from "lucide-react";
 import { isNodeExecutable as isNodeExecutableFn } from "~/app/whiteboard/execution";
 import { api } from "../../../../convex/_generated/api";
 import { useAction } from "convex/react";
@@ -112,8 +105,8 @@ export default function TextEditorNode({
       {/* Header */}
       <div className="flex items-center justify-between px-1 py-2">
         <div className="handle flex cursor-grab items-center text-black">
-          <GripVertical size={18} />
-          <span className="ml-2 font-medium">Text</span>
+          <Type size={16} className="mx-1" />
+          <span className="mr-2 font-medium">Text</span>
         </div>
 
         <div className="flex items-center space-x-2">

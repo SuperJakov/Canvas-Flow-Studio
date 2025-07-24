@@ -16,7 +16,7 @@ export default function DocsPage({ activeChapter, activeSection }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="flex min-h-screen flex-col pt-24 md:flex-row">
       {/* Sidebar navigation */}
       <Sidebar
         chapters={chapters}
@@ -25,7 +25,7 @@ export default function DocsPage({ activeChapter, activeSection }: Props) {
       />
 
       {/* Main content area */}
-      <main className="bg-background flex-1 p-6 md:p-8 lg:p-12">
+      <main className="bg-background flex-1 px-6 md:px-8 lg:px-12">
         <ChapterContent
           activeChapter={activeChapter}
           activeSection={activeSection}

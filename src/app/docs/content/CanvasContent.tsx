@@ -12,7 +12,7 @@ export default function CanvasContent() {
           Understanding the Canvas
         </span>
       </h2>
-      <div className="p-6">
+      <div>
         <p className="mb-6">
           The whiteboard canvas is your creative workspace for building AI
           workflows. Let&apos;s explore its key components:

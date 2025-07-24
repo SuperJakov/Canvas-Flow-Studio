@@ -3,14 +3,10 @@
 import {
   Database,
   Share2,
-  BookText,
   Image as ImageIcon,
   MessageSquare,
-  ArrowDownUp,
   Lightbulb,
-  Mail,
-  Globe,
-  Server,
+  Type,
 } from "lucide-react";
 
 export default function NodesConnectionsContent() {
@@ -21,11 +17,11 @@ export default function NodesConnectionsContent() {
           Nodes & Connections
         </span>
       </h2>
-      <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6">
-        <p className="mb-6 text-gray-300">
-          The power of AI Flow Studio comes from its modular node system and the
-          connections between them. Understanding how different nodes work and
-          interact is essential for building effective workflows.
+      <div>
+        <p className="mb-6">
+          AI Flow Studio uses a simple but powerful node-based system. Each node
+          has a specific purpose, and by connecting them together, you can
+          create AI-powered workflows without any coding.
         </p>
 
         <div className="mb-8">
@@ -33,26 +29,27 @@ export default function NodesConnectionsContent() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-lg border border-blue-500/30 bg-blue-900/10 p-4">
               <div className="mb-3 flex items-center">
-                <BookText className="mr-2 h-5 w-5 text-blue-400" />
+                <Type className="mr-2 h-5 w-5 text-blue-400" />
                 <h4 className="text-lg font-medium text-white">Text Node</h4>
               </div>
-              <p className="mb-3 text-gray-300">
-                Text nodes are the primary way to input textual data into your
-                workflows.
+              <p className="mb-3">
+                Text nodes are the starting point of most workflows. They let
+                you input text that can be used to generate images or be
+                processed by instruction nodes.
               </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
+              <ul className="list-disc space-y-2 pl-5">
                 <li>
                   <span className="font-semibold text-blue-400">Purpose:</span>{" "}
-                  Enter prompts, instructions, or any text-based content
+                  Write prompts or text for AI processing
                 </li>
                 <li>
-                  <span className="font-semibold text-blue-400">Output:</span>{" "}
-                  Raw text that can be connected to instruction nodes or other
-                  processing nodes
+                  <span className="font-semibold text-blue-400">Usage:</span>{" "}
+                  Connect to Image Nodes to generate images or Instruction Nodes
+                  for text processing
                 </li>
                 <li>
                   <span className="font-semibold text-blue-400">Features:</span>{" "}
-                  Rich text editor, formatting options, variable length
+                  Simple text editing, automatic creation in new whiteboards
                 </li>
               </ul>
             </div>
@@ -62,184 +59,87 @@ export default function NodesConnectionsContent() {
                 <ImageIcon className="mr-2 h-5 w-5 text-purple-400" />
                 <h4 className="text-lg font-medium text-white">Image Node</h4>
               </div>
-              <p className="mb-3 text-gray-300">
-                Image nodes allow you to incorporate visual elements into your
-                workflows.
+              <p className="mb-3">
+                Image nodes are used to generate AI images from text
+                descriptions or display uploaded images.
               </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
+              <ul className="list-disc space-y-2 pl-5">
                 <li>
                   <span className="font-semibold text-purple-400">
                     Purpose:
                   </span>{" "}
-                  Upload images or display generated visuals
+                  Generate AI images or display uploaded images
                 </li>
                 <li>
-                  <span className="font-semibold text-purple-400">Output:</span>{" "}
-                  Image data that can be further processed or analyzed
+                  <span className="font-semibold text-purple-400">Input:</span>{" "}
+                  Text descriptions from Text Nodes
                 </li>
                 <li>
                   <span className="font-semibold text-purple-400">
                     Features:
                   </span>{" "}
-                  Preview, resize options, metadata display
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-lg border border-pink-500/30 bg-pink-900/10 p-4">
-              <div className="mb-3 flex items-center">
-                <MessageSquare className="mr-2 h-5 w-5 text-pink-400" />
-                <h4 className="text-lg font-medium text-white">
-                  Instruction Node
-                </h4>
-              </div>
-              <p className="mb-3 text-gray-300">
-                The powerhouse of AI Flow Studio, instruction nodes process
-                inputs using AI models.
-              </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
-                <li>
-                  <span className="font-semibold text-pink-400">Purpose:</span>{" "}
-                  Apply AI transformations based on your chosen model and
-                  instructions
-                </li>
-                <li>
-                  <span className="font-semibold text-pink-400">Input:</span>{" "}
-                  Can accept text, images, or outputs from other nodes
-                </li>
-                <li>
-                  <span className="font-semibold text-pink-400">Output:</span>{" "}
-                  Generated text, images, or analysis results
-                </li>
-                <li>
-                  <span className="font-semibold text-pink-400">Features:</span>{" "}
-                  Model selection, parameter tuning, instruction templates
+                  AI image generation, image preview
                 </li>
               </ul>
             </div>
 
             <div className="rounded-lg border border-yellow-500/30 bg-yellow-900/10 p-4">
               <div className="mb-3 flex items-center">
-                <Database className="mr-2 h-5 w-5 text-yellow-400" />
+                <MessageSquare className="mr-2 h-5 w-5 text-yellow-400" />
+                <h4 className="text-lg font-medium text-white">
+                  Instruction Node
+                </h4>
+                <span className="ml-2 rounded-full bg-yellow-500/20 px-2 py-1 text-xs text-yellow-200">
+                  Beta
+                </span>
+              </div>
+              <p className="mb-3">
+                Instruction nodes modify and process content from other nodes
+                using AI models.
+              </p>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  <span className="font-semibold text-yellow-400">
+                    Purpose:
+                  </span>{" "}
+                  Process and transform content using AI
+                </li>
+                <li>
+                  <span className="font-semibold text-yellow-400">Input:</span>{" "}
+                  Text or images from other nodes
+                </li>
+                <li>
+                  <span className="font-semibold text-yellow-400">Output:</span>{" "}
+                  Modified text, images, or other content types
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-orange-500/30 bg-orange-900/10 p-4">
+              <div className="mb-3 flex items-center">
+                <Database className="mr-2 h-5 w-5 text-orange-400" />
                 <h4 className="text-lg font-medium text-white">Comment Node</h4>
               </div>
-              <p className="mb-3 text-gray-300">
-                Comment nodes help document and organize your workflows.
+              <p className="mb-3">
+                Comment nodes help document your workflow. They don&apos;t
+                process any data.
               </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
-                <li>
-                  <span className="font-semibold text-yellow-400">
-                    Purpose:
-                  </span>{" "}
-                  Add notes, explanations, or section labels to your workflow
-                </li>
-                <li>
-                  <span className="font-semibold text-yellow-400">
-                    Behavior:
-                  </span>{" "}
-                  Do not process data; purely for documentation
-                </li>
-                <li>
-                  <span className="font-semibold text-yellow-400">
-                    Features:
-                  </span>{" "}
-                  Customizable colors, sizes, and styles for better organization
-                </li>
-              </ul>
-            </div>
-
-            <div className="relative rounded-lg border border-green-500/30 bg-green-900/10 p-4">
-              <div className="absolute -top-3 right-3 rounded-full bg-blue-600 px-2 py-1 text-xs font-medium text-white">
-                Coming Soon
-              </div>
-              <div className="mb-3 flex items-center">
-                <Mail className="mr-2 h-5 w-5 text-green-400" />
-                <h4 className="text-lg font-medium text-white">Email Node</h4>
-              </div>
-              <p className="mb-3 text-gray-300">
-                Email nodes will enable your workflows to send automated emails
-                based on your data.
-              </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
-                <li>
-                  <span className="font-semibold text-green-400">Purpose:</span>{" "}
-                  Send emails with content from connected nodes
-                </li>
-                <li>
-                  <span className="font-semibold text-green-400">Input:</span>{" "}
-                  Subject, body content, recipient information
-                </li>
-                <li>
-                  <span className="font-semibold text-green-400">
-                    Features:
-                  </span>{" "}
-                  Templates, scheduling, attachment support
-                </li>
-              </ul>
-            </div>
-
-            <div className="relative rounded-lg border border-indigo-500/30 bg-indigo-900/10 p-4">
-              <div className="absolute -top-3 right-3 rounded-full bg-blue-600 px-2 py-1 text-xs font-medium text-white">
-                Coming Soon
-              </div>
-              <div className="mb-3 flex items-center">
-                <Globe className="mr-2 h-5 w-5 text-indigo-400" />
-                <h4 className="text-lg font-medium text-white">Website Node</h4>
-              </div>
-              <p className="mb-3 text-gray-300">
-                Website nodes will transform your workflow outputs into
-                shareable web pages.
-              </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
-                <li>
-                  <span className="font-semibold text-indigo-400">
-                    Purpose:
-                  </span>{" "}
-                  Create a webpage displaying data from connected nodes
-                </li>
-                <li>
-                  <span className="font-semibold text-indigo-400">Input:</span>{" "}
-                  Content from any connected node type
-                </li>
-                <li>
-                  <span className="font-semibold text-indigo-400">
-                    Features:
-                  </span>{" "}
-                  Custom themes, layouts, public/private sharing options
-                </li>
-              </ul>
-            </div>
-
-            <div className="relative rounded-lg border border-orange-500/30 bg-orange-900/10 p-4">
-              <div className="absolute -top-3 right-3 rounded-full bg-blue-600 px-2 py-1 text-xs font-medium text-white">
-                Coming Soon
-              </div>
-              <div className="mb-3 flex items-center">
-                <Server className="mr-2 h-5 w-5 text-orange-400" />
-                <h4 className="text-lg font-medium text-white">
-                  Data Fetching Node
-                </h4>
-              </div>
-              <p className="mb-3 text-gray-300">
-                Advanced nodes for retrieving data from external sources across
-                the internet.
-              </p>
-              <ul className="list-disc space-y-2 pl-5 text-gray-300">
+              <ul className="list-disc space-y-2 pl-5">
                 <li>
                   <span className="font-semibold text-orange-400">
                     Purpose:
                   </span>{" "}
-                  Fetch data from APIs, websites, and other online sources
+                  Add notes and documentation to your workflow
                 </li>
                 <li>
-                  <span className="font-semibold text-orange-400">Output:</span>{" "}
-                  Structured data that can be processed by other nodes
+                  <span className="font-semibold text-orange-400">Usage:</span>{" "}
+                  Cannot be connected to other nodes
                 </li>
                 <li>
                   <span className="font-semibold text-orange-400">
                     Features:
                   </span>{" "}
-                  Request configuration, data parsing, error handling
+                  Customizable appearance for better organization
                 </li>
               </ul>
             </div>
@@ -248,176 +148,67 @@ export default function NodesConnectionsContent() {
 
         <div className="mb-8">
           <h3 className="mb-4 text-xl font-semibold text-white">
-            Connection Behavior
+            How Connections Work
           </h3>
-          <p className="mb-4 text-gray-300">
-            Connections define the flow of data between nodes, determining how
-            information travels through your workflow.
+          <p className="mb-4">
+            Connections allow nodes to work together by passing data between
+            them. Here&apos;s how to use them:
           </p>
 
           <div className="mb-6 rounded-lg border border-gray-700 bg-gray-800/70 p-5">
             <div className="mb-4 flex items-center">
               <Share2 className="mr-2 h-5 w-5 text-blue-400" />
               <h4 className="text-lg font-medium text-white">
-                Connection Types
+                Basic Connections
               </h4>
             </div>
             <div className="space-y-4">
               <div>
                 <h5 className="mb-1 font-semibold text-blue-300">
-                  Text to Instruction
+                  Text to Image
                 </h5>
-                <p className="ml-4 text-gray-300">
-                  When connecting a Text Node to an Instruction Node, the text
-                  content serves as the input prompt or context for the AI
-                  model. The instruction node will process this text according
-                  to its configuration.
+                <p className="ml-4">
+                  The most common connection: Connect a Text Node to an Image
+                  Node to generate an AI image based on your text description.
                 </p>
               </div>
 
               <div>
                 <h5 className="mb-1 font-semibold text-purple-300">
-                  Image to Instruction
+                  Creating Connections
                 </h5>
-                <p className="ml-4 text-gray-300">
-                  When an Image Node connects to an Instruction Node, the image
-                  is analyzed or modified by the selected AI model. This can be
-                  used for image analysis, captioning, or combined with text for
-                  image manipulation.
-                </p>
-              </div>
-
-              <div>
-                <h5 className="mb-1 font-semibold text-pink-300">
-                  Instruction to Image
-                </h5>
-                <p className="ml-4 text-gray-300">
-                  Text-to-image generation occurs when an Instruction Node is
-                  configured to generate an image and is connected to an Image
-                  Node. The output will be displayed in the Image Node.
+                <p className="ml-4">
+                  Click and drag from an output handle (bottom) of one node to
+                  an input handle (top) of another node.
                 </p>
               </div>
 
               <div>
                 <h5 className="mb-1 font-semibold text-green-300">
-                  Chained Instructions
+                  Managing Connections
                 </h5>
-                <p className="ml-4 text-gray-300">
-                  Multiple Instruction Nodes can be chained together to perform
-                  sequential operations, with each node processing the output of
-                  the previous one to create complex transformations.
-                </p>
-              </div>
-
-              <div className="rounded-lg bg-gray-700/30 p-3">
-                <h5 className="mb-1 font-semibold text-blue-300">
-                  Coming Soon: Advanced Connection Types
-                </h5>
-                <p className="ml-4 text-gray-300">
-                  With our upcoming nodes, you&apos;ll be able to create even
-                  more powerful workflows:
-                </p>
-                <ul className="mt-2 ml-8 list-disc space-y-2 text-gray-300">
-                  <li>
-                    <span className="font-semibold text-green-300">
-                      Content to Email:
-                    </span>{" "}
-                    Connect any content node to an Email Node to send its data
-                    automatically
-                  </li>
-                  <li>
-                    <span className="font-semibold text-indigo-300">
-                      Flow to Website:
-                    </span>{" "}
-                    Export entire workflow results to shareable web pages
-                  </li>
-                  <li>
-                    <span className="font-semibold text-orange-300">
-                      Data Fetch to Processing:
-                    </span>{" "}
-                    Retrieve external data and feed it directly into your AI
-                    processing pipeline
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <h3 className="mb-4 text-xl font-semibold text-white">
-            Data Flow Principles
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <ArrowDownUp className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-400" />
-              <div>
-                <h4 className="mb-1 font-medium text-white">
-                  Directional Flow
-                </h4>
-                <p className="text-gray-300">
-                  Data in AI Flow Studio always flows from left to right.
-                  Outputs from nodes on the left become inputs for nodes on the
-                  right, creating a clear visual representation of your
-                  processing pipeline.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <ArrowDownUp className="mt-0.5 h-5 w-5 flex-shrink-0 text-purple-400" />
-              <div>
-                <h4 className="mb-1 font-medium text-white">
-                  One-to-Many Connections
-                </h4>
-                <p className="text-gray-300">
-                  A single node&apos;s output can connect to multiple
-                  destination nodes, allowing you to process the same data in
-                  different ways simultaneously.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <ArrowDownUp className="mt-0.5 h-5 w-5 flex-shrink-0 text-pink-400" />
-              <div>
-                <h4 className="mb-1 font-medium text-white">
-                  Many-to-One Connections
-                </h4>
-                <p className="text-gray-300">
-                  Some nodes can accept multiple inputs, combining data from
-                  different sources. For example, an Instruction Node might take
-                  2 text nodes to generate an image based on the combined
-                  content, using all elements and descriptions from both text
-                  inputs to create a comprehensive visual that incorporates all
-                  specified details.
+                <p className="ml-4">
+                  Select a connection and press Delete to remove it. You can
+                  reconnect nodes at any time.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-md border border-blue-500/30 bg-blue-900/20 p-4">
+        <div className="bg-muted/50 border-border-2 rounded-md border p-4">
           <div className="mb-3 flex items-center">
             <Lightbulb className="mr-2 h-5 w-5 text-yellow-400" />
-            <h4 className="text-lg font-medium text-white">Best Practices</h4>
+            <h4 className="text-lg font-medium text-white">Tips for Success</h4>
           </div>
-          <ul className="list-disc space-y-2 pl-5 text-gray-300">
-            <li>Start simple and gradually add complexity to your workflows</li>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>Start with a simple Text Node to Image Node connection</li>
+            <li>Test your connections one at a time</li>
             <li>
-              Use Comment Nodes to document your thought process and node
-              configurations
+              Use Comment Nodes to document complex parts of your workflow
             </li>
-            <li>
-              Organize your nodes in logical groups based on functionality
-            </li>
-            <li>
-              Test connections individually before running the entire workflow
-            </li>
-            <li>
-              Stay tuned for our upcoming node types to extend your workflow
-              capabilities
-            </li>
+            <li>Organize your nodes in a clear left-to-right layout</li>
+            <li>Break complex workflows into smaller, manageable segments</li>
           </ul>
         </div>
       </div>

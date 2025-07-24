@@ -38,7 +38,7 @@ export default function DocsSidebar({
   activeSection,
 }: DocsSidebarProps) {
   return (
-    <Sidebar>
+    <Sidebar className="pt-10">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Documentation</SidebarGroupLabel>
