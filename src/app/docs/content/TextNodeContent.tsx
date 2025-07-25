@@ -5,6 +5,7 @@ import TextToTextExample from "public/text_to_text_example.png";
 import TextToImageExample from "public/text_to_image_example.png";
 import ModifyingTextExample from "public/modifying_text_example.png";
 import ModifyingText2Example from "public/modifying_text_2_example.png";
+import GeneratingSpeech from "public/speech_generation.png";
 
 export default function TextNodeContent() {
   return (
@@ -21,7 +22,7 @@ export default function TextNodeContent() {
 
       <Separator className="my-4" />
 
-      <h3 className="text-lg font-semibold">Text to Text Connection</h3>
+      <h3 className="pb-1 text-lg font-semibold">Text to Text Connection</h3>
       <p>
         Connecting two Text Nodes results in the content of the source node
         being copied to the target node. While not a frequent use case, it can
@@ -34,7 +35,7 @@ export default function TextNodeContent() {
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
 
-      <h3 className="text-lg font-semibold">Text to Image Generation</h3>
+      <h3 className="pb-1 text-lg font-semibold">Text to Image Generation</h3>
       <p>
         This is where the magic happens. Connecting a Text Node to an Image Node
         allows you to generate images using AI. You can even connect multiple
@@ -48,7 +49,7 @@ export default function TextNodeContent() {
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
 
-      <h3 className="text-lg font-semibold">
+      <h3 className="pb-1 text-lg font-semibold">
         Modifying Text with an Instruction
       </h3>
       <p>
@@ -62,7 +63,7 @@ export default function TextNodeContent() {
         placeholder="blur"
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
-      <h3 className="text-lg font-semibold">
+      <h3 className="pb-1 text-lg font-semibold">
         Instruction-driven Image Generation
       </h3>
       <p>
@@ -73,6 +74,20 @@ export default function TextNodeContent() {
       <Image
         src={ModifyingText2Example}
         alt="Modifying Text Node & Generate Image"
+        placeholder="blur"
+        className="my-5 rounded-lg outline-2 outline-white select-none"
+      />
+      <h3 className="pb-1 text-lg font-semibold">Generating a Speech</h3>
+      <p>
+        Drop a text node onto the canvas. Write something you want to hear
+        speech about (e.g. why education should be free). Then, connect it to a
+        Speech Node. Run the text node or the speech node, and wait. It can take
+        a long time for longer speeches. You can connect multiple text nodes to
+        a single speech if you want.
+      </p>
+      <Image
+        src={GeneratingSpeech}
+        alt="Generating Speech"
         placeholder="blur"
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />

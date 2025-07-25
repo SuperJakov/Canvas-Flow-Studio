@@ -12,16 +12,16 @@ import {
 export default function NodesConnectionsContent() {
   return (
     <section id="nodes-connections" className="mb-16 scroll-mt-16">
-      <h2 className="mb-4 text-2xl font-bold text-white">
+      <h2 className="mb-4 text-2xl font-bold">
         <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           Nodes & Connections
         </span>
       </h2>
       <div>
         <p className="mb-6">
-          AI Flow Studio uses a simple but powerful node-based system. Each node
-          has a specific purpose, and by connecting them together, you can
-          create AI-powered workflows without any coding.
+          AI Flow Studio uses a simple node-based system. Each node has a
+          specific purpose, and by connecting them together, you can create
+          AI-powered workflows without any coding.
         </p>
 
         <div className="mb-8">
@@ -147,14 +147,25 @@ export default function NodesConnectionsContent() {
         </div>
 
         <div className="mb-8">
-          <h3 className="mb-4 text-xl font-semibold text-white">
-            How Connections Work
-          </h3>
+          <h3 className="mb-4 text-xl font-semibold">How Connections Work</h3>
           <p className="mb-4">
             Connections allow nodes to work together by passing data between
-            them. Here&apos;s how to use them:
+            them. You can create a connection by dragging the handle from the
+            bottom one node to the handle top of another node.
           </p>
-
+          <div className="my-5 rounded-lg outline-2 outline-white select-none">
+            <video
+              width="100%"
+              muted
+              autoPlay
+              loop
+              playsInline
+              controls={false}
+            >
+              <source src="/connecting_nodes.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
           <div className="mb-6 rounded-lg border border-gray-700 bg-gray-800/70 p-5">
             <div className="mb-4 flex items-center">
               <Share2 className="mr-2 h-5 w-5 text-blue-400" />
@@ -180,16 +191,6 @@ export default function NodesConnectionsContent() {
                 <p className="ml-4">
                   Click and drag from an output handle (bottom) of one node to
                   an input handle (top) of another node.
-                </p>
-              </div>
-
-              <div>
-                <h5 className="mb-1 font-semibold text-green-300">
-                  Managing Connections
-                </h5>
-                <p className="ml-4">
-                  Select a connection and press Delete to remove it. You can
-                  reconnect nodes at any time.
                 </p>
               </div>
             </div>
