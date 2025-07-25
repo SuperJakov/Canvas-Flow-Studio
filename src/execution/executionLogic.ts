@@ -22,7 +22,6 @@ import {
   executionProgressAtom,
   currentWhiteboardIdAtom,
 } from "~/app/whiteboard/atoms";
-import { v4 as uuidv4 } from "uuid";
 import { findExecutor } from "~/execution/registry";
 import type { ExecutionContext } from "~/execution/types";
 
