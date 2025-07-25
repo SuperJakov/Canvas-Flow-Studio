@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getBaseUrl } from "~/helpers/baseurl";
+import { chapters } from "./docs/chapters";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -33,9 +34,19 @@ async function generateSitemapEntry(pathRoute: string): Promise<SitemapEntry> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const entries = await Promise.all(
+  const rootEntries = await Promise.all(
     ROOT_ROUTES.map((route) => generateSitemapEntry(route)),
   );
 
-  return entries;
+  const docRoutes = chapters.flatMap((chapter) =>
+    chapter.sections.map(
+      (section) => `/docs/${chapter.slug}/${section.slug}`,
+    ),
+  );
+
+  const docEntries = await Promise.all(
+    docRoutes.map((route) => generateSitemapEntry(route)),
+  );
+
+  return [...rootEntries, ...docEntries];
 }
