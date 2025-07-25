@@ -24,7 +24,7 @@ import { useParams } from "next/navigation";
 import {
   registerSpeechAction,
   unregisterImageAction,
-} from "~/app/whiteboard/nodeActionRegistry";
+} from "~/execution/nodeActionRegistry";
 import { useConvexQuery } from "~/helpers/convex";
 import { Progress } from "~/components/ui/progress";
 

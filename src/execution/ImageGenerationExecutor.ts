@@ -2,7 +2,7 @@
 
 import type { IExecutor, ExecutionContext } from "./types";
 import type { ImageNodeType } from "~/Types/nodes";
-import { getImageAction } from "~/app/whiteboard/nodeActionRegistry";
+import { getImageAction } from "~/execution/nodeActionRegistry";
 import {
   collectSourceNodes,
   validateWhiteboardId,
@@ -14,7 +14,7 @@ class ImageGenerationExecutor implements IExecutor {
     return currentNode.type === "image";
   }
 
-  async execute({ get, set, currentNode }: ExecutionContext): Promise<void> {
+  async execute({ get, set: _, currentNode }: ExecutionContext): Promise<void> {
     console.groupCollapsed(
       `ImageGenerationExecutor: Executing for node ${currentNode.id}`,
     );

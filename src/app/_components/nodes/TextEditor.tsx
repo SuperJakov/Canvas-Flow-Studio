@@ -16,7 +16,7 @@ import { useAction } from "convex/react";
 import {
   registerTextAction,
   unregisterTextAction,
-} from "~/app/whiteboard/nodeActionRegistry";
+} from "~/execution/nodeActionRegistry";
 
 export default function TextEditorNode({
   data,

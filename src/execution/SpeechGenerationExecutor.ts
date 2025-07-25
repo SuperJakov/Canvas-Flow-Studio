@@ -2,7 +2,7 @@
 
 import type { IExecutor, ExecutionContext } from "./types";
 import type { SpeechNodeType, TextEditorNodeType } from "~/Types/nodes";
-import { getSpeechAction } from "~/app/whiteboard/nodeActionRegistry";
+import { getSpeechAction } from "~/execution/nodeActionRegistry";
 import {
   collectSourceNodes,
   validateWhiteboardId,
@@ -14,7 +14,7 @@ class SpeechGenerationExecutor implements IExecutor {
     return currentNode.type === "speech";
   }
 
-  async execute({ get, set, currentNode }: ExecutionContext): Promise<void> {
+  async execute({ get, set: _, currentNode }: ExecutionContext): Promise<void> {
     console.groupCollapsed(
       `SpeechGenerationExecutor: Executing for node ${currentNode.id}`,
     );

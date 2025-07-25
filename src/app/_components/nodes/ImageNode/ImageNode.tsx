@@ -12,7 +12,7 @@ import { useConvexQuery } from "~/helpers/convex";
 import {
   registerImageAction,
   unregisterImageAction,
-} from "~/app/whiteboard/nodeActionRegistry";
+} from "~/execution/nodeActionRegistry";
 import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../../Portal";
 import { ImageNodeHeader } from "./ImageNodeHeader";

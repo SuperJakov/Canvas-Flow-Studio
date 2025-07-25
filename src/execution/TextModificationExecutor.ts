@@ -2,7 +2,7 @@
 
 import type { IExecutor, ExecutionContext } from "./types";
 import type { TextEditorNodeType } from "~/Types/nodes";
-import { getTextAction } from "~/app/whiteboard/nodeActionRegistry";
+import { getTextAction } from "~/execution/nodeActionRegistry";
 import { collectSourceNodes } from "~/execution/executionLogic";
 import { updateNodeDataAtom } from "~/app/whiteboard/atoms";
 
