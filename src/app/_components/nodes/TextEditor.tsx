@@ -10,7 +10,7 @@ import {
   updateNodeDataAtom,
 } from "~/app/whiteboard/atoms";
 import { AlertCircle, Lock, LockOpen, Play, Square, Type } from "lucide-react";
-import { isNodeExecutable as isNodeExecutableFn } from "~/app/whiteboard/execution";
+import { isNodeExecutable as isNodeExecutableFn } from "~/execution/executionLogic";
 import { api } from "../../../../convex/_generated/api";
 import { useAction } from "convex/react";
 import {

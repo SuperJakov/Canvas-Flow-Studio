@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { PopoverTrigger } from "~/components/ui/popover";
 import { IMAGE_STYLES } from "./constants";
-import { isNodeExecutable } from "~/app/whiteboard/execution";
+import { isNodeExecutable } from "~/execution/executionLogic";
 import { useAtom } from "jotai";
 import { nodesAtom } from "~/app/whiteboard/atoms";
 

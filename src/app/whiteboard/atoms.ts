@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { type AppEdge, type AppNode } from "~/Types/nodes";
-import { executeNodeLogic } from "./execution";
+import { executeNodeLogic } from "~/execution/executionLogic";
 import { merge } from "lodash";
 
 export const nodesAtom = atom<AppNode[]>([]);

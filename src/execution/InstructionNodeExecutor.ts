@@ -24,7 +24,9 @@ class InstructionNodeExecutor implements IExecutor {
 
     try {
       const instruction = instructionNode.data.text;
-      const inputNodeTypes = sourceNodes.map((node) => node.type);
+      const inputNodeTypes = sourceNodes
+        .filter(node => node.type === "textEditor" || node.type === "image" || node.type === "speech")
+        .map((node) => node.type);
       const imageSource = sourceNodes.find((node) => node.type === "image");
 
       const { detectOutputNodeTypeAction } =
