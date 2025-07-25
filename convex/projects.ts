@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { internalMutation } from "./functions";
 
 export const getProjects = query({
   args: {
@@ -105,7 +107,47 @@ export const deleteProject = mutation({
       throw new Error("Not authorized");
     }
 
-    // TODO: also delete all whiteboards and sub-projects
+    await ctx.runMutation(internal.projects.deleteProjectInternal, {
+      projectId: projectId,
+      userId: identity.subject,
+    });
+  },
+});
+
+export const deleteProjectInternal = internalMutation({
+  args: {
+    projectId: v.id("projects"),
+    userId: v.string(),
+  },
+  handler: async (ctx, { projectId, userId }) => {
+    const associatedWhiteboards = await ctx.db
+      .query("whiteboards")
+      .withIndex("by_projectId_and_ownerId", (q) =>
+        q.eq("projectId", projectId).eq("ownerId", userId),
+      )
+      .collect();
+    for (const whiteboard of associatedWhiteboards) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.whiteboards.deleteWhiteboardInternal,
+        {
+          id: whiteboard._id,
+          userId: userId,
+        },
+      );
+    }
+    const associatedProjects = await ctx.db
+      .query("projects")
+      .withIndex("by_user_and_parent", (q) =>
+        q.eq("userExternalId", userId).eq("parentProject", projectId),
+      )
+      .collect();
+    for (const project of associatedProjects) {
+      await ctx.scheduler.runAfter(0, internal.projects.deleteProjectInternal, {
+        projectId: project._id,
+        userId: userId,
+      });
+    }
 
     await ctx.db.delete(projectId);
   },

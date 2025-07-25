@@ -44,10 +44,7 @@ export function getSpeechAction(nodeId: string) {
   return speechActionMap.get(nodeId);
 }
 
-const textActionMap = new Map<
-  string,
-  ReactAction<typeof api.textNodes.modifyText>
->();
+const textActionMap = new Map<string, ReactAction<typeof api.textNodes.modifyText>>();
 
 export function registerTextAction(
   nodeId: string,
@@ -62,4 +59,24 @@ export function unregisterTextAction(nodeId: string) {
 
 export function getTextAction(nodeId: string) {
   return textActionMap.get(nodeId);
+}
+
+const imageDescriptionActionMap = new Map<
+  string,
+  ReactAction<typeof api.textNodes.describeImages>
+>();
+
+export function registerImageDescriptionAction(
+  nodeId: string,
+  fn: ReactAction<typeof api.textNodes.describeImages>,
+) {
+  imageDescriptionActionMap.set(nodeId, fn);
+}
+
+export function unregisterImageDescriptionAction(nodeId: string) {
+  imageDescriptionActionMap.delete(nodeId);
+}
+
+export function getImageDescriptionAction(nodeId: string) {
+  return imageDescriptionActionMap.get(nodeId);
 }

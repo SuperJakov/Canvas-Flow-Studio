@@ -417,11 +417,13 @@ export default function Whiteboard({ id }: Props) {
   }
   if (id && whiteboardData === null) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-800 text-white">
-        Whiteboard not found or access denied.
-        <Link href="/whiteboards" className="underline">
-          Go to whiteboards page to create a new one.
-        </Link>
+      <div className="flex h-screen w-full items-center justify-center">
+        <p>
+          Whiteboard not found or access denied.{" "}
+          <Link href="/whiteboards" className="underline">
+            Go to whiteboards page to create a new one.
+          </Link>
+        </p>
       </div>
     );
   }

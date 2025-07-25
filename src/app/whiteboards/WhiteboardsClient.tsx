@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
@@ -448,7 +448,10 @@ export default function WhiteboardsClient({ projectIds }: Props) {
         parentProject: lastProjectId,
       });
       setNewItemName("");
-      router.push(`/whiteboards/${newProjectId}`);
+      const currentUrl = new URL(window.location.href);
+      const newPath = `${currentUrl.pathname}/${newProjectId}`;
+
+      router.push(newPath);
     } catch (error) {
       console.error("Failed to create project:", error);
       setErrorMessage(
@@ -497,6 +500,8 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   ) {
     return <Loading />;
   }
+
+  if (whiteboards === null) redirect("/whiteboards");
 
   return (
     <div className="bg-background text-foreground min-h-screen pt-16">

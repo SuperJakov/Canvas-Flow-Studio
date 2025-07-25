@@ -164,7 +164,7 @@ export default function WhiteboardHeader({ id }: Props) {
 
             {/* Center section - Title */}
             <div className="flex justify-center">
-              {whiteboard ? (
+              {whiteboard && (
                 <Input
                   value={isEditing ? title : (whiteboard?.title ?? "Untitled")}
                   onChange={handleTitleChange}
@@ -187,8 +187,6 @@ export default function WhiteboardHeader({ id }: Props) {
                   autoFocus={isEditing}
                   maxLength={30}
                 />
-              ) : (
-                <div className="h-8 w-32 animate-pulse rounded bg-gray-200" />
               )}
             </div>
 

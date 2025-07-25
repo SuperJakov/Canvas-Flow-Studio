@@ -5,10 +5,12 @@ import { imageGenerationExecutor } from "./ImageGenerationExecutor";
 import { speechGenerationExecutor } from "./SpeechGenerationExecutor";
 import { textModificationExecutor } from "./TextModificationExecutor";
 import { instructionNodeExecutor } from "./InstructionNodeExecutor";
+import { imageDescriptionExecutor } from "./ImageDescriptionExecutor";
 
 const executorRegistry: IExecutor[] = [
   // More specific executors should come first to be matched first.
   textModificationExecutor,
+  imageDescriptionExecutor,
 
   // General-purpose executors
   imageGenerationExecutor,

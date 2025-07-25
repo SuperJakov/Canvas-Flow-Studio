@@ -16,6 +16,8 @@ import { useAction } from "convex/react";
 import {
   registerTextAction,
   unregisterTextAction,
+  registerImageDescriptionAction,
+  unregisterImageDescriptionAction,
 } from "~/execution/nodeActionRegistry";
 
 export default function TextEditorNode({
@@ -26,6 +28,7 @@ export default function TextEditorNode({
   const { isLocked, internal, text } = data;
   const isRunning = internal?.isRunning;
   const modifyTextAction = useAction(api.textNodes.modifyText);
+  const describeImagesAction = useAction(api.textNodes.describeImages);
 
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
@@ -38,10 +41,12 @@ export default function TextEditorNode({
 
   useEffect(() => {
     registerTextAction(id, modifyTextAction);
+    registerImageDescriptionAction(id, describeImagesAction);
     return () => {
       unregisterTextAction(id);
+      unregisterImageDescriptionAction(id);
     };
-  }, [id, modifyTextAction]);
+  }, [id, modifyTextAction, describeImagesAction]);
 
   function toggleRunning(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,

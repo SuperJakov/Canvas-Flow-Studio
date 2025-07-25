@@ -199,14 +199,29 @@ export const deleteWhiteboard = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    // Call the internal mutation, passing the user id
+    await ctx.runMutation(internal.whiteboards.deleteWhiteboardInternal, {
+      id,
+      userId: identity.subject,
+    });
+  },
+});
+
+// Internal mutation: receives userId as an argument
+export const deleteWhiteboardInternal = internalMutation({
+  args: { id: v.id("whiteboards"), userId: v.string() },
+  handler: async (ctx, { id, userId }) => {
     const whiteboard = await ctx.db.get(id);
     if (!whiteboard) throw new Error("Whiteboard not found");
 
-    if (whiteboard.ownerId !== identity.subject) {
+    if (whiteboard.ownerId !== userId) {
       throw new Error("Unauthorized");
     }
 
     await ctx.db.delete(id);
+    const previewImageStorageId = whiteboard.previewStorageId;
+    if (!previewImageStorageId) return;
+    await ctx.storage.delete(previewImageStorageId);
   },
 });
 
@@ -215,18 +230,23 @@ export const listWhiteboards = query({
   args: {
     projectId: v.optional(v.id("projects")),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, { projectId }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
     const userId = identity.subject;
 
-    if (args.projectId) {
-      // Use the composite index to efficiently query by both project and owner
+    if (projectId) {
+      const project = await ctx.db
+        .query("projects")
+        .withIndex("by_id", (q) => q.eq("_id", projectId))
+        .unique();
+      if (!project) return null;
+
       return await ctx.db
         .query("whiteboards")
         .withIndex("by_projectId_and_ownerId", (q) =>
-          q.eq("projectId", args.projectId).eq("ownerId", userId),
+          q.eq("projectId", projectId).eq("ownerId", userId),
         )
         .order("desc")
         .collect();

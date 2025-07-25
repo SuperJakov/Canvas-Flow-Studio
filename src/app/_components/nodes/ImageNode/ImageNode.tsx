@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { Handle, Position, useEdges, type NodeProps } from "@xyflow/react";
+import { Handle, Position, useEdges, useNodes, type NodeProps } from "@xyflow/react";
 import { useAction } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
@@ -52,6 +52,7 @@ export default function ImageNode({
   const [bannerFeature, setBannerFeature] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const edges = useEdges();
+  const nodes = useNodes();
   const params = useParams();
   const whiteboardId = params?.id as string | undefined;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -122,13 +123,23 @@ export default function ImageNode({
         updatedData: { internal: { isRunning: false } },
         nodeType: "image",
       });
-    } else if (hasIncomingConnections && !isRateLimited) {
-      void executeNode({ nodeId: id });
     } else if (isRateLimited) {
       console.log("Node cannot run: rate limit reached");
       openBanner("Higher Rate Limits");
     } else {
-      console.log("Node cannot run: no incoming connections");
+      const hasOutgoingTextNode = edges.some(edge => {
+        if (edge.source !== id) return false;
+        const targetNode = nodes.find(node => node.id === edge.target);
+        return targetNode?.type === "textEditor";
+      });
+
+      if (hasIncomingConnections || hasOutgoingTextNode) {
+        void executeNode({ nodeId: id });
+      } else {
+        console.log(
+          "Node cannot run: no incoming connections or outgoing text nodes",
+        );
+      }
     }
   };
 
