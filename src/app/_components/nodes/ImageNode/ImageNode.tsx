@@ -260,6 +260,7 @@ export default function ImageNode({
             />
           ) : (
             <ImageNodeHeader
+              id={id}
               isLocked={isLocked}
               isRunning={isRunning}
               hasIncomingConnections={hasIncomingConnections}

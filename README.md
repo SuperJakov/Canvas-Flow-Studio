@@ -246,5 +246,16 @@ Our team will review all model recommendations and prioritize based on user dema
 
 ## Where I left off
 
-- [] Add full support for text, image, comment and instruction nodes
-- [] Stable Stripe
+- [] Demo video on Home Page
+- [] Text & Speech nodes in docs
+- [] Finish all examples & Make it work
+- [] Better README for SoM
+- [] Make sign in more accessible for users that don't give e-mail
+
+- Ship 1, wait for cert
+
+- [] Fix gallery
+- [] Better error handling when running nodes
+- [] Finish docs
+- [] Blog
+- [] Website node

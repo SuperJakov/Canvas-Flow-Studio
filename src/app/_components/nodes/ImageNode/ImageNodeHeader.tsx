@@ -8,8 +8,12 @@ import {
 } from "lucide-react";
 import { PopoverTrigger } from "~/components/ui/popover";
 import { IMAGE_STYLES } from "./constants";
+import { isNodeExecutable } from "~/app/whiteboard/execution";
+import { useAtom } from "jotai";
+import { nodesAtom } from "~/app/whiteboard/atoms";
 
 interface ImageNodeHeaderProps {
+  id: string;
   isLocked: boolean;
   isRunning: boolean;
   hasIncomingConnections: boolean;
@@ -35,10 +39,16 @@ export function ImageNodeHeader({
   onToggleLock,
   onToggleRunning,
   onStylePopoverTrigger,
+  id,
 }: ImageNodeHeaderProps) {
   const currentStyle =
     IMAGE_STYLES.find((s) => s.id === selectedStyle) ?? IMAGE_STYLES[0];
   const CurrentIcon = currentStyle.icon;
+
+  const [nodes] = useAtom(nodesAtom);
+  const thisNode = nodes.find((n) => n.id === id);
+  if (!thisNode) return null;
+  const isExecutable = isNodeExecutable(thisNode);
 
   return (
     <div className="flex items-center justify-between px-1 py-2">
@@ -63,7 +73,7 @@ export function ImageNodeHeader({
         </button>
         <button
           className={`cursor-pointer rounded p-1 ${
-            hasIncomingConnections && !isRateLimited
+            isExecutable
               ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
               : "cursor-not-allowed text-gray-400"
           }`}
@@ -75,11 +85,11 @@ export function ImageNodeHeader({
                 ? "Run node"
                 : "Cannot run: no incoming text connection"
           }
-          disabled={!hasIncomingConnections || isRateLimited}
+          disabled={!isExecutable}
         >
           {isRunning ? (
             <Square size={18} />
-          ) : hasIncomingConnections && !isRateLimited ? (
+          ) : isExecutable ? (
             <Play size={18} fill="currentColor" />
           ) : (
             <AlertCircle size={18} />
