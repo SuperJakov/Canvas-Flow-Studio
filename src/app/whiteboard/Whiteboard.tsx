@@ -139,6 +139,9 @@ export default function Whiteboard({ id }: Props) {
   const isSharedWhiteboard =
     whiteboardData?.isPublic && whiteboardData?.ownerId !== user?.externalId;
 
+  // console.log(JSON.stringify(nodes));
+  // console.log(JSON.stringify(edges));
+
   // Load whiteboard data from Convex into Jotai atoms
   useEffect(() => {
     if (whiteboardData && !initialLoadDone.current) {
