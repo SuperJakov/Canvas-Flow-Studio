@@ -3,7 +3,7 @@ import ConstructionPage from "~/app/_components/ConstructionPage";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { getTemplate } from "./templates";
 import { fetchMutation } from "convex/nextjs";
-import { api } from "convex/_generated/api";
+import { api } from "../../../../convex/_generated/api";
 import { redirect } from "next/navigation";
 
 type Props = {
@@ -19,6 +19,9 @@ export default async function TemplatePage({ params }: Props) {
 
   const template = getTemplate(templateName);
   if (!template) return <ConstructionPage />;
+
+  // There's a bug in nextjs with redirect() function so we have to use this way
+  let redirectTo = "";
   try {
     const newWhiteboardId = await fetchMutation(
       api.whiteboards.createWhiteboard,
@@ -42,10 +45,11 @@ export default async function TemplatePage({ params }: Props) {
         token,
       },
     );
-
-    redirect(`/whiteboard/${newWhiteboardId}`);
+    redirectTo = `/whiteboard/${newWhiteboardId}`;
   } catch (error) {
     console.error(error);
-    redirect("/whiteboards");
+    redirectTo = "/whiteboards";
+  } finally {
+    redirect(redirectTo);
   }
 }
