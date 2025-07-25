@@ -28,7 +28,7 @@ export const imageGenerationTemplate: Template = {
     },
     {
       data: {
-        isLocked: false,
+        isLocked: true,
         text: 'Press on the icon next to "Image" to change styles',
       },
       height: 125,
