@@ -1,7 +1,7 @@
 import Sidebar from "./components/Sidebar";
 import ChapterContent from "./components/ChapterContent";
 import { chapters } from "./chapters";
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 type Props = {
   activeChapter: string;
@@ -12,7 +12,7 @@ export default function DocsPage({ activeChapter, activeSection }: Props) {
   if (!activeChapter || !activeSection) {
     const chapter = activeChapter ?? chapters[0]?.slug;
     const section = activeSection ?? chapters[0]?.sections[0]?.slug;
-    redirect(`/docs/${chapter}/${section}`);
+    permanentRedirect(`/docs/${chapter}/${section}`);
   }
 
   return (

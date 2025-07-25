@@ -1,6 +1,18 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { chapters } from "./app/docs/chapters";
 
-export default clerkMiddleware();
+export default clerkMiddleware((auth, req) => {
+  if (req.nextUrl.pathname === "/docs") {
+    const url = req.nextUrl.clone();
+    const chapter = chapters[0]?.slug;
+    const section = chapters[0]?.sections[0]?.slug;
+    url.pathname = `/docs/${chapter}/${section}`;
+    return NextResponse.redirect(url, 308);
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
