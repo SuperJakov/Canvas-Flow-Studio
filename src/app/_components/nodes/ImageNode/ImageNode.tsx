@@ -2,7 +2,13 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { Handle, Position, useEdges, useNodes, type NodeProps } from "@xyflow/react";
+import {
+  Handle,
+  Position,
+  useEdges,
+  useNodes,
+  type NodeProps,
+} from "@xyflow/react";
 import { useAction } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
@@ -36,6 +42,9 @@ export default function ImageNode({
     api.imageNodes.uploadAndStoreImage,
   );
   const url = useConvexQuery(api.imageNodes.getImageNodeUrl, {
+    nodeId: id,
+  });
+  const isGeneratingImage = useConvexQuery(api.imageNodes.isGeneratingImage, {
     nodeId: id,
   });
   const imageGenRateLimit = useConvexQuery(
@@ -127,9 +136,9 @@ export default function ImageNode({
       console.log("Node cannot run: rate limit reached");
       openBanner("Higher Rate Limits");
     } else {
-      const hasOutgoingTextNode = edges.some(edge => {
+      const hasOutgoingTextNode = edges.some((edge) => {
         if (edge.source !== id) return false;
-        const targetNode = nodes.find(node => node.id === edge.target);
+        const targetNode = nodes.find((node) => node.id === edge.target);
         return targetNode?.type === "textEditor";
       });
 
@@ -290,7 +299,7 @@ export default function ImageNode({
             <Handle type="target" position={Position.Top} />
             <ImageNodeContent
               url={url}
-              isRunning={isRunning}
+              isRunning={!!isGeneratingImage}
               isImageLoading={isImageLoading}
               isDownloading={isDownloading}
               isUploading={isUploading}

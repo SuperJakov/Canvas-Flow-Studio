@@ -125,9 +125,10 @@ const whiteboards = defineTable({
 const imageNodes = defineTable({
   nodeId: v.string(),
   imageUrl: v.union(v.string(), v.null()),
-  storageId: v.id("_storage"),
+  storageId: v.union(v.id("_storage"), v.null()),
   whiteboardId: v.id("whiteboards"),
   authorExternalId: v.string(),
+  isGenerating: v.optional(v.boolean()),
 })
   .index("by_userId", ["authorExternalId"])
   .index("by_nodeId", ["nodeId"])

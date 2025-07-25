@@ -225,6 +225,20 @@ Ensure all elements are clearly represented and cohesively integrated.`;
   };
 }
 
+export const isGeneratingImage = query({
+  args: {
+    nodeId: v.string(),
+  },
+  handler: async (ctx, { nodeId }) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+
+    return !!imageNode?.isGenerating;
+  },
+});
+
 export const generateAndStoreImage = action({
   args: {
     sourceNodes: v.array(
@@ -237,69 +251,131 @@ export const generateAndStoreImage = action({
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId, style }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+    try {
+      const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
+      if (!userPlanInfo) throw new Error("Error when getting user's plan");
 
-    const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
-    if (!userPlanInfo) throw new Error("Error when getting user's plan");
-
-    const config = getRateLimitConfigForPlan(userPlanInfo.plan);
-    const { ok, retryAfter } = await rateLimiter.limit(ctx, "imageGeneration", {
-      key: identity.subject,
-      config,
-    });
-    if (!ok) {
-      throw new Error(
-        `Rate limit reached. Try after: ${Math.ceil(retryAfter / 1000)} s`,
+      const config = getRateLimitConfigForPlan(userPlanInfo.plan);
+      const { ok, retryAfter } = await rateLimiter.limit(
+        ctx,
+        "imageGeneration",
+        {
+          key: identity.subject,
+          config,
+        },
       );
+      if (!ok) {
+        throw new Error(
+          `Rate limit reached. Try after: ${Math.ceil(retryAfter / 1000)} s`,
+        );
+      }
+
+      await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
+        isGenerating: true,
+        nodeId: nodeId,
+        authorExternalId: identity.subject,
+        whiteboardId: whiteboardId,
+      });
+
+      const textContents = sourceNodes
+        .filter((n) => n.type === "textEditor")
+        .map((n) => n.data.text);
+
+      const imageNodes = sourceNodes.filter(
+        (n): n is typeof n & { type: "image" } => n.type === "image",
+      );
+      let inputImageBase64: string | undefined = undefined;
+      let actionType: "generate" | "edit" = "generate";
+
+      if (imageNodes.length === 1) {
+        const url = imageNodes[0]!.data.imageUrl;
+        if (!url) throw new Error("Image node has no URL to edit.");
+        inputImageBase64 = await fetchAsBase64(url);
+        actionType = "edit";
+      } else if (imageNodes.length > 1) {
+        throw new Error("Ambiguous request: more than one image supplied.");
+      }
+
+      const { base64OfImage, inputTokenDetails } = await generateAIImage(
+        identity,
+        textContents,
+        style,
+        inputImageBase64,
+      );
+
+      const bytes = Uint8Array.from(atob(base64OfImage), (c) =>
+        c.charCodeAt(0),
+      );
+      const imageBlob = new Blob([bytes], { type: "image/png" });
+      const storageId = await ctx.storage.store(imageBlob);
+
+      await ctx.runMutation(internal.imageNodes.storeResult, {
+        storageId,
+        nodeId,
+        whiteboardId,
+        authorId: identity.subject,
+      });
+
+      await ctx.scheduler.runAfter(0, internal.imageLogs.logGeneration, {
+        userExternalId: identity.subject,
+        whiteboardId,
+        nodeId,
+        action: actionType,
+        timestamp: BigInt(Date.now()),
+        model: "gpt-image-1",
+        prompt: textContents.join("\n"),
+        quality: "low",
+        resolution: "1024x1024",
+        inputTokenDetails,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
+        isGenerating: false,
+        nodeId: nodeId,
+        authorExternalId: identity.subject,
+        whiteboardId: whiteboardId,
+      });
+    }
+  },
+});
+
+export const markImageNodeAsGenerating = internalMutation({
+  args: {
+    nodeId: v.string(),
+    isGenerating: v.boolean(),
+    authorExternalId: v.string(),
+    whiteboardId: v.string(),
+  },
+  handler: async (
+    ctx,
+    { nodeId, isGenerating, authorExternalId, whiteboardId },
+  ) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+    if (!imageNode) {
+      const normalizedWhiteboardId = ctx.db.normalizeId(
+        "whiteboards",
+        whiteboardId,
+      );
+      if (!normalizedWhiteboardId)
+        throw new Error("Could not normalize whiteboard id");
+      await ctx.db.insert("imageNodes", {
+        nodeId,
+        isGenerating,
+        authorExternalId,
+        imageUrl: null,
+        storageId: null,
+        whiteboardId: normalizedWhiteboardId,
+      });
+      return;
     }
 
-    const textContents = sourceNodes
-      .filter((n) => n.type === "textEditor")
-      .map((n) => n.data.text);
-
-    const imageNodes = sourceNodes.filter(
-      (n): n is typeof n & { type: "image" } => n.type === "image",
-    );
-    let inputImageBase64: string | undefined = undefined;
-    let actionType: "generate" | "edit" = "generate";
-
-    if (imageNodes.length === 1) {
-      const url = imageNodes[0]!.data.imageUrl;
-      if (!url) throw new Error("Image node has no URL to edit.");
-      inputImageBase64 = await fetchAsBase64(url);
-      actionType = "edit";
-    } else if (imageNodes.length > 1) {
-      throw new Error("Ambiguous request: more than one image supplied.");
-    }
-
-    const { base64OfImage, inputTokenDetails } = await generateAIImage(
-      identity,
-      textContents,
-      style,
-      inputImageBase64,
-    );
-
-    const bytes = Uint8Array.from(atob(base64OfImage), (c) => c.charCodeAt(0));
-    const imageBlob = new Blob([bytes], { type: "image/png" });
-    const storageId = await ctx.storage.store(imageBlob);
-
-    await ctx.runMutation(internal.imageNodes.storeResult, {
-      storageId,
-      nodeId,
-      whiteboardId,
-      authorId: identity.subject,
-    });
-
-    await ctx.scheduler.runAfter(0, internal.imageLogs.logGeneration, {
-      userExternalId: identity.subject,
-      whiteboardId,
-      nodeId,
-      action: actionType,
-      timestamp: BigInt(Date.now()),
-      model: "gpt-image-1",
-      prompt: textContents.join("\n"),
-      quality: "low",
-      resolution: "1024x1024",
-      inputTokenDetails,
+    await ctx.db.patch(imageNode._id, {
+      isGenerating: isGenerating,
     });
   },
 });
