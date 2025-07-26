@@ -14,9 +14,6 @@ export default function HomePage() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Canvas Preview Section */}
-      {/* <CanvasPreviewSection /> */}
-
       {/* Demo Video Section */}
       <DemoVideoSection />
 
