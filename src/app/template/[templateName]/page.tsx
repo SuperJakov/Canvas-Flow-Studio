@@ -1,10 +1,9 @@
 import { RedirectToSignIn } from "@clerk/nextjs";
-import ConstructionPage from "~/app/_components/ConstructionPage";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { getTemplate } from "./templates";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "../../../../convex/_generated/api";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -18,7 +17,7 @@ export default async function TemplatePage({ params }: Props) {
   const { templateName } = await params;
 
   const template = getTemplate(templateName);
-  if (!template) return <ConstructionPage />;
+  if (!template) return notFound();
 
   // There's a bug in nextjs with redirect() function so we have to use this way
   let redirectTo = "";

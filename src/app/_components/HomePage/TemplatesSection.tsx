@@ -7,6 +7,7 @@ import {
   Users,
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
 import Link from "next/link";
 
 export default function TemplatesSection() {
@@ -28,21 +29,43 @@ export default function TemplatesSection() {
           <Link
             key={template.href}
             href={template.href}
-            className={`group transition ${template.hoverClasses}`}
+            className={`group transition ${template.hoverClasses} ${
+              template.workInProgress ? "pointer-events-none" : ""
+            }`}
           >
-            <Card className="min-h-[220px] border p-6 shadow-lg">
+            <Card
+              className={`relative min-h-[220px] border p-6 shadow-lg ${
+                template.workInProgress
+                  ? "border-dashed border-gray-400 opacity-75"
+                  : ""
+              }`}
+            >
               <CardContent className="p-0">
+                {template.workInProgress && (
+                  <Badge
+                    variant="secondary"
+                    className="absolute top-2 right-2 border-yellow-300 bg-yellow-100 text-yellow-800"
+                  >
+                    Work in Progress
+                  </Badge>
+                )}
                 <div
-                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${template.iconBg} shadow-lg`}
+                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${template.iconBg} shadow-lg ${
+                    template.workInProgress ? "grayscale" : ""
+                  }`}
                 >
                   <template.icon className="h-6 w-6 text-white" />
                 </div>
                 <h3
-                  className={`mb-2 text-xl font-semibold ${template.titleClasses} transition-all duration-300`}
+                  className={`mb-2 text-xl font-semibold ${template.titleClasses} transition-all duration-300 ${
+                    template.workInProgress ? "text-gray-500" : ""
+                  }`}
                 >
                   {template.title}
                 </h3>
-                <p>{template.description}</p>
+                <p className={template.workInProgress ? "text-gray-500" : ""}>
+                  {template.description}
+                </p>
               </CardContent>
             </Card>
           </Link>
@@ -82,6 +105,7 @@ const templates = [
     iconBg: "bg-gradient-to-r from-purple-600 to-pink-600",
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
     titleClasses: "group-hover:text-purple-400",
+    workInProgress: true,
   },
   {
     href: "/template/image-generation",
@@ -112,5 +136,6 @@ const templates = [
     iconBg: "bg-gradient-to-r from-teal-600 to-cyan-600",
     hoverClasses: "hover:border-teal-500/50 hover:shadow-teal-900/20",
     titleClasses: "group-hover:text-teal-400",
+    workInProgress: true,
   },
 ];
