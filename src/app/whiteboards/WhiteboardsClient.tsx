@@ -47,7 +47,6 @@ function WhiteboardCard({
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(whiteboard.title ?? "");
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const convexEditWhiteboard = useMutation(
     api.whiteboards.editWhiteboard,
@@ -106,7 +105,6 @@ function WhiteboardCard({
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
     await convexDeleteWhiteboard({ id: whiteboard._id });
   };
 
@@ -215,9 +213,8 @@ function WhiteboardCard({
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
                     className="cursor-pointer rounded-md px-2 py-1.5 text-sm text-red-500 hover:bg-red-50"
-                    disabled={isDeleting}
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -247,7 +244,6 @@ function ProjectCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(project.name ?? "");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const convexEditProject = useMutation(
     api.projects.editProject,
@@ -290,7 +286,6 @@ function ProjectCard({
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
     await convexDeleteProject({ projectId: project._id });
   };
 
@@ -384,9 +379,8 @@ function ProjectCard({
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
                     className="cursor-pointer rounded-md px-2 py-1.5 text-sm text-red-500 hover:bg-red-50"
-                    disabled={isDeleting}
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

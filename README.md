@@ -247,7 +247,6 @@ Our team will review all model recommendations and prioritize based on user dema
 ## Where I left off
 
 - [] Demo video on Home Page
-- [] Text & Speech nodes in docs
 - [] Finish all examples & Make it work
 - [] Better README for SoM
 - [] Make sign in more accessible for users that don't give e-mail

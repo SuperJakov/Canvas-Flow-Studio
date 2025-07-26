@@ -1,0 +1,157 @@
+import type { Template } from "./templates";
+
+export const describeAndGenerateTemplate: Template = {
+  title: "Describe and Generate",
+  nodes: [
+    {
+      data: {
+        isLocked: false,
+        text: "Speak like a pirate explaining how to find treasure",
+      },
+      height: 180,
+      id: "33bd48ee-cd4e-4d34-b315-0b385529e788",
+      position: { x: 404.5039439579818, y: 153.61832244233196 },
+      type: "textEditor",
+      width: 280,
+      zIndex: 31,
+    },
+    {
+      data: { isLocked: false, text: "30 seconds" },
+      height: 180,
+      id: "f93b3872-07b9-486d-b7c3-10c8a634d5cd",
+      position: { x: 758.0039439579818, y: 152.118322442332 },
+      type: "textEditor",
+      width: 280,
+      zIndex: 4,
+    },
+    {
+      data: {
+        isLocked: false,
+      },
+      id: "a6a14014-80e8-4250-a6a1-0d45166cb5ff",
+      position: { x: 521.2920396409312, y: 472.055268986656 },
+      type: "speech",
+      zIndex: 35,
+    },
+    {
+      data: {
+        isLocked: true,
+        text: "Connect one or more text nodes to a speech node!",
+      },
+      height: 158,
+      id: "6dada053-ee2c-4329-921b-793bd3f38939",
+      position: { x: 144.4226577919489, y: 387.54678215537444 },
+      type: "comment",
+      width: 291,
+      zIndex: 14,
+    },
+    {
+      data: {
+        isLocked: false,
+        text: "A rugged pirate with a weathered face, tricorn hat, and gold earrings, pointing to a treasure map under the moonlight on a stormy sea.",
+      },
+      height: 201,
+      id: "34ebb397-2634-4165-9dfb-0f92263f7e62",
+      position: { x: 1182.0138228530384, y: 106.66393343877415 },
+      type: "textEditor",
+      width: 364,
+      zIndex: 21,
+    },
+    {
+      data: {
+        imageUrl: null,
+        isLocked: false,
+        style: "auto",
+      },
+      id: "4e161766-3ad0-4898-bee4-a4ca9ca6f0e3",
+      position: { x: 1206.0723864589906, y: 408.0711717074165 },
+      type: "image",
+      zIndex: 33,
+    },
+    {
+      data: {
+        isLocked: false,
+        text: "",
+      },
+      height: 244,
+      id: "d02a6680-1b7f-4fb5-be92-2ebab64c260f",
+      position: { x: 1197.7225237908149, y: 882.1572380131514 },
+      type: "textEditor",
+      width: 319,
+      zIndex: 24,
+    },
+    {
+      data: { isLocked: true, text: "Describe the image!" },
+      height: 120,
+      id: "f1252371-e738-44d2-abc0-2e3f0b741eca",
+      position: { x: 953.3014491165648, y: 807.3275548108458 },
+      type: "comment",
+      width: 226,
+      zIndex: 32,
+    },
+    {
+      data: {
+        isLocked: true,
+        text: "You can also describe your own image, just upload and run",
+      },
+      height: 164,
+      id: "d1e81ae2-6ebc-4d66-a43d-9d59ea4bcd98",
+      position: { x: 1726.7997546151398, y: 266.9418397715839 },
+      type: "comment",
+      width: 250,
+      zIndex: 30,
+    },
+    {
+      data: {
+        imageUrl: null,
+        isLocked: false,
+        style: "auto",
+      },
+      id: "956db347-99a0-4513-8f44-ddc683d9396b",
+      position: { x: 2024.4778624383393, y: 31.699284016165564 },
+      type: "image",
+      zIndex: 34,
+    },
+    {
+      data: { isLocked: false, text: "" },
+      height: 180,
+      id: "178d3e95-9971-464f-8236-f1607f65b039",
+      position: { x: 2036.6035949704215, y: 475.8042380037124 },
+      type: "textEditor",
+      width: 280,
+      zIndex: 29,
+    },
+  ],
+  edges: [
+    {
+      id: "bc924752-beb7-4934-b3cf-7f458398cd8e",
+      source: "33bd48ee-cd4e-4d34-b315-0b385529e788",
+      target: "a6a14014-80e8-4250-a6a1-0d45166cb5ff",
+      type: "default",
+    },
+    {
+      id: "e9158c2c-f217-4c23-9fdb-cd604d61b8f0",
+      source: "f93b3872-07b9-486d-b7c3-10c8a634d5cd",
+      target: "a6a14014-80e8-4250-a6a1-0d45166cb5ff",
+      type: "default",
+    },
+    {
+      id: "e697acfb-2ab9-489b-a0b5-23c76be0201f",
+      source: "34ebb397-2634-4165-9dfb-0f92263f7e62",
+      target: "4e161766-3ad0-4898-bee4-a4ca9ca6f0e3",
+      type: "default",
+    },
+    {
+      id: "76ac5472-7701-49b0-94bd-da9139e6c94b",
+      source: "4e161766-3ad0-4898-bee4-a4ca9ca6f0e3",
+      target: "d02a6680-1b7f-4fb5-be92-2ebab64c260f",
+      type: "default",
+    },
+    {
+      id: "a5ef29c3-e243-4af8-880b-1469d77f9875",
+      source: "956db347-99a0-4513-8f44-ddc683d9396b",
+      target: "178d3e95-9971-464f-8236-f1607f65b039",
+      type: "default",
+    },
+  ],
+};

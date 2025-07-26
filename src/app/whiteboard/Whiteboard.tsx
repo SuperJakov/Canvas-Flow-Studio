@@ -135,6 +135,9 @@ export default function Whiteboard({ id }: Props) {
   const updateContentMutation = useMutation(api.whiteboards.editWhiteboard);
   const initialLoadDone = useRef(false);
 
+  console.log(JSON.stringify(nodes));
+  console.log(JSON.stringify(edges));
+
   // Check if this is a shared whiteboard
   const isSharedWhiteboard =
     whiteboardData?.isPublic && whiteboardData?.ownerId !== user?.externalId;
