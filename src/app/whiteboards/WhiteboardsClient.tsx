@@ -410,6 +410,11 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   const projects = useConvexQuery(api.projects.getProjects, {
     projectId: lastProjectId,
   });
+  const projectCountLimit = useConvexQuery(api.projects.getProjectCountLimit);
+  const isProjectLimitReached = projectCountLimit
+    ? projectCountLimit.currentProjectCount >= projectCountLimit.maxProjectCount
+    : false;
+
   const whiteboards = useConvexQuery(api.whiteboards.listWhiteboards, {
     projectId: lastProjectId,
   });
@@ -417,6 +422,10 @@ export default function WhiteboardsClient({ projectIds }: Props) {
     api.whiteboards.getWhiteboardCountLimit,
     {},
   );
+  const isWhiteboardLimitReached = whiteboardCountLimit
+    ? whiteboardCountLimit.currentWhiteboardCount >=
+      whiteboardCountLimit.maxWhiteboardCount
+    : false;
 
   const convexCreateProject = useMutation(api.projects.createProject);
   const convexCreateWhiteboard = useMutation(api.whiteboards.createWhiteboard);
@@ -427,16 +436,20 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   const [isCreatingWhiteboard, setIsCreatingWhiteboard] =
     useState<boolean>(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
+  const [featureName, setFeatureName] = useState("");
+
   const router = useRouter();
 
-  const isLimitReached = whiteboardCountLimit
-    ? whiteboardCountLimit.currentWhiteboardCount >=
-      whiteboardCountLimit.maxWhiteboardCount
-    : false;
+  function showUpgradeBannerFn(featureName: string) {
+    setFeatureName(featureName);
+    setShowUpgradeBanner(true);
+  }
 
   const handleCreateProject = async () => {
     if (isCreatingProject) return;
+    if (isProjectLimitReached) return showUpgradeBannerFn("More Projects");
     const name = newItemName.trim();
     if (!name) return;
 
@@ -464,10 +477,9 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   };
 
   const handleCreateWhiteboard = async () => {
-    if (isCreatingWhiteboard || isLimitReached) {
-      if (isLimitReached) setShowUpgradeBanner(true);
-      return;
-    }
+    if (isCreatingWhiteboard) return;
+    if (isWhiteboardLimitReached)
+      return showUpgradeBannerFn("More Whiteboards");
 
     setErrorMessage(null);
     const title = newItemName.trim();
@@ -550,7 +562,11 @@ export default function WhiteboardsClient({ projectIds }: Props) {
               <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                 <Button
                   onClick={handleCreateProject}
-                  disabled={isCreatingProject || !newItemName.trim()}
+                  disabled={
+                    isCreatingProject ||
+                    !newItemName.trim() ||
+                    isProjectLimitReached
+                  }
                   variant="outline"
                   className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
                 >
@@ -561,7 +577,7 @@ export default function WhiteboardsClient({ projectIds }: Props) {
                   onClick={handleCreateWhiteboard}
                   disabled={
                     isCreatingWhiteboard ||
-                    isLimitReached ||
+                    isWhiteboardLimitReached ||
                     !newItemName.trim()
                   }
                   className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
@@ -572,17 +588,32 @@ export default function WhiteboardsClient({ projectIds }: Props) {
               </div>
             </div>
 
-            {isLimitReached && !newItemName && (
-              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-sm text-amber-800">
-                  <span className="font-medium">Limit reached.</span>{" "}
+            {isWhiteboardLimitReached && (
+              <div className="bg-destructive/90 text-destructive-foreground border-border mt-4 rounded-lg border-2 p-3">
+                <p className="text-sm">
+                  <span className="font-medium">Whiteboard limit reached.</span>{" "}
                   <button
-                    onClick={() => setShowUpgradeBanner(true)}
-                    className="font-medium underline transition-colors hover:text-amber-900"
+                    onClick={() => showUpgradeBannerFn("More Whiteboards")}
+                    className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
                   >
                     Upgrade your plan
                   </button>{" "}
                   to create more whiteboards.
+                </p>
+              </div>
+            )}
+
+            {isProjectLimitReached && (
+              <div className="bg-destructive/90 text-destructive-foreground border-border mt-4 rounded-lg border-2 p-3">
+                <p className="text-sm">
+                  <span className="font-medium">Project limit reached.</span>{" "}
+                  <button
+                    onClick={() => showUpgradeBannerFn("More Projects")}
+                    className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
+                  >
+                    Upgrade your plan
+                  </button>{" "}
+                  to create more projects.
                 </p>
               </div>
             )}
@@ -650,7 +681,7 @@ export default function WhiteboardsClient({ projectIds }: Props) {
       <UpgradeBanner
         isOpen={showUpgradeBanner}
         onCloseAction={() => setShowUpgradeBanner(false)}
-        featureName="More Whiteboards"
+        featureName={featureName}
       />
     </div>
   );

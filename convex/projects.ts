@@ -1,7 +1,43 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { internalMutation } from "./functions";
+import type { Tier } from "~/Types/stripe";
+
+function getProjectCountLimitForTier(tier: Tier) {
+  switch (tier) {
+    case "Free":
+      return 5;
+    case "Plus":
+      return 50;
+    case "Pro":
+      return 200;
+    default:
+      throw new Error(`Unknown tier: ${String(tier)}`);
+  }
+}
+
+export const getProjectCountLimit = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
+    if (!userPlanInfo) throw new Error("User not found");
+
+    const maxProjects = getProjectCountLimitForTier(userPlanInfo.plan);
+
+    const usersProjects = await ctx.db
+      .query("projects")
+      .withIndex("by_userId", (q) => q.eq("userExternalId", identity.subject))
+      .collect();
+
+    return {
+      maxProjectCount: maxProjects,
+      currentProjectCount: usersProjects.length,
+    };
+  },
+});
 
 export const getProjects = query({
   args: {
@@ -61,6 +97,17 @@ export const createProject = mutation({
   handler: async (ctx, { name, parentProject }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+
+    const { currentProjectCount, maxProjectCount } = await ctx.runQuery(
+      api.projects.getProjectCountLimit,
+    );
+
+    if (currentProjectCount + 1 > maxProjectCount) {
+      throw new Error(
+        `You have reached the limit of ${maxProjectCount} projects for your plan.
+      Delete some projects or upgrade your plan.`,
+      );
+    }
 
     const project = await ctx.db.insert("projects", {
       name,
