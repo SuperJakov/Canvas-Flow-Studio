@@ -41,7 +41,7 @@ function getWhiteboardCountLimitForTier(tier: Tier) {
 function getNodeCountLimitForTier(tier: Tier) {
   switch (tier) {
     case "Free":
-      return 10; // Free tier allows up to 10 node
+      return 20; // Free tier allows up to 10 node
     case "Plus":
       return 50; // Plus tier allows up to 50 nodes
     case "Pro":
