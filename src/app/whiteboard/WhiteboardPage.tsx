@@ -6,7 +6,7 @@ import Whiteboard from "./Whiteboard";
 import type { Id } from "../../../convex/_generated/dataModel";
 import WhiteboardHeader from "./WhiteboardHeader";
 import TitleChanger from "./TitleChanger";
-import { Authenticated } from "convex/react";
+import { Authenticated, AuthLoading } from "convex/react";
 import { Suspense } from "react";
 import Loading from "../loading";
 import { useCopyWhiteboard } from "./utils";
@@ -31,6 +31,9 @@ export default function WhiteboardPage({ id }: Props) {
           </ReactFlowProvider>
         </DnDProvider>
       </Authenticated>
+      <AuthLoading>
+        <Loading />
+      </AuthLoading>
     </Suspense>
   );
 }

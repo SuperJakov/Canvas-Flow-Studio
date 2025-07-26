@@ -2,6 +2,8 @@ import type { AppEdge, AppNode } from "~/Types/nodes";
 import { v4 as uuidv4 } from "uuid";
 import { imageGenerationTemplate } from "./imageGeneration";
 import { describeAndGenerateTemplate } from "./describeAndGenerate";
+import { companyMeetingTemplate } from "./companyMeeting";
+import { languageTranslationTemplate } from "./languageTranslation";
 
 export type Template = {
   title: string;
@@ -14,6 +16,8 @@ type TemplateMap = Record<string, Template>;
 const templates: TemplateMap = {
   "image-generation": imageGenerationTemplate,
   "describe-and-generate": describeAndGenerateTemplate,
+  "company-meeting": companyMeetingTemplate,
+  "language-translation": languageTranslationTemplate,
 } as const;
 
 // This function will expose all templates, then switch out the node id's to new random one's and modify edges accordingly.
