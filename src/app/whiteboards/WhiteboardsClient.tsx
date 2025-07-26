@@ -21,6 +21,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 
 const formatDate = (timestamp: bigint | number | undefined | null): string => {
   if (!timestamp) return "N/A";
@@ -437,12 +442,18 @@ export default function WhiteboardsClient({ projectIds }: Props) {
     useState<boolean>(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const [isProjectPopoverOpen, setProjectPopoverOpen] = useState(false);
+  const [isWhiteboardPopoverOpen, setWhiteboardPopoverOpen] = useState(false);
+
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
   const [featureName, setFeatureName] = useState("");
 
   const router = useRouter();
 
   function showUpgradeBannerFn(featureName: string) {
+    setProjectPopoverOpen(false);
+    setWhiteboardPopoverOpen(false);
+
     setFeatureName(featureName);
     setShowUpgradeBanner(true);
   }
@@ -560,63 +571,98 @@ export default function WhiteboardsClient({ projectIds }: Props) {
                 />
               </div>
               <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-                <Button
-                  onClick={handleCreateProject}
-                  disabled={
-                    isCreatingProject ||
-                    !newItemName.trim() ||
-                    isProjectLimitReached
-                  }
-                  variant="outline"
-                  className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
-                >
-                  <Folder className="mr-2 h-4 w-4" />
-                  Project
-                </Button>
-                <Button
-                  onClick={handleCreateWhiteboard}
-                  disabled={
-                    isCreatingWhiteboard ||
-                    isWhiteboardLimitReached ||
-                    !newItemName.trim()
-                  }
-                  className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Whiteboard
-                </Button>
+                {isProjectLimitReached ? (
+                  <Popover
+                    open={isProjectPopoverOpen}
+                    onOpenChange={setProjectPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <span className="inline-block flex-1 sm:flex-initial">
+                        <Button
+                          disabled
+                          variant="outline"
+                          className="w-full rounded-lg px-4 py-3 font-medium shadow-sm transition-all"
+                        >
+                          <Folder className="mr-2 h-4 w-4" />
+                          Project
+                        </Button>
+                      </span>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[var(--radix-popover-content-available-width)] max-w-sm border-none bg-transparent p-0 shadow-none">
+                      <div className="bg-destructive/90 text-destructive-foreground border-border rounded-lg border-2 p-3">
+                        <p className="text-sm">
+                          <span className="font-medium">
+                            Project limit reached.
+                          </span>{" "}
+                          <button
+                            onClick={() => showUpgradeBannerFn("More Projects")}
+                            className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
+                          >
+                            Upgrade your plan
+                          </button>{" "}
+                          to create more projects.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Button
+                    onClick={handleCreateProject}
+                    disabled={isCreatingProject || !newItemName.trim()}
+                    variant="outline"
+                    className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
+                  >
+                    <Folder className="mr-2 h-4 w-4" />
+                    Project
+                  </Button>
+                )}
+                {isWhiteboardLimitReached ? (
+                  <Popover
+                    open={isWhiteboardPopoverOpen}
+                    onOpenChange={setWhiteboardPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <span className="inline-block flex-1 sm:flex-initial">
+                        <Button
+                          disabled
+                          className="w-full rounded-lg px-4 py-3 font-medium shadow-sm transition-all"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Whiteboard
+                        </Button>
+                      </span>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[var(--radix-popover-content-available-width)] max-w-sm border-none bg-transparent p-0 shadow-none">
+                      <div className="bg-destructive/90 text-destructive-foreground border-border rounded-lg border-2 p-3">
+                        <p className="text-sm">
+                          <span className="font-medium">
+                            Whiteboard limit reached.
+                          </span>{" "}
+                          <button
+                            onClick={() =>
+                              showUpgradeBannerFn("More Whiteboards")
+                            }
+                            className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
+                          >
+                            Upgrade your plan
+                          </button>{" "}
+                          to create more whiteboards.
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Button
+                    onClick={handleCreateWhiteboard}
+                    disabled={isCreatingWhiteboard || !newItemName.trim()}
+                    className="flex-1 rounded-lg px-4 py-3 font-medium shadow-sm transition-all hover:shadow-md sm:flex-initial"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Whiteboard
+                  </Button>
+                )}
               </div>
             </div>
-
-            {isWhiteboardLimitReached && (
-              <div className="bg-destructive/90 text-destructive-foreground border-border mt-4 rounded-lg border-2 p-3">
-                <p className="text-sm">
-                  <span className="font-medium">Whiteboard limit reached.</span>{" "}
-                  <button
-                    onClick={() => showUpgradeBannerFn("More Whiteboards")}
-                    className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
-                  >
-                    Upgrade your plan
-                  </button>{" "}
-                  to create more whiteboards.
-                </p>
-              </div>
-            )}
-
-            {isProjectLimitReached && (
-              <div className="bg-destructive/90 text-destructive-foreground border-border mt-4 rounded-lg border-2 p-3">
-                <p className="text-sm">
-                  <span className="font-medium">Project limit reached.</span>{" "}
-                  <button
-                    onClick={() => showUpgradeBannerFn("More Projects")}
-                    className="hover:text-destructive-foreground/70 cursor-pointer underline transition-colors"
-                  >
-                    Upgrade your plan
-                  </button>{" "}
-                  to create more projects.
-                </p>
-              </div>
-            )}
           </div>
         </div>
 

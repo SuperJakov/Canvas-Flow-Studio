@@ -22,7 +22,7 @@ const plans = [
     features: [
       "50 Whiteboards",
       "50 Nodes per whiteboard",
-      "100 Image & Text Generations/month",
+      "250 Image & Text Credits/month",
       "Higher Image Quality",
       "Priority Support",
       "Access to Beta Features",
@@ -37,7 +37,7 @@ const plans = [
     features: [
       "Unlimited* Whiteboards",
       "100 Nodes per whiteboard",
-      "250 Image & Text Generations/month",
+      "650 Image & Text Credits/month",
       "Highest Image Quality",
       "Workflow History & Versioning",
       "All features from Plus",
@@ -147,16 +147,10 @@ export default function UpgradeBanner({
                       {/* Compact plan header */}
                       <div className="mb-3 flex items-center">
                         <div className="bg-muted mr-2 rounded-lg border p-1.5">
-                          <IconComponent
-                            className={`h-4 w-4 ${isPlusCard ? "text-accent" : "text-primary"}`}
-                          />
+                          <IconComponent className="text-primary h-4 w-4" />
                         </div>
                         <div>
-                          <h3
-                            className={`text-xl font-bold ${
-                              isPlusCard ? "text-accent" : "text-primary"
-                            }`}
-                          >
+                          <h3 className={`text-primary text-xl font-bold`}>
                             {plan.name}
                           </h3>
                         </div>
