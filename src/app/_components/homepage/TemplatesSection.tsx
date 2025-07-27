@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Calendar,
   FileText,
@@ -9,10 +11,32 @@ import {
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
+import posthog from "posthog-js";
 
 export default function TemplatesSection() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    let sent = false;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && !sent) {
+          sent = true;
+          posthog.capture("templates section viewed");
+          io.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(sectionRef.current);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       className="container mx-auto px-4 pt-20 sm:px-6 lg:px-8"
       id="templates"
     >
@@ -29,6 +53,11 @@ export default function TemplatesSection() {
           <Link
             key={template.href}
             href={template.href}
+            onClick={() =>
+              posthog.capture("template click", {
+                template: template.title,
+              })
+            }
             className={`group transition ${template.hoverClasses} ${
               template.workInProgress ? "pointer-events-none" : ""
             }`}

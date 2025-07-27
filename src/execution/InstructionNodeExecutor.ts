@@ -25,7 +25,12 @@ class InstructionNodeExecutor implements IExecutor {
     try {
       const instruction = instructionNode.data.text;
       const inputNodeTypes = sourceNodes
-        .filter(node => node.type === "textEditor" || node.type === "image" || node.type === "speech")
+        .filter(
+          (node) =>
+            node.type === "textEditor" ||
+            node.type === "image" ||
+            node.type === "speech",
+        )
         .map((node) => node.type);
       const imageSource = sourceNodes.find((node) => node.type === "image");
 
@@ -58,6 +63,7 @@ class InstructionNodeExecutor implements IExecutor {
           ...getDefaultNodeData(outputNodeType),
           ...(outputNodeType === "image" && { style: styleToUse }),
         },
+        ...(outputNodeType === "textEditor" && { width: 270, height: 170 }),
       } as AppNode;
 
       set(nodesAtom, [...get(nodesAtom), newNode]);

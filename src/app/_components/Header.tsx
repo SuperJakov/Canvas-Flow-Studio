@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ import { ChevronDown } from "lucide-react";
 import { DiscordIcon } from "~/components/icons";
 import AppLogo from "public/AI Flow Studio logo.png";
 import Image from "next/image";
+import posthog from "posthog-js";
 
 export function Header() {
   const pathname = usePathname();
@@ -23,67 +24,71 @@ export function Header() {
   const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
   const [isCommunityDropdownOpen, setIsCommunityDropdownOpen] = useState(false);
 
-  // Timeout refs for delayed closing
   const productTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const communityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const discordUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ?? "#";
 
+  const capture = (event: string, props?: Record<string, unknown>) =>
+    posthog?.capture(event, {
+      current_path: pathname,
+      ...props,
+    });
+
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((open) => {
+      capture("mobile_menu toggled", { state: !open ? "opened" : "closed" });
+      return !open;
+    });
   };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    capture("mobile_menu toggled", { state: "closed" });
   };
 
-  // Close dropdowns when scrolling
   useEffect(() => {
     const handleScroll = () => {
       setIsProductDropdownOpen(false);
       setIsCommunityDropdownOpen(false);
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Product dropdown handlers with useCallback to prevent recreation
-  const handleProductMouseEnter = useCallback(() => {
-    if (productTimeoutRef.current) {
-      clearTimeout(productTimeoutRef.current);
-      productTimeoutRef.current = null;
-    }
+  const handleProductMouseEnter = () => {
+    if (productTimeoutRef.current) clearTimeout(productTimeoutRef.current);
     setIsCommunityDropdownOpen(false);
     setIsProductDropdownOpen(true);
-  }, []);
+    capture("dropdown opened", { dropdown: "product" });
+  };
 
-  const handleProductMouseLeave = useCallback(() => {
+  const handleProductMouseLeave = () => {
     productTimeoutRef.current = setTimeout(() => {
       setIsProductDropdownOpen(false);
+      capture("dropdown closed", { dropdown: "product" });
     }, 250);
-  }, []);
+  };
 
-  // Community dropdown handlers with useCallback to prevent recreation
-  const handleCommunityMouseEnter = useCallback(() => {
-    if (communityTimeoutRef.current) {
-      clearTimeout(communityTimeoutRef.current);
-      communityTimeoutRef.current = null;
-    }
+  const handleCommunityMouseEnter = () => {
+    if (communityTimeoutRef.current) clearTimeout(communityTimeoutRef.current);
     setIsProductDropdownOpen(false);
     setIsCommunityDropdownOpen(true);
-  }, []);
+    capture("dropdown opened", { dropdown: "community" });
+  };
 
-  const handleCommunityMouseLeave = useCallback(() => {
+  const handleCommunityMouseLeave = () => {
     communityTimeoutRef.current = setTimeout(() => {
       setIsCommunityDropdownOpen(false);
+      capture("dropdown closed", { dropdown: "community" });
     }, 250);
-  }, []);
+  };
 
-  // Don't render the header on the whiteboard page
   if (pathname === "/whiteboard" || pathname.startsWith("/whiteboard/")) {
     return null;
   }
+
+  const navClick = (label: string) => () => capture("nav click", { label });
 
   return (
     <>
@@ -96,17 +101,14 @@ export function Header() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
-            {/* Left side - App name and navigation */}
             <div className="flex items-center space-x-8">
-              <Link href="/" onClick={closeMenu}>
+              <Link href="/" onClick={navClick("home")}>
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
                   AFS
                 </span>
               </Link>
 
-              {/* Desktop Navigation */}
               <nav className="hidden items-center space-x-6 lg:flex">
-                {/* Product Dropdown */}
                 <div
                   onMouseEnter={handleProductMouseEnter}
                   onMouseLeave={handleProductMouseLeave}
@@ -114,12 +116,12 @@ export function Header() {
                   <DropdownMenu
                     open={isProductDropdownOpen}
                     onOpenChange={(open) => {
-                      // Only allow manual control, prevent automatic closing
-                      if (!open && productTimeoutRef.current) {
-                        // If there's a timeout running, don't close immediately
-                        return;
-                      }
+                      if (!open && productTimeoutRef.current) return;
                       setIsProductDropdownOpen(open);
+                      capture(open ? "dropdown opened" : "dropdown closed", {
+                        dropdown: "product",
+                        triggered_by: "manual",
+                      });
                     }}
                     modal={false}
                   >
@@ -133,21 +135,23 @@ export function Header() {
                       className="w-80 p-0"
                       align="start"
                       onPointerDownOutside={(e) => {
-                        // Allow scrolling by not preventing default
                         const target = e.target as Element;
                         if (
                           !target.closest("[data-radix-dropdown-menu-content]")
                         ) {
                           setIsProductDropdownOpen(false);
+                          capture("dropdown closed", { dropdown: "product" });
                         }
                       }}
                     >
                       <DropdownMenuItem
                         asChild
                         className="text-foreground bg-background cursor-pointer p-4"
+                        onSelect={() =>
+                          capture("nav click", { label: "whiteboard" })
+                        }
                       >
                         <Link href="/whiteboard" className="flex items-start">
-                          {/* Left side - Logo placeholder */}
                           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
                             <Image
                               src={AppLogo}
@@ -155,7 +159,6 @@ export function Header() {
                               placeholder="blur"
                             />
                           </div>
-                          {/* Right side - Product info */}
                           <div className="flex-1">
                             <h3 className="mb-1 font-bold">AI Flow Studio</h3>
                             <p className="text-muted-foreground text-sm">
@@ -172,6 +175,7 @@ export function Header() {
                   href="/pricing"
                   className="text-gray-300 transition hover:text-white"
                   prefetch={true}
+                  onClick={navClick("pricing")}
                 >
                   Pricing
                 </Link>
@@ -179,6 +183,7 @@ export function Header() {
                 <Link
                   href="/blog"
                   className="text-gray-300 transition hover:text-white"
+                  onClick={navClick("blog")}
                 >
                   Blog
                 </Link>
@@ -186,11 +191,11 @@ export function Header() {
                 <Link
                   href="/docs"
                   className="text-gray-300 transition hover:text-white"
+                  onClick={navClick("docs")}
                 >
                   Docs
                 </Link>
 
-                {/* Community Dropdown */}
                 <div
                   onMouseEnter={handleCommunityMouseEnter}
                   onMouseLeave={handleCommunityMouseLeave}
@@ -198,12 +203,12 @@ export function Header() {
                   <DropdownMenu
                     open={isCommunityDropdownOpen}
                     onOpenChange={(open) => {
-                      // Only allow manual control, prevent automatic closing
-                      if (!open && communityTimeoutRef.current) {
-                        // If there's a timeout running, don't close immediately
-                        return;
-                      }
+                      if (!open && communityTimeoutRef.current) return;
                       setIsCommunityDropdownOpen(open);
+                      capture(open ? "dropdown opened" : "dropdown closed", {
+                        dropdown: "community",
+                        triggered_by: "manual",
+                      });
                     }}
                     modal={false}
                   >
@@ -217,28 +222,34 @@ export function Header() {
                       className="w-80 p-0"
                       align="start"
                       onPointerDownOutside={(e) => {
-                        // Allow scrolling by not preventing default
                         const target = e.target as Element;
                         if (
                           !target.closest("[data-radix-dropdown-menu-content]")
                         ) {
                           setIsCommunityDropdownOpen(false);
+                          capture("dropdown closed", { dropdown: "community" });
                         }
                       }}
                     >
-                      <DropdownMenuItem asChild className="cursor-pointer p-4">
+                      <DropdownMenuItem
+                        asChild
+                        className="cursor-pointer p-4"
+                        onSelect={() =>
+                          capture("external link click", {
+                            label: "discord",
+                            location: "desktop nav",
+                          })
+                        }
+                      >
                         <a
                           href={discordUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-start space-x-4"
                         >
-                          {/* Left side - Discord icon */}
                           <div className="flex h-10 w-10 items-center justify-center">
                             <DiscordIcon width="28px" height="28px" />
                           </div>
-
-                          {/* Right side - Discord info */}
                           <div className="flex-1">
                             <h3 className="mb-1 font-bold">Discord</h3>
                             <p className="text-muted-foreground text-sm">
@@ -253,14 +264,22 @@ export function Header() {
               </nav>
             </div>
 
-            {/* Right side - Auth buttons */}
             <div className="hidden min-h-[40px] min-w-[155px] items-center space-x-4 lg:flex">
               <Unauthenticated>
                 <SignInButton mode="modal">
-                  <Button variant="ghost">Sign In</Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => capture("auth click", { action: "sign_in" })}
+                  >
+                    Sign In
+                  </Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button>Sign Up</Button>
+                  <Button
+                    onClick={() => capture("auth click", { action: "sign_up" })}
+                  >
+                    Sign Up
+                  </Button>
                 </SignUpButton>
               </Unauthenticated>
               <Authenticated>
@@ -268,7 +287,6 @@ export function Header() {
               </Authenticated>
             </div>
 
-            {/* Mobile Hamburger Button */}
             <button
               className="flex cursor-pointer flex-col items-center justify-center space-y-1 lg:hidden"
               onClick={toggleMenu}
@@ -294,7 +312,6 @@ export function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div
           className="fixed inset-0 z-40 lg:hidden"
@@ -303,9 +320,7 @@ export function Header() {
           }}
         >
           <div className="flex h-full flex-col backdrop-blur-md">
-            {/* Navigation Links - Top Section */}
             <nav className="flex flex-1 flex-col items-start justify-center space-y-8 pt-20 pl-8">
-              {/* Product Section in Mobile */}
               <div className="flex flex-col space-y-4">
                 <span className="text-muted-foreground text-lg font-medium">
                   Product
@@ -314,7 +329,13 @@ export function Header() {
                   <Link
                     href="/whiteboard"
                     className="text-muted-foreground hover:text-foreground no-underline transition"
-                    onClick={closeMenu}
+                    onClick={() => {
+                      closeMenu();
+                      capture("nav click", {
+                        label: "whiteboard (mobile)",
+                        location: "mobile menu",
+                      });
+                    }}
                   >
                     AI Flow Studio
                   </Link>
@@ -325,7 +346,13 @@ export function Header() {
                 <Link
                   href="/pricing"
                   className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
-                  onClick={closeMenu}
+                  onClick={() => {
+                    closeMenu();
+                    capture("nav click", {
+                      label: "pricing (mobile)",
+                      location: "mobile menu",
+                    });
+                  }}
                 >
                   Pricing
                 </Link>
@@ -335,7 +362,13 @@ export function Header() {
                 <Link
                   href="/blog"
                   className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
-                  onClick={closeMenu}
+                  onClick={() => {
+                    closeMenu();
+                    capture("nav click", {
+                      label: "blog (mobile)",
+                      location: "mobile menu",
+                    });
+                  }}
                 >
                   Blog
                 </Link>
@@ -345,13 +378,18 @@ export function Header() {
                 <Link
                   href="/docs"
                   className="text-muted-foreground hover:text-foreground font-medium no-underline transition"
-                  onClick={closeMenu}
+                  onClick={() => {
+                    closeMenu();
+                    capture("nav click", {
+                      label: "docs (mobile)",
+                      location: "mobile menu",
+                    });
+                  }}
                 >
                   Docs
                 </Link>
               </Button>
 
-              {/* Community Section in Mobile */}
               <div className="flex flex-col space-y-4">
                 <span className="text-muted-foreground text-lg font-medium">
                   Community
@@ -362,7 +400,12 @@ export function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-foreground flex items-center space-x-2 no-underline transition"
-                    onClick={closeMenu}
+                    onClick={() =>
+                      capture("external link click", {
+                        label: "discord (mobile)",
+                        location: "mobile menu",
+                      })
+                    }
                   >
                     <DiscordIcon className="h-4 w-4" />
                     <span>Discord</span>
@@ -371,7 +414,6 @@ export function Header() {
               </div>
             </nav>
 
-            {/* Auth Section - Bottom */}
             <div className="flex flex-col items-start space-y-6 px-8 pt-8 pb-20">
               <Unauthenticated>
                 <div className="flex w-full flex-col gap-4 lg:flex-row">
@@ -380,7 +422,13 @@ export function Header() {
                       variant="outline"
                       size="lg"
                       className="text-muted-foreground hover:border/80 hover:bg-accent/10 hover:text-foreground h-12 w-full border bg-transparent text-lg font-medium"
-                      onClick={closeMenu}
+                      onClick={() => {
+                        closeMenu();
+                        capture("auth click", {
+                          action: "sign_in",
+                          location: "mobile menu",
+                        });
+                      }}
                     >
                       Sign In
                     </Button>
@@ -389,7 +437,13 @@ export function Header() {
                     <Button
                       size="lg"
                       className="h-12 w-full text-lg font-medium"
-                      onClick={closeMenu}
+                      onClick={() => {
+                        closeMenu();
+                        capture("auth click", {
+                          action: "sign_up",
+                          location: "mobile menu",
+                        });
+                      }}
                     >
                       Sign Up
                     </Button>

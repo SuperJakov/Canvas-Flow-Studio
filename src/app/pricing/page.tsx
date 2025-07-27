@@ -32,6 +32,7 @@ import {
   DialogFooter,
 } from "~/components/ui/dialog";
 import CTASection from "../_components/homepage/CTASection";
+import posthog from "posthog-js";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -75,27 +76,37 @@ export default function PricingPage() {
 
   const handlePlanChange = async (planName: string) => {
     if (!auth.isAuthenticated) return;
-    if (process.env.NEXT_PUBLIC_IS_STRIPE_DISABLED === "true")
+    if (process.env.NEXT_PUBLIC_IS_STRIPE_DISABLED === "true") {
+      posthog.capture("subscription_disabled_click");
       return setShowDisabledDialog(true);
+    }
     setLoadingTier(planName === "Reactivate" ? currentTier : planName);
 
     try {
       if (planName === "Reactivate") {
+        posthog.capture("subscription_reactivate_click");
         await reactivateSubscription();
       } else if (planName === "Free") {
+        posthog.capture("subscription_cancel_click");
         await cancelSubscription();
       } else {
+        posthog.capture("subscription_upgrade_click", { plan: planName });
         const url = await getCheckoutSessionUrl({
           tier: planName as "Plus" | "Pro",
         });
         if (url) {
+          posthog.capture("subscription_checkout_redirect", { plan: planName });
           window.location.href = url;
         } else {
+          posthog.capture("subscription_checkout_error", { plan: planName });
           console.error("Failed to get checkout session URL.");
           alert("Could not initiate plan change. Please try again later.");
         }
       }
     } catch (error) {
+      posthog.capture("subscription_error", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       console.error("Error during plan change process:", error);
       alert(
         `An error occurred: ${
@@ -109,13 +120,18 @@ export default function PricingPage() {
 
   const handleManageSubscription = async () => {
     try {
+      posthog.capture("manage_subscription_click");
       const url = await getCustomerBillingPortalUrl({
         returnUrl: window.location.href,
       });
       if (url) {
+        posthog.capture("billing_portal_redirect");
         window.location.href = url;
       }
     } catch (error) {
+      posthog.capture("billing_portal_error", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       console.error("Error getting billing portal URL:", error);
       alert("Could not access billing portal. Please try again later.");
     }
@@ -195,6 +211,7 @@ export default function PricingPage() {
             <Link
               href="/whiteboard"
               className="from-primary to-secondary text-primary-foreground bg-gradient-to-r shadow-lg hover:scale-[1.02] hover:shadow-xl"
+              onClick={() => posthog.capture("get_started_free_click")}
             >
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -212,6 +229,9 @@ export default function PricingPage() {
                   ? "from-primary to-secondary text-primary-foreground bg-gradient-to-r shadow-lg hover:scale-[1.02] hover:shadow-xl"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-lg hover:scale-[1.02]",
               )}
+              onClick={() =>
+                posthog.capture("sign_up_to_upgrade_click", { plan: plan.name })
+              }
             >
               Sign Up to Upgrade
               <ArrowRight className="ml-2 h-4 w-4" />
