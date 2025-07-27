@@ -15,28 +15,58 @@ http.route({
   path: "/clerk-users-webhook",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
-    const event = await validateRequest(request);
-    if (!event) {
-      return new Response("Error occured", { status: 400 });
-    }
-    switch (event.type) {
-      case "user.created": // intentional fallthrough
-      case "user.updated":
-        await ctx.runMutation(internal.users.upsertFromClerk, {
-          data: event.data,
-        });
-        break;
+    console.log("Received Clerk webhook request");
 
-      case "user.deleted": {
-        const clerkUserId = event.data.id!;
-        await ctx.runMutation(internal.users.deleteFromClerk, { clerkUserId });
-        break;
+    try {
+      const event = await validateRequest(request);
+      if (!event) {
+        console.error("Failed to validate webhook request");
+        return new Response("Error occurred", { status: 400 });
       }
-      default:
-        console.log("Ignored Clerk webhook event", event.type);
-    }
 
-    return new Response(null, { status: 200 });
+      console.log(`Processing Clerk webhook event: ${event.type}`, {
+        eventId: event.data.id,
+        eventObject: event.data.object,
+      });
+
+      switch (event.type) {
+        case "user.created":
+          console.log(`User created: ${event.data.id}`);
+          await ctx.runMutation(internal.users.upsertFromClerk, {
+            data: event.data,
+          });
+          break;
+
+        case "user.updated":
+          console.log(`User updated: ${event.data.id}`);
+          await ctx.runMutation(internal.users.upsertFromClerk, {
+            data: event.data,
+          });
+          break;
+
+        case "user.deleted": {
+          const clerkUserId = event.data.id!;
+          console.log(`User deleted: ${clerkUserId}`);
+          await ctx.runMutation(internal.users.deleteFromClerk, {
+            clerkUserId,
+          });
+          break;
+        }
+
+        default:
+          console.log("Ignored Clerk webhook event", {
+            type: event.type,
+            eventId: event.data.id,
+            eventObject: event.data.object,
+          });
+      }
+
+      console.log(`Successfully processed Clerk webhook event: ${event.type}`);
+      return new Response(null, { status: 200 });
+    } catch (error) {
+      console.error("Error processing Clerk webhook:", error);
+      return new Response("Internal server error", { status: 500 });
+    }
   }),
 });
 

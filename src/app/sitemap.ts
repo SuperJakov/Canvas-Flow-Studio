@@ -4,10 +4,10 @@ import { chapters } from "./docs/chapters";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-const ROOT_ROUTES = ["/", "/docs", "/pricing"] as const;
+const ROOT_ROUTES = ["/", "/pricing"] as const;
 const PRIORITY_OVERRIDES: Record<string, number> = {
   "/": 1,
-  "/docs": 0.8,
+  "/docs/getting-started/introduction": 0.8,
   "/pricing": 0.7,
 };
 
@@ -39,9 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const docRoutes = chapters.flatMap((chapter) =>
-    chapter.sections.map(
-      (section) => `/docs/${chapter.slug}/${section.slug}`,
-    ),
+    chapter.sections.map((section) => `/docs/${chapter.slug}/${section.slug}`),
   );
 
   const docEntries = await Promise.all(
