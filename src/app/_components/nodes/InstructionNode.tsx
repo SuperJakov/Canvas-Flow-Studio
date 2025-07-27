@@ -41,15 +41,10 @@ export default function InstructionNode({
   const isRateLimited = instructionUseRateLimit
     ? !instructionUseRateLimit.ok
     : false;
-  const retryAfterMs = instructionUseRateLimit?.retryAfter ?? 0;
 
   const [isBannerOpen, setIsBannerOpen] = useState(false);
   const openBanner = () => setIsBannerOpen(true);
   const closeBanner = () => setIsBannerOpen(false);
-
-  const hoursUntilReset = Math.ceil(retryAfterMs / 1000 / 3600);
-  const daysUntilReset =
-    hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
 
   useLayoutEffect(() => {
     updateNodeData({
@@ -136,11 +131,7 @@ export default function InstructionNode({
         className={`${containerClasses} ${isRateLimited ? "border-2 border-red-500" : ""}`}
       >
         {isRateLimited ? (
-          <RateLimitBanner
-            hoursUntilReset={hoursUntilReset}
-            daysUntilReset={daysUntilReset}
-            onUpgradeClick={openBanner}
-          />
+          <RateLimitBanner onUpgradeClick={openBanner} />
         ) : (
           <>
             <Handle type="target" position={Position.Top} />

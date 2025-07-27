@@ -1,16 +1,10 @@
 import { AlertCircle, ExternalLink } from "lucide-react";
 
 interface RateLimitBannerProps {
-  hoursUntilReset: number;
-  daysUntilReset: number;
   onUpgradeClick: () => void;
 }
 
-export function RateLimitBanner({
-  hoursUntilReset,
-  daysUntilReset,
-  onUpgradeClick,
-}: RateLimitBannerProps) {
+export function RateLimitBanner({ onUpgradeClick }: RateLimitBannerProps) {
   return (
     <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-500">
       <div className="flex items-center justify-between px-4 py-3">
@@ -21,12 +15,6 @@ export function RateLimitBanner({
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-white">
               Rate Limit Reached
-            </span>
-            <span className="text-xs text-red-100">
-              Resets in{" "}
-              {daysUntilReset > 0
-                ? `${daysUntilReset} day${daysUntilReset > 1 ? "s" : ""}`
-                : `${hoursUntilReset} hour${hoursUntilReset !== 1 ? "s" : ""}`}
             </span>
           </div>
         </div>

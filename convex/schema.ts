@@ -221,6 +221,33 @@ const projects = defineTable({
   .index("by_userId", ["userExternalId"])
   .index("by_user_and_parent", ["userExternalId", "parentProject"]);
 
+export const CreditType = v.union(v.literal("image"), v.literal("speech"));
+
+const transactions = defineTable({
+  amount: v.number(), // Positive for additions, negative for usage/deductions
+  type: v.union(
+    // Credit additions
+    v.literal("trial"),
+    v.literal("subscription"),
+    v.literal("topup"),
+    // Usage
+    v.literal("usage"),
+    // Adjustments
+    v.literal("adjustment"),
+    v.literal("refund"),
+    // Signup
+    v.literal("signup"),
+  ),
+
+  userId: v.string(),
+  // System fields
+  reason: v.optional(v.string()), // Human readable reason for the credit transaction
+  metadata: v.optional(v.record(v.string(), v.any())), // Additional data
+  idempotencyKey: v.optional(v.string()), // For preventing duplicate transactions
+  updatedAt: v.number(), // ISO string - last update time
+  creditType: CreditType,
+});
+
 const schema = defineSchema({
   users,
   subscriptions,
@@ -229,6 +256,7 @@ const schema = defineSchema({
   speechNodes,
   imageLogs,
   projects,
+  transactions,
 });
 
 export default schema;

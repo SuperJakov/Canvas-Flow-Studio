@@ -23,6 +23,12 @@ const priceIdToTier: Record<string, Tier> = {
   [process.env.PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID!]: "Pro",
 };
 
+// Credit amounts for each tier
+const tierCredits: Record<Tier, number> = {
+  Plus: 250,
+  Pro: 650,
+};
+
 /**
  * Creates a Stripe Checkout Session for a given tier and returns the URL.
  * Handles both new subscriptions and upgrades from existing subscriptions.
@@ -372,6 +378,45 @@ export const syncStripeDataToDb = internalAction({
   },
 });
 
+/**
+ * Helper function to add credits based on subscription tier
+ */
+const addCreditsForSubscription = async (
+  ctx: ActionCtx,
+  clerkUserId: string,
+  tier: Tier,
+  creditType: "subscription" = "subscription",
+) => {
+  const user = await ctx.runQuery(internal.users.getUserByExternalId, {
+    externalId: clerkUserId,
+  });
+
+  if (!user) {
+    console.error(`User not found for clerkUserId: ${clerkUserId}`);
+    return;
+  }
+
+  const creditAmount = tierCredits[tier];
+
+  try {
+    await ctx.runMutation(internal.credits.addCredits, {
+      userId: clerkUserId,
+      creditType: "image", // Assuming "image" is your credit type
+      creditAmount,
+      type: creditType,
+    });
+
+    console.log(
+      `[Credits] Added ${creditAmount} credits for ${tier} subscription to user ${clerkUserId}`,
+    );
+  } catch (error) {
+    console.error(
+      `[Credits] Error adding credits for user ${clerkUserId}:`,
+      error,
+    );
+  }
+};
+
 // Helper function to extract Clerk User ID and schedule a database sync.
 // This centralizes the logic for finding the user associated with a Stripe event.
 const scheduleSyncForUser = async (
@@ -451,12 +496,89 @@ export const handleEvent = internalAction({
             );
           }
 
+          // Add initial credits for new subscription
+          if (tier === "Plus" || tier === "Pro") {
+            await addCreditsForSubscription(
+              ctx,
+              clerkUserId,
+              tier as Tier,
+              "subscription",
+            );
+          }
+
           // Sync the user's subscription state.
           await scheduleSyncForUser(ctx, session, stripeEvent.type);
 
           console.log(
             `[Webhook] User ${clerkUserId} successfully subscribed to ${tier}.`,
           );
+          break;
+        }
+
+        // Handle successful invoice payments (recurring charges)
+        case "invoice.paid": {
+          const invoice = stripeEvent.data.object;
+          const subscriptionIdOrObject = invoice.lines.data[0]?.subscription;
+
+          // Only process if this is a subscription invoice (not one-time payments)
+          if (
+            subscriptionIdOrObject &&
+            invoice.billing_reason === "subscription_cycle"
+          ) {
+            const subscriptionId =
+              typeof subscriptionIdOrObject === "string"
+                ? subscriptionIdOrObject
+                : subscriptionIdOrObject.id;
+
+            let clerkUserId: string | undefined | null;
+
+            // Try to get clerkUserId from customer metadata
+            if (invoice.customer && typeof invoice.customer === "string") {
+              try {
+                const customer = (await stripe.customers.retrieve(
+                  invoice.customer,
+                )) as Stripe.Customer;
+                clerkUserId = customer.metadata.clerkUserId;
+              } catch (error) {
+                console.error(
+                  `[Webhook] Error retrieving customer for invoice.paid:`,
+                  error,
+                );
+              }
+            }
+
+            if (clerkUserId) {
+              // Get subscription to determine tier
+              try {
+                // ✅ FIX: We now pass a guaranteed string to retrieve()
+                const subscription =
+                  await stripe.subscriptions.retrieve(subscriptionId);
+
+                const priceId = subscription.items.data[0]?.price.id;
+                const tier = priceId ? priceIdToTier[priceId] : null;
+
+                if (tier) {
+                  await addCreditsForSubscription(
+                    ctx,
+                    clerkUserId,
+                    tier,
+                    "subscription",
+                  );
+                  console.log(
+                    `[Webhook] Added ${tierCredits[tier]} credits for recurring payment - User: ${clerkUserId}, Tier: ${tier}`,
+                  );
+                }
+              } catch (error) {
+                console.error(
+                  `[Webhook] Error processing subscription for credit allocation:`,
+                  error,
+                );
+              }
+            }
+          }
+
+          // Continue with regular sync
+          await scheduleSyncForUser(ctx, invoice, stripeEvent.type);
           break;
         }
 
@@ -475,7 +597,6 @@ export const handleEvent = internalAction({
         // --- Invoice & Payment Events ---
         // These events are crucial for managing access based on payment status.
         // A failed payment might lead to a 'past_due' status, which our sync function handles.
-        case "invoice.paid":
         case "invoice.payment_failed":
         case "invoice.payment_action_required":
         case "invoice.upcoming":

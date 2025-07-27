@@ -35,6 +35,14 @@ http.route({
           await ctx.runMutation(internal.users.upsertFromClerk, {
             data: event.data,
           });
+
+          console.log("Adding 10 image credits...");
+          await ctx.scheduler.runAfter(0, internal.credits.addCredits, {
+            userId: event.data.id,
+            creditType: "image",
+            creditAmount: 10,
+            type: "signup",
+          });
           break;
 
         case "user.updated":

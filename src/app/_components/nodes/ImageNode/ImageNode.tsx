@@ -50,8 +50,9 @@ export default function ImageNode({
   const imageGenRateLimit = useConvexQuery(
     api.imageNodes.getImageGenerationRateLimit,
   );
-  const isRateLimited = imageGenRateLimit ? !imageGenRateLimit.ok : false;
-  const retryAfterMs = imageGenRateLimit?.retryAfter;
+  const isRateLimited = imageGenRateLimit
+    ? imageGenRateLimit.isRateLimited
+    : false;
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
   const [isDownloading, setIsDownloading] = useState(false);
@@ -74,13 +75,6 @@ export default function ImageNode({
   const closeBanner = () => {
     setIsBannerOpen(false);
   };
-
-  const hoursUntilReset = retryAfterMs
-    ? Math.ceil(retryAfterMs / 3600 / 1000)
-    : 0;
-
-  const daysUntilReset =
-    hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
 
   useLayoutEffect(() => {
     updateNodeData({
@@ -274,8 +268,6 @@ export default function ImageNode({
         >
           {isRateLimited ? (
             <RateLimitBanner
-              hoursUntilReset={hoursUntilReset}
-              daysUntilReset={daysUntilReset}
               onUpgradeClick={() => openBanner("Higher Rate Limits")}
             />
           ) : (

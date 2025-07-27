@@ -3,52 +3,28 @@ import { action, query } from "./_generated/server";
 import { internalMutation } from "./functions";
 import { Style, TextEditorNodeData } from "./schema";
 import { AzureOpenAI } from "openai";
-import { RateLimiter, HOUR } from "@convex-dev/rate-limiter";
-import { api, components, internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { UserIdentity } from "convex/server";
-import type { Tier } from "~/Types/stripe";
-
-const DAY = 24 * HOUR;
-const MONTH = 30 * DAY;
-
-// Limits will be defined dynamically based on the user's plan.
-const rateLimiter = new RateLimiter(components.rateLimiter);
-
-// Helper function to get rate limit configuration based on a user's plan.
-// This allows for defining limits dynamically at the point of use.
-export const getRateLimitConfigForPlan = (plan: Tier) => {
-  switch (plan) {
-    case "Pro":
-      return { kind: "fixed window" as const, period: MONTH, rate: 250 };
-    case "Plus":
-      return { kind: "fixed window" as const, period: MONTH, rate: 100 };
-    case "Free":
-    default:
-      return { kind: "fixed window" as const, period: MONTH, rate: 10 };
-  }
-};
 
 export const getImageGenerationRateLimit = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    // Get the user's current plan to check the correct rate limit.
-    const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
-    if (!userPlanInfo) {
-      throw new Error("Could not retrieve user plan info.");
+    const remainingImageCredits = await ctx.runQuery(
+      internal.credits.getRemainingCredits,
+      {
+        userId: identity.subject,
+        creditType: "image",
+      },
+    );
+    console.log("Remaining image credits", remainingImageCredits);
+    if (remainingImageCredits < 1) {
+      return {
+        isRateLimited: true,
+      };
     }
-
-    // Get the dynamic rate limit configuration for the user's plan.
-    const config = getRateLimitConfigForPlan(userPlanInfo.plan);
-
-    // Check the rate limit status using the dynamic configuration.
-    const status = await rateLimiter.check(ctx, "imageGeneration", {
-      key: identity.subject,
-      config, // Pass the dynamic config here
-    });
-
-    return status;
+    return { isRateLimited: false };
   },
 });
 
@@ -251,24 +227,27 @@ export const generateAndStoreImage = action({
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId, style }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+    const remainingImageCredits = await ctx.runQuery(
+      internal.credits.getRemainingCredits,
+      {
+        userId: identity.subject,
+        creditType: "image",
+      },
+    );
+    console.log("Remaining image credits", remainingImageCredits);
+    if (remainingImageCredits < 1) {
+      throw new Error("Not enough credits to generate an image.");
+    }
+
+    await ctx.runMutation(internal.credits.spendCredits, {
+      userId: identity.subject,
+      creditType: "image",
+      creditAmount: 1,
+    });
+
     try {
       const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
       if (!userPlanInfo) throw new Error("Error when getting user's plan");
-
-      const config = getRateLimitConfigForPlan(userPlanInfo.plan);
-      const { ok, retryAfter } = await rateLimiter.limit(
-        ctx,
-        "imageGeneration",
-        {
-          key: identity.subject,
-          config,
-        },
-      );
-      if (!ok) {
-        throw new Error(
-          `Rate limit reached. Try after: ${Math.ceil(retryAfter / 1000)} s`,
-        );
-      }
 
       await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
         isGenerating: true,
