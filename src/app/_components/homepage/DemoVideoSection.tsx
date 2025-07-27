@@ -128,12 +128,10 @@ export default function DemoImageSection(): JSX.Element {
           <div className="relative aspect-video w-full">
             {/* Show loading state while images are preloading */}
             {!imagesLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+              <div className="bg-background absolute inset-0 flex items-center justify-center">
                 <div className="flex items-center space-x-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-500 border-t-transparent"></div>
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Loading demo images...
-                  </span>
+                  <span className="text-sm">Loading demo images...</span>
                 </div>
               </div>
             )}
