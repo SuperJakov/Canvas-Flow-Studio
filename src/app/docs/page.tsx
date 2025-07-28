@@ -2,6 +2,7 @@ import Sidebar from "./components/Sidebar";
 import ChapterContent from "./components/ChapterContent";
 import { chapters } from "./chapters";
 import { permanentRedirect } from "next/navigation";
+import { MobileMenuButton } from "./components/MobileMenuButton";
 
 type Props = {
   activeChapter: string;
@@ -26,6 +27,7 @@ export default function DocsPage({ activeChapter, activeSection }: Props) {
 
       {/* Main content area */}
       <main className="bg-background flex-1 px-6 md:px-8 lg:px-12">
+        <MobileMenuButton />
         <ChapterContent
           activeChapter={activeChapter}
           activeSection={activeSection}

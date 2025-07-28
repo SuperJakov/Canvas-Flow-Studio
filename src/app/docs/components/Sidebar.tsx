@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ChevronRight, MessageSquare } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -13,6 +14,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "~/components/ui/sidebar";
 
 // Types for documentation structure
@@ -38,8 +40,14 @@ export default function DocsSidebar({
   activeChapter,
   activeSection,
 }: DocsSidebarProps) {
+  const { setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    setOpenMobile(false);
+  };
+
   return (
-    <Sidebar className="pt-16">
+    <Sidebar className="pt-16 md:pt-16">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Documentation</SidebarGroupLabel>
@@ -56,6 +64,7 @@ export default function DocsSidebar({
                       href={`/docs/${chapter.slug}/${chapter.sections[0]?.slug ?? ""}`}
                       prefetch={true}
                       className="break-words whitespace-normal"
+                      onClick={handleLinkClick}
                     >
                       {chapter.title}
                     </Link>
@@ -80,6 +89,7 @@ export default function DocsSidebar({
                                 : undefined
                             }
                             className="break-words whitespace-normal"
+                            onClick={handleLinkClick}
                           >
                             <ChevronRight className="h-4 w-4 flex-shrink-0" />
                             <span className="flex-1">{section.title}</span>
