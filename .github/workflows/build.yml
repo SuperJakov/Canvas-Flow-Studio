@@ -12,7 +12,7 @@ jobs:
 
     env:
       SKIP_ENV_VALIDATION: "true"
-      BASE_URl: "http://localhost:3000" # This is just for build to not fail
+      BASE_URL: "http://localhost:3000" # This is just for build to not fail
       NEXT_TELEMETRY_DISABLED: "1"
 
     steps:
