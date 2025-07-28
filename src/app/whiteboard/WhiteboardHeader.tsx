@@ -1,3 +1,4 @@
+// WhiteboardHeader.tsx
 "use client";
 
 import { Suspense, useState, useEffect, useRef } from "react";
@@ -23,9 +24,116 @@ import {
   DialogDescription,
 } from "~/components/ui/dialog";
 
-type Props = {
-  id: Id<"whiteboards">;
+type ShareDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
+
+function ShareDialog({ open, onOpenChange }: ShareDialogProps) {
+  const shareInput = useRef<HTMLInputElement>(null);
+
+  const selectShareInput = () => shareInput.current?.select();
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Copied to clipboard!", {
+        duration: 2000,
+        position: "top-center",
+      });
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy to clipboard");
+    } finally {
+      onOpenChange(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    selectShareInput();
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Share this whiteboard</DialogTitle>
+          <DialogDescription>
+            Anyone who has this link will be able to view this.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex items-center space-x-2">
+          <Input
+            id="share-url-input"
+            value={typeof window !== "undefined" ? window.location.href : ""}
+            readOnly
+            className="flex-1"
+            onFocus={selectShareInput}
+            onClick={selectShareInput}
+            ref={shareInput}
+          />
+          <Button size="sm" onClick={copyLink}>
+            Copy
+          </Button>
+        </div>
+
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type EditableTitleProps = {
+  isEditing: boolean;
+  title: string;
+  whiteboardTitle: string | null | undefined;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: () => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onClick: () => void;
+  onFocus: () => void;
+};
+
+function EditableTitle({
+  isEditing,
+  title,
+  whiteboardTitle,
+  onChange,
+  onBlur,
+  onKeyDown,
+  onClick,
+  onFocus,
+}: EditableTitleProps) {
+  return (
+    <Input
+      value={isEditing ? title : (whiteboardTitle ?? "Untitled")}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
+      onFocus={onFocus}
+      className={cn(
+        "field-sizing-content h-auto w-auto min-w-[100px] px-2 py-0.5 text-center",
+        isEditing
+          ? "border-transparent"
+          : "cursor-pointer hover:ring-2 hover:ring-gray-500",
+      )}
+      readOnly={!isEditing}
+      autoFocus={isEditing}
+      maxLength={30}
+    />
+  );
+}
+
+type Props = { id: Id<"whiteboards"> };
 
 export default function WhiteboardHeader({ id }: Props) {
   const [isEditing, setIsEditing] = useState(false);
@@ -33,8 +141,6 @@ export default function WhiteboardHeader({ id }: Props) {
   const [shareOpen, setShareOpen] = useState(false);
   const whiteboard = useConvexQuery(api.whiteboards.getWhiteboard, { id });
   const user = useConvexQuery(api.users.current);
-
-  const shareInput = useRef<HTMLInputElement>(null);
 
   const editWhiteboardMutation = useMutation(
     api.whiteboards.editWhiteboard,
@@ -48,10 +154,7 @@ export default function WhiteboardHeader({ id }: Props) {
     localStore.setQuery(
       api.whiteboards.getWhiteboard,
       { id },
-      {
-        ...currentWhiteboard,
-        title,
-      },
+      { ...currentWhiteboard, title },
     );
   });
 
@@ -67,25 +170,18 @@ export default function WhiteboardHeader({ id }: Props) {
     localStore.setQuery(
       api.whiteboards.getWhiteboard,
       { id },
-      {
-        ...currentWhiteboard,
-        isPublic,
-      },
+      { ...currentWhiteboard, isPublic },
     );
   });
 
   const { copyWhiteboard, isCopying, CopyingOverlay } = useCopyWhiteboard();
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
-  };
 
   const handleTitleSubmit = async () => {
     if (title.trim()) {
-      await editWhiteboardMutation({
-        id,
-        title: title.trim(),
-      });
+      await editWhiteboardMutation({ id, title: title.trim() });
     }
     setIsEditing(false);
   };
@@ -107,37 +203,8 @@ export default function WhiteboardHeader({ id }: Props) {
 
   const handlePublishToggle = async () => {
     if (!whiteboard) return;
-    await setPublicStatusMutation({
-      id,
-      isPublic: !whiteboard.isPublic,
-    });
+    await setPublicStatusMutation({ id, isPublic: !whiteboard.isPublic });
   };
-
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success("Copied to clipboard!", {
-        duration: 2000,
-        position: "top-center",
-      });
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      toast.error("Failed to copy to clipboard");
-    } finally {
-      setShareOpen(false);
-    }
-  };
-
-  const selectShareInput = () => {
-    if (!shareInput.current) return;
-    shareInput.current.select();
-  };
-
-  useEffect(() => {
-    if (!shareOpen) return;
-    // Pre-select the content when the dialog opens
-    selectShareInput();
-  }, [shareOpen]);
 
   return (
     <>
@@ -148,9 +215,8 @@ export default function WhiteboardHeader({ id }: Props) {
         }}
       >
         <div className="mx-auto h-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Grid layout for consistent spacing */}
           <div className="grid h-full grid-cols-3 items-center gap-4">
-            {/* Left section - Navigation */}
+            {/* Left */}
             <div className="flex justify-start">
               <Link
                 href="/whiteboards"
@@ -162,37 +228,24 @@ export default function WhiteboardHeader({ id }: Props) {
               </Link>
             </div>
 
-            {/* Center section - Title */}
+            {/* Centre */}
             <div className="flex justify-center">
               {whiteboard && (
-                <Input
-                  value={isEditing ? title : (whiteboard?.title ?? "Untitled")}
+                <EditableTitle
+                  isEditing={isEditing}
+                  title={title}
+                  whiteboardTitle={whiteboard.title}
                   onChange={handleTitleChange}
                   onBlur={handleTitleSubmit}
                   onKeyDown={handleKeyDown}
                   onClick={startEditing}
                   onFocus={startEditing}
-                  className={cn(
-                    "h-auto w-auto min-w-[100px] px-2 py-0.5 text-center",
-                    isEditing
-                      ? "border-transparent"
-                      : "cursor-pointer hover:ring-2 hover:ring-gray-500",
-                  )}
-                  style={{
-                    width: isEditing
-                      ? `${Math.max(100, Math.min(300, (title.length || 1) * 8.5))}px`
-                      : `${Math.max(100, Math.min(300, (whiteboard?.title ?? "Untitled").length * 8.5))}px`,
-                  }}
-                  readOnly={!isEditing}
-                  autoFocus={isEditing}
-                  maxLength={30}
                 />
               )}
             </div>
 
-            {/* Right section - Actions */}
+            {/* Right */}
             <div className="flex items-center justify-end gap-2 sm:gap-3 md:gap-4">
-              {/* Share button with consistent width */}
               <div className="flex w-8 justify-center">
                 {whiteboard?.isPublic && (
                   <Button
@@ -207,7 +260,6 @@ export default function WhiteboardHeader({ id }: Props) {
                 )}
               </div>
 
-              {/* Publish/Copy button */}
               <Button
                 onClick={
                   whiteboard?.isPublic &&
@@ -234,7 +286,6 @@ export default function WhiteboardHeader({ id }: Props) {
                     : "Publish"}
               </Button>
 
-              {/* User button */}
               <Suspense
                 fallback={
                   <div
@@ -251,40 +302,8 @@ export default function WhiteboardHeader({ id }: Props) {
           </div>
         </div>
       </header>
-      {/* Share Dialog */}
-      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share this whiteboard</DialogTitle>
-            <DialogDescription>
-              Anyone who has this link will be able to view this.
-            </DialogDescription>
-          </DialogHeader>
 
-          <div className="flex items-center space-x-2">
-            <Input
-              id="share-url-input"
-              value={typeof window !== "undefined" ? window.location.href : ""}
-              readOnly
-              className="flex-1"
-              onFocus={selectShareInput} // selects all text on focus
-              onClick={selectShareInput}
-              ref={shareInput}
-            />
-            <Button size="sm" onClick={copyLink}>
-              Copy
-            </Button>
-          </div>
-
-          <DialogFooter className="sm:justify-start">
-            <DialogClose asChild>
-              <Button type="button" variant="secondary">
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ShareDialog open={shareOpen} onOpenChange={setShareOpen} />
       <CopyingOverlay />
     </>
   );
