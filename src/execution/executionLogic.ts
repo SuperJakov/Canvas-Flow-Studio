@@ -177,10 +177,22 @@ function initializeExecutionProgress(
   });
 }
 
-function updateExecutionProgress(get: Getter, set: Setter) {
+function updateExecutionProgress(
+  get: Getter,
+  set: Setter,
+  startNodeId: string,
+) {
   const progress = get(executionProgressAtom);
+  const allNodes = get(nodesAtom);
+  const allEdges = get(edgesAtom);
+  const totalNodes = calculateTotalNodesToExecute(
+    allNodes,
+    allEdges,
+    startNodeId,
+  );
   set(executionProgressAtom, {
     ...progress,
+    totalNodesForExecution: totalNodes,
     executedNodesCount: progress.executedNodesCount + 1,
   });
 }
@@ -189,9 +201,17 @@ function finalizeExecutionProgress(
   get: Getter,
   set: Setter,
   visited: Set<string>,
+  startNodeId: string,
 ) {
-  const progress = get(executionProgressAtom);
-  if (visited.size === progress.totalNodesForExecution) {
+  const allNodes = get(nodesAtom);
+  const allEdges = get(edgesAtom);
+  const totalNodes = calculateTotalNodesToExecute(
+    allNodes,
+    allEdges,
+    startNodeId,
+  );
+
+  if (visited.size >= totalNodes) {
     set(executionProgressAtom, {
       isExecuting: false,
       totalNodesForExecution: 0,
@@ -266,6 +286,7 @@ async function processOutgoingEdges(
   set: Setter,
   currentNode: AppNode,
   visited: Set<string>,
+  startNodeId: string,
 ) {
   const allNodes = get(nodesAtom);
   const allEdges = get(edgesAtom);
@@ -285,7 +306,7 @@ async function processOutgoingEdges(
         executeTextNode(get, set, currentNode, nextNode);
       }
 
-      await executeNodeLogic(get, set, nextNode.id, visited);
+      await executeNodeLogic(get, set, nextNode.id, visited, startNodeId);
     } finally {
       console.groupEnd();
     }
@@ -297,11 +318,13 @@ export async function executeNodeLogic(
   set: Setter,
   nodeId: string,
   visited: Set<string> = new Set<string>(),
+  startNodeId?: string,
 ) {
+  const actualStartNodeId = startNodeId ?? nodeId;
   console.groupCollapsed(`executeNodeLogic: Executing node ${nodeId}`);
   try {
     if (visited.size === 0) {
-      initializeExecutionProgress(get, set, nodeId);
+      initializeExecutionProgress(get, set, actualStartNodeId);
     }
     if (visited.has(nodeId)) return;
     visited.add(nodeId);
@@ -315,13 +338,20 @@ export async function executeNodeLogic(
     try {
       setNodeRunning(set, nodeId, currentNode.type, true);
       set(isExecutingNodeAtom, true);
-      updateExecutionProgress(get, set);
 
       await executeCurrentNode(get, set, currentNode);
-      await processOutgoingEdges(get, set, currentNode, visited);
+      await processOutgoingEdges(
+        get,
+        set,
+        currentNode,
+        visited,
+        actualStartNodeId,
+      );
+
+      updateExecutionProgress(get, set, actualStartNodeId);
     } finally {
       setNodeRunning(set, nodeId, currentNode.type, false);
-      finalizeExecutionProgress(get, set, visited);
+      finalizeExecutionProgress(get, set, visited, actualStartNodeId);
     }
   } finally {
     set(isExecutingNodeAtom, false); // Ensure this is always reset

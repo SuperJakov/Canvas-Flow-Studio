@@ -10,6 +10,7 @@ import { Authenticated, AuthLoading } from "convex/react";
 import { Suspense } from "react";
 import Loading from "../loading";
 import { useCopyWhiteboard } from "./utils";
+import ProgressBar from "./ProgressBar";
 
 type Props = {
   id: Id<"whiteboards">;
@@ -27,6 +28,7 @@ export default function WhiteboardPage({ id }: Props) {
               {!isCopying && <WhiteboardHeader id={id} />}
               {!isCopying && <Sidebar />}
               <Whiteboard id={id} />
+              <ProgressBar />
             </div>
           </ReactFlowProvider>
         </DnDProvider>

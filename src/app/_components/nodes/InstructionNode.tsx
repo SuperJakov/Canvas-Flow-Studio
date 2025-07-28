@@ -133,17 +133,16 @@ export default function InstructionNode({
         {isRateLimited ? (
           <RateLimitBanner onUpgradeClick={openBanner} />
         ) : (
-          <>
-            <Handle type="target" position={Position.Top} />
-            <Header
-              isLocked={isLocked}
-              canRunNode={canRunNode}
-              isRunning={isRunning}
-              onToggleLock={toggleLock}
-              onToggleRunning={toggleRunning}
-            />
-          </>
+          <Header
+            isLocked={isLocked}
+            canRunNode={canRunNode}
+            isRunning={isRunning}
+            onToggleLock={toggleLock}
+            onToggleRunning={toggleRunning}
+          />
         )}
+
+        <Handle type="target" position={Position.Top} />
 
         <div className="bg-gray-700">
           <textarea
