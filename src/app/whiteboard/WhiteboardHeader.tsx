@@ -121,11 +121,16 @@ function EditableTitle({
       onClick={onClick}
       onFocus={onFocus}
       className={cn(
-        "field-sizing-content h-auto w-auto min-w-[100px] px-2 py-0.5 text-center",
+        "h-auto w-auto min-w-[100px] px-0 py-0.5 text-center",
         isEditing
           ? "border-transparent"
           : "cursor-pointer hover:ring-2 hover:ring-gray-500",
       )}
+      style={{
+        width: isEditing
+          ? `${Math.max(100, Math.min(300, (title.length || 1) * 8.5))}px`
+          : `${Math.max(100, Math.min(300, (whiteboardTitle ?? "Untitled").length * 8.5))}px`,
+      }}
       readOnly={!isEditing}
       autoFocus={isEditing}
       maxLength={30}
