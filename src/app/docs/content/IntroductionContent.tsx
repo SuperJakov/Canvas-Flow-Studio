@@ -5,8 +5,10 @@ import { Separator } from "~/components/ui/separator";
 export default function IntroductionContent() {
   return (
     <section id="introduction" className="bg-background mb-16 scroll-mt-16">
-      <h2 className="mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
-        Introduction
+      <h2>
+        <span className="mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
+          Introduction
+        </span>
       </h2>
       <div>
         <p>Welcome to AI Flow Studio documentation!</p>
@@ -14,6 +16,7 @@ export default function IntroductionContent() {
         <Separator className="my-6" />
 
         <h3 className="pb-2 text-2xl font-black">What is AI Flow Studio?</h3>
+
         <p>
           AI Flow Studio is an app which is used to create AI-powered workflows
           through a visual, node-based interface.

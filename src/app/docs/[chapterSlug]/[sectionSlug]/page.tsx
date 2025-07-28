@@ -1,4 +1,4 @@
-import DocsPage from "../../page";
+import DocsPage from "../../DocsPage";
 
 type Props = {
   params: Promise<{

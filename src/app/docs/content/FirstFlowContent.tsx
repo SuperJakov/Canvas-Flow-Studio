@@ -42,14 +42,14 @@ export default function FirstFlowContent() {
         </span>
       </h2>
       <div>
-        <div className="mb-6">
-          <p className="mb-4">
+        <div>
+          <p>
             Let&apos;s walk through the process of creating your first AI
             workflow:
           </p>
         </div>
-        <Separator />
-        <div className="space-y-6 pt-8 pb-8">
+        <Separator className="my-6" />
+        <div className="space-y-6 pb-8">
           <Step
             number={1}
             title="Access the Whiteboard"

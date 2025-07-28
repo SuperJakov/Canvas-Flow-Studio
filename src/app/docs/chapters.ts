@@ -28,4 +28,4 @@ export const chapters: DocChapter[] = [
       { title: "AI Models", slug: "ai-models" },
     ],
   },
-];
+] as const; // Make it readonly to preserve literal types

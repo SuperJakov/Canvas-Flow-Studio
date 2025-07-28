@@ -19,15 +19,13 @@ export default function CanvasContent() {
           whiteboards. Let&apos;s explore its key components:
         </p>
 
-        <Separator className="my-4" />
+        <Separator className="my-6" />
 
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
             <CardHeader className="pb-2">
               <div className="inline-flex items-center gap-1">
-                <CardTitle className="text-xl font-semibold">
-                  Sidebar
-                </CardTitle>
+                <CardTitle className="text-xl font-semibold">Sidebar</CardTitle>
               </div>
             </CardHeader>
             <CardContent>

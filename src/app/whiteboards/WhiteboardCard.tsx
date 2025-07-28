@@ -156,8 +156,11 @@ export default function WhiteboardCard({
                     if (e.key === "Escape") setIsEditing(false);
                   }}
                   autoFocus
-                  onClick={(e) => e.stopPropagation()}
-                  className="no-link h-auto w-full cursor-text rounded-md border-blue-500 bg-white/10 p-1 text-base font-semibold focus:ring-2 focus:ring-blue-500"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent link redirecting
+                    e.stopPropagation();
+                  }}
+                  className="no-link h-auto w-full cursor-text rounded-md bg-white/10 p-1 text-base font-semibold"
                   maxLength={30}
                 />
               ) : (
@@ -172,7 +175,7 @@ export default function WhiteboardCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                    className={`h-8 w-8 rounded-full p-0 transition-opacity ${isMenuOpen ? "opacity-100" : "opacity-0"} group-hover:opacity-100 focus:opacity-100`}
                     aria-label="More options"
                   >
                     <MoreVertical className="h-5 w-5" />
