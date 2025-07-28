@@ -4,6 +4,7 @@ import CanvasContent from "./content/CanvasContent";
 import NodesConnectionsContent from "./content/NodesConnectionsContent";
 import TextNodeContent from "./content/TextNodeContent";
 import { type chapters } from "./chapters";
+import PageTitle from "./components/PageTitle";
 
 // Extract the structure from chapters to create a type
 type ChapterStructure = {
@@ -36,11 +37,8 @@ function Placeholder({ title }: { title: string }) {
       id={title.toLowerCase().replace(/\s+/g, "-")}
       className="mb-16 scroll-mt-16"
     >
-      <h2 className="mb-4 text-2xl font-bold text-white">
-        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          {title}
-        </span>
-      </h2>
+      <PageTitle>{title}</PageTitle>
+
       <div className="">
         <p>Advanced usage content for {title} coming soon…</p>
       </div>

@@ -1,15 +1,12 @@
 "use client";
 
 import { Separator } from "~/components/ui/separator";
+import PageTitle from "../components/PageTitle";
 
 export default function IntroductionContent() {
   return (
     <section id="introduction" className="bg-background mb-16 scroll-mt-16">
-      <h2>
-        <span className="mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-2xl font-bold text-transparent">
-          Introduction
-        </span>
-      </h2>
+      <PageTitle>Introduction</PageTitle>
       <div>
         <p>Welcome to AI Flow Studio documentation!</p>
 

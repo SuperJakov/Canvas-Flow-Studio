@@ -4,15 +4,12 @@ import { Delete } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
+import PageTitle from "../components/PageTitle";
 
 export default function CanvasContent() {
   return (
     <section id="canvas" className="mb-16 scroll-mt-16">
-      <h2 className="mb-4 text-2xl font-bold">
-        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Understanding the Canvas
-        </span>
-      </h2>
+      <PageTitle>Understanding the Canvas</PageTitle>
       <div>
         <p>
           The whiteboard canvas is your creative place for building AI

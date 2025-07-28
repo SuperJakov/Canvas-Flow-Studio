@@ -6,15 +6,12 @@ import TextToImageExample from "public/text_to_image_example.png";
 import ModifyingTextExample from "public/modifying_text_example.png";
 import ModifyingText2Example from "public/modifying_text_2_example.png";
 import GeneratingSpeech from "public/speech_generation.png";
+import PageTitle from "../components/PageTitle";
 
 export default function TextNodeContent() {
   return (
     <section id="first-flow" className="bg-background mb-16 scroll-mt-16">
-      <h2 className="mb-4 text-2xl font-bold">
-        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Mastering the Text Node
-        </span>
-      </h2>
+      <PageTitle>Mastering the Text Node</PageTitle>
       <p>
         The Text Node is a fundamental building block in AI Flow Studio. This
         guide will walk you through its various interactions with other nodes.

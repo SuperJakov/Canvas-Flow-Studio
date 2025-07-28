@@ -8,15 +8,12 @@ import {
   Lightbulb,
   Type,
 } from "lucide-react";
+import PageTitle from "../components/PageTitle";
 
 export default function NodesConnectionsContent() {
   return (
     <section id="nodes-connections" className="mb-16 scroll-mt-16">
-      <h2 className="mb-4 text-2xl font-bold">
-        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Nodes & Connections
-        </span>
-      </h2>
+      <PageTitle>Nodes & Connections</PageTitle>
       <div>
         <p className="mb-6">
           AI Flow Studio uses a simple node-based system. Each node has a

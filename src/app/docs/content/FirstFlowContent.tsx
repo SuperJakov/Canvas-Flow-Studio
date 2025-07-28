@@ -8,6 +8,7 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 
 import screenshot from "public/firstflow_screenshot.png";
 import Image from "next/image";
+import PageTitle from "../components/PageTitle";
 
 function Step({
   number,
@@ -36,11 +37,7 @@ function Step({
 export default function FirstFlowContent() {
   return (
     <section id="first-flow" className="bg-background mb-16 scroll-mt-16">
-      <h2 className="mb-4 text-2xl font-bold">
-        <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Creating Your First Flow
-        </span>
-      </h2>
+      <PageTitle>Creating Your First Flow</PageTitle>
       <div>
         <div>
           <p>
