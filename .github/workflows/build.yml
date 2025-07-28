@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: node:20-alpine
-      options: --user node
 
     env:
       SKIP_ENV_VALIDATION: "true"
