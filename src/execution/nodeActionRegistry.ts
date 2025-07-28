@@ -44,7 +44,10 @@ export function getSpeechAction(nodeId: string) {
   return speechActionMap.get(nodeId);
 }
 
-const textActionMap = new Map<string, ReactAction<typeof api.textNodes.modifyText>>();
+const textActionMap = new Map<
+  string,
+  ReactAction<typeof api.textNodes.modifyText>
+>();
 
 export function registerTextAction(
   nodeId: string,
