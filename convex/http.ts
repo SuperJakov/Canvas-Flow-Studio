@@ -43,6 +43,13 @@ http.route({
             creditAmount: 10,
             type: "signup",
           });
+          console.log("Adding 3 speech credits...");
+          await ctx.scheduler.runAfter(0, internal.credits.addCredits, {
+            userId: event.data.id,
+            creditType: "speech",
+            creditAmount: 3,
+            type: "signup",
+          });
           break;
 
         case "user.updated":

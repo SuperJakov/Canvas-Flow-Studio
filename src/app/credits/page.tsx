@@ -4,7 +4,7 @@ import CreditsPageClient from "./CreditsPageClient";
 
 export default async function CreditsPage() {
   const token = await getConvexToken();
-  if (!token) <RedirectToSignIn />;
+  if (!token) return <RedirectToSignIn />;
 
   return <CreditsPageClient />;
 }

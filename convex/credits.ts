@@ -13,11 +13,11 @@ export const getRemainingCreditsPublic = query({
     if (!identity) throw new Error("Not authenticated");
 
     const userId = identity.subject;
-    const imageCredits = await creditsAggregate.sum(ctx, {
+    const credits = await creditsAggregate.sum(ctx, {
       bounds: { prefix: [userId, creditType] },
     });
 
-    return imageCredits;
+    return credits;
   },
 });
 

@@ -24,9 +24,15 @@ const priceIdToTier: Record<string, Tier> = {
 };
 
 // Credit amounts for each tier
-const tierCredits: Record<Tier, number> = {
-  Plus: 250,
-  Pro: 650,
+const tierCredits: Record<Tier, Record<"image" | "speech", number>> = {
+  Plus: {
+    image: 250,
+    speech: 35,
+  },
+  Pro: {
+    image: 650,
+    speech: 100,
+  },
 };
 
 /**
@@ -402,12 +408,21 @@ const addCreditsForSubscription = async (
     await ctx.runMutation(internal.credits.addCredits, {
       userId: clerkUserId,
       creditType: "image", // Assuming "image" is your credit type
-      creditAmount,
+      creditAmount: creditAmount.image,
+      type: creditType,
+    });
+    await ctx.runMutation(internal.credits.addCredits, {
+      userId: clerkUserId,
+      creditType: "speech",
+      creditAmount: creditAmount.speech,
       type: creditType,
     });
 
     console.log(
-      `[Credits] Added ${creditAmount} credits for ${tier} subscription to user ${clerkUserId}`,
+      `[Credits] Added ${creditAmount.image} image credits for ${tier} subscription to user ${clerkUserId}`,
+    );
+    console.log(
+      `[Credits] Added ${creditAmount.speech} speech credits for ${tier} subscription to user ${clerkUserId}`,
     );
   } catch (error) {
     console.error(
@@ -550,7 +565,6 @@ export const handleEvent = internalAction({
             if (clerkUserId) {
               // Get subscription to determine tier
               try {
-                // ✅ FIX: We now pass a guaranteed string to retrieve()
                 const subscription =
                   await stripe.subscriptions.retrieve(subscriptionId);
 
@@ -565,7 +579,7 @@ export const handleEvent = internalAction({
                     "subscription",
                   );
                   console.log(
-                    `[Webhook] Added ${tierCredits[tier]} credits for recurring payment - User: ${clerkUserId}, Tier: ${tier}`,
+                    `[Webhook] Added ${tierCredits[tier].image} image credits and ${tierCredits[tier].speech} speech credits for recurring payment - User: ${clerkUserId}, Tier: ${tier}`,
                   );
                 }
               } catch (error) {

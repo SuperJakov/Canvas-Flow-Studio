@@ -263,8 +263,7 @@ export default function SpeechNode({
   const speechGenRateLimit = useConvexQuery(
     api.speechNodes.getSpeechGenerationRateLimit,
   );
-  const isRateLimited = speechGenRateLimit ? !speechGenRateLimit.ok : false;
-  const retryAfterSeconds = speechGenRateLimit?.retryAfter;
+  const isRateLimited = speechGenRateLimit?.isRateLimited;
 
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
@@ -290,13 +289,6 @@ export default function SpeechNode({
   const closeBanner = () => {
     setIsBannerOpen(false);
   };
-
-  const hoursUntilReset = retryAfterSeconds
-    ? Math.ceil(retryAfterSeconds / 3600 / 1000)
-    : 0;
-
-  const daysUntilReset =
-    hoursUntilReset > 24 ? Math.ceil(hoursUntilReset / 24) : 0;
 
   const hasIncomingConnections = edges.some((edge) => edge.target === id);
 
@@ -454,14 +446,6 @@ export default function SpeechNode({
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-white">
                     Rate Limit Reached
-                  </span>
-                  <span className="text-xs text-red-100">
-                    Resets in{" "}
-                    {daysUntilReset > 0
-                      ? `${daysUntilReset} day${daysUntilReset > 1 ? "s" : ""}`
-                      : `${hoursUntilReset} hour${
-                          hoursUntilReset !== 1 ? "s" : ""
-                        }`}
                   </span>
                 </div>
               </div>
