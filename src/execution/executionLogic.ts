@@ -163,11 +163,9 @@ function initializeExecutionProgress(
   set: Setter,
   startNodeId: string,
 ) {
-  const allNodes = get(nodesAtom);
-  const allEdges = get(edgesAtom);
   const totalNodes = calculateTotalNodesToExecute(
-    allNodes,
-    allEdges,
+    get(nodesAtom),
+    get(edgesAtom),
     startNodeId,
   );
   set(executionProgressAtom, {
@@ -183,11 +181,9 @@ function updateExecutionProgress(
   startNodeId: string,
 ) {
   const progress = get(executionProgressAtom);
-  const allNodes = get(nodesAtom);
-  const allEdges = get(edgesAtom);
   const totalNodes = calculateTotalNodesToExecute(
-    allNodes,
-    allEdges,
+    get(nodesAtom),
+    get(edgesAtom),
     startNodeId,
   );
   set(executionProgressAtom, {
@@ -203,11 +199,9 @@ function finalizeExecutionProgress(
   visited: Set<string>,
   startNodeId: string,
 ) {
-  const allNodes = get(nodesAtom);
-  const allEdges = get(edgesAtom);
   const totalNodes = calculateTotalNodesToExecute(
-    allNodes,
-    allEdges,
+    get(nodesAtom),
+    get(edgesAtom),
     startNodeId,
   );
 
@@ -220,27 +214,48 @@ function finalizeExecutionProgress(
   }
 }
 
-function calculateTotalNodesToExecute(
+export function calculateTotalNodesToExecute(
   nodes: AppNode[],
   edges: AppEdge[],
   startNodeId: string,
-  visited: Set<string> = new Set<string>(),
 ): number {
-  if (visited.has(startNodeId)) return 0;
-  visited.add(startNodeId);
-  const node = nodes.find((n) => n.id === startNodeId);
-  if (!node || node.data.isLocked) return 0;
-  const outgoingEdges = edges.filter((edge) => edge.source === startNodeId);
-  let totalNodes = 1;
-  for (const edge of outgoingEdges) {
-    totalNodes += calculateTotalNodesToExecute(
-      nodes,
-      edges,
-      edge.target,
-      visited,
-    );
+  const visited = new Set<string>();
+
+  function countNodesRecursive(nodeId: string): number {
+    if (visited.has(nodeId)) return 0;
+    visited.add(nodeId);
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node || node.data.isLocked) return 0;
+
+    const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+    let totalNodes = 1;
+    for (const edge of outgoingEdges) {
+      totalNodes += countNodesRecursive(edge.target);
+    }
+    return totalNodes;
   }
-  return totalNodes;
+
+  return countNodesRecursive(startNodeId);
+}
+
+export function recalculateExecutionProgress(
+  get: Getter,
+  set: Setter,
+  startNodeId: string,
+): void {
+  const totalNodes = calculateTotalNodesToExecute(
+    get(nodesAtom),
+    get(edgesAtom),
+    startNodeId,
+  );
+
+  const currentProgress = get(executionProgressAtom);
+  if (currentProgress.isExecuting) {
+    set(executionProgressAtom, {
+      ...currentProgress,
+      totalNodesForExecution: totalNodes,
+    });
+  }
 }
 
 // NODE STATE MANAGEMENT (no changes needed)
