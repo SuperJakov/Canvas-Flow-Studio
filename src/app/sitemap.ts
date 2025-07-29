@@ -4,11 +4,25 @@ import { chapters } from "./docs/chapters";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-const ROOT_ROUTES = ["/", "/pricing"] as const;
+const ROOT_ROUTES = ["/", "/pricing", "/changelog"] as const;
 const PRIORITY_OVERRIDES: Record<string, number> = {
   "/": 1,
   "/docs/getting-started/introduction": 0.8,
   "/pricing": 0.7,
+  "/changelog": 0.6,
+};
+
+type ChangeFrequency =
+  | "always"
+  | "hourly"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "yearly"
+  | "never";
+
+const CHANGE_FREQUENCY_OVERRIDES: Record<string, ChangeFrequency> = {
+  "/changelog": "daily",
 };
 
 /**
@@ -25,10 +39,13 @@ async function generateSitemapEntry(pathRoute: string): Promise<SitemapEntry> {
 
   const priority = PRIORITY_OVERRIDES[pathRoute] ?? 0.5;
 
+  const changeFrequency: ChangeFrequency =
+    CHANGE_FREQUENCY_OVERRIDES[pathRoute] ?? "weekly";
+
   return {
     url: fullUrl,
     lastModified,
-    changeFrequency: "weekly",
+    changeFrequency,
     priority,
   };
 }
