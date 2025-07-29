@@ -248,11 +248,16 @@ Our team will review all model recommendations and prioritize based on user dema
 
 - Ship 1, wait for cert
 
+- [x] Fix progress bar total node count
+- [] Fix progress bar when multiple are running
 - [] Finish WIP examples
 - [] Fix select on whiteboard page for light areas
 - [] Instructions shouldnt create new nodes
 - [] More clear status when nodes are running
 - [] Fixed `isNodeExecutable` function
+
+---
+
 - [] Fix new nodes added by instruction node exceeding rate limit
 - [] Fix gallery
 - [] Better error handling when running nodes

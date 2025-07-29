@@ -309,6 +309,9 @@ async function processOutgoingEdges(
     (edge) => edge.source === currentNode.id,
   );
 
+  // Recalculate progress before processing edges in case structure changed
+  recalculateExecutionProgress(get, set, startNodeId);
+
   for (const edge of outgoingEdges) {
     console.groupCollapsed(
       `Processing edge from node ${currentNode.id} to ${edge.target}`,
@@ -354,6 +357,9 @@ export async function executeNodeLogic(
       setNodeRunning(set, nodeId, currentNode.type, true);
       set(isExecutingNodeAtom, true);
 
+      // Ensure progress is synced before execution
+      recalculateExecutionProgress(get, set, actualStartNodeId);
+      
       await executeCurrentNode(get, set, currentNode);
       await processOutgoingEdges(
         get,
