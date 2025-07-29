@@ -115,7 +115,9 @@ export default function GalleryClient() {
           }
 
           const blob = await response.blob();
-          const filename = `generated-image-${index + 1}-${image._id}.png`;
+          const filename = image.imageDescription
+            ? `${image.imageDescription}.png`
+            : `generated-image-${String(index + 1).padStart(String(validImages.length).length, "0")}.png`;
 
           // Update progress atomically
           completedCount++;
@@ -287,8 +289,8 @@ export default function GalleryClient() {
                           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           className="cursor-pointer object-cover"
                           onClick={() => handleImageClick(image)}
+                          loading="lazy"
                           quality={100}
-                          priority={true}
                         />
                         {/* Download button - appears on hover */}
                         <button
@@ -351,6 +353,7 @@ export default function GalleryClient() {
                   sizes="100vw"
                   className="object-contain"
                   quality={100}
+                  loading="eager"
                   priority={true}
                 />
               )}
@@ -369,6 +372,13 @@ export default function GalleryClient() {
                 <p>{formatDate(fullscreenImage._creationTime)}</p>
               </div>
 
+              <div>
+                <label className="text-muted-foreground text-sm font-medium">
+                  Image Description
+                </label>
+                <p>{fullscreenImage.imageDescription ?? "No description"}</p>
+              </div>
+
               {fullscreenImage.whiteboardId && (
                 <div>
                   <label className="text-muted-foreground text-sm font-medium">
@@ -382,15 +392,6 @@ export default function GalleryClient() {
                   </Link>
                 </div>
               )}
-
-              <div>
-                <label className="text-muted-foreground text-sm font-medium">
-                  Prompt
-                </label>
-                <p className="bg-secondary text-secondary-foreground mt-1 rounded p-3 text-sm">
-                  Prompt goes here
-                </p>
-              </div>
 
               <div className="border-t border-gray-700 pt-4">
                 <Button

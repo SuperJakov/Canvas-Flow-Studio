@@ -23,6 +23,7 @@
     "@convex-dev/auth": "^0.0.87",
     "@convex-dev/migrations": "^0.2.9",
     "@convex-dev/rate-limiter": "^0.2.12",
+    "@convex-dev/workpool": "^0.2.17",
     "@google/genai": "^1.11.0",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-dialog": "^1.1.14",

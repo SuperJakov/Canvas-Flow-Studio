@@ -1,10 +1,33 @@
 import { type Infer, v } from "convex/values";
-import { action, query } from "./_generated/server";
+import {
+  action,
+  internalAction,
+  internalQuery,
+  query,
+} from "./_generated/server";
 import { internalMutation } from "./functions";
 import { Style, TextEditorNodeData } from "./schema";
 import { AzureOpenAI } from "openai";
-import { api, internal } from "./_generated/api";
+import { api, components, internal } from "./_generated/api";
 import type { UserIdentity } from "convex/server";
+import { Workpool } from "@convex-dev/workpool";
+import { GoogleGenAI } from "@google/genai";
+import { type Doc } from "./_generated/dataModel";
+
+function initGemini() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY not set");
+  }
+  const ai = new GoogleGenAI({ apiKey });
+
+  return ai;
+}
+
+const imageDescriptionPool = new Workpool(components.imageDescription, {
+  maxParallelism: 1,
+  retryActionsByDefault: true,
+});
 
 export const getImageGenerationRateLimit = query({
   handler: async (ctx) => {
@@ -41,6 +64,34 @@ export const getImageNodeUrl = query({
       .first();
 
     return imageNode?.imageUrl ?? null;
+  },
+});
+
+export const getImageNodeUrlInternal = internalQuery({
+  args: {
+    nodeId: v.string(),
+  },
+  handler: async (ctx, { nodeId }) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+
+    return imageNode?.imageUrl ?? null;
+  },
+});
+
+export const getImageNodeByNodeId = internalQuery({
+  args: {
+    nodeId: v.string(),
+  },
+  handler: async (ctx, { nodeId }) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+
+    return imageNode;
   },
 });
 
@@ -249,6 +300,30 @@ export const generateAndStoreImage = action({
       const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
       if (!userPlanInfo) throw new Error("Error when getting user's plan");
 
+      // Check if there's an existing poolId and cancel it
+      const existingImageNode = await ctx.runQuery(
+        internal.imageNodes.getImageNodeByNodeId,
+        { nodeId },
+      );
+
+      if (existingImageNode?.poolId) {
+        await imageDescriptionPool.cancel(ctx, existingImageNode.poolId);
+        await ctx.runMutation(internal.imageNodes.editImageNode, {
+          nodeId,
+          updatedNode: {
+            poolId: null,
+          },
+        });
+      }
+      if (existingImageNode?.imageDescription) {
+        await ctx.runMutation(internal.imageNodes.editImageNode, {
+          nodeId,
+          updatedNode: {
+            imageDescription: null,
+          },
+        });
+      }
+
       await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
         isGenerating: true,
         nodeId: nodeId,
@@ -306,6 +381,27 @@ export const generateAndStoreImage = action({
         quality: "low",
         resolution: "1024x1024",
         inputTokenDetails,
+      });
+
+      const poolId = await imageDescriptionPool.enqueueAction(
+        ctx,
+        internal.imageNodes.addImageDescription,
+        {
+          imageNodeId: nodeId,
+        },
+        {
+          retry: {
+            initialBackoffMs: 1000 * 60 * 60, // 1 hour
+            base: 2,
+            maxAttempts: 20,
+          },
+          runAfter: 5000,
+        },
+      );
+
+      await ctx.runMutation(internal.imageNodes.editImageNode, {
+        nodeId: nodeId,
+        updatedNode: { poolId },
       });
     } catch (error) {
       console.error(error);
@@ -458,5 +554,80 @@ export const getAllGeneratedImages = query({
       .collect();
 
     return allGeneratedImages;
+  },
+});
+
+export const addImageDescription = internalAction({
+  args: { imageNodeId: v.string() },
+  handler: async (ctx, { imageNodeId }) => {
+    const imageNodeUrl = await ctx.runQuery(
+      internal.imageNodes.getImageNodeUrlInternal,
+      { nodeId: imageNodeId },
+    );
+    if (!imageNodeUrl) {
+      console.log("Image node URL not found. Exiting safely");
+      return;
+    } // Dont throw
+
+    // 1) Fetch blob
+    const blob = await fetch(imageNodeUrl).then((res) => res.blob());
+    const mimeType = blob.type;
+
+    // 2) ArrayBuffer → base64 via chunked helper
+    const arrayBuffer = await blob.arrayBuffer();
+    const base64 = arrayBufferToBase64(arrayBuffer);
+
+    // 3) Call Gemini
+    const ai = initGemini();
+    const response = await ai.models.generateContent({
+      contents: [
+        { inlineData: { data: base64, mimeType } },
+        `Generate a concise, descriptive phrase (4 - 6 words) that captures the essential subject or focal point of the image. Do not use punctuation. Do not   include phrases like "here's your description" or any other meta-commentary. Respond ONLY with the descriptive phrase itself. Focus on being accurate, specific, and brief.`,
+      ],
+      model: "gemini-2.5-flash",
+      config: {
+        thinkingConfig: {
+          thinkingBudget: -1, // Model decides thinking
+        },
+        seed: Math.floor(Math.random() * 10000000),
+      },
+    });
+
+    await ctx.runMutation(internal.imageNodes.editImageNode, {
+      nodeId: imageNodeId,
+      updatedNode: {
+        imageDescription: response.text,
+      },
+    });
+    console.log(
+      "Generated and added description:",
+      response.text,
+      "to node with ID:",
+      imageNodeId,
+    );
+    await ctx.runMutation(internal.imageNodes.editImageNode, {
+      nodeId: imageNodeId,
+      updatedNode: {
+        poolId: null,
+      },
+    });
+  },
+});
+
+export const editImageNode = internalMutation({
+  handler: async (
+    ctx,
+    args: {
+      nodeId: string;
+      updatedNode: Partial<Doc<"imageNodes">>;
+    },
+  ) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", args.nodeId))
+      .first();
+    if (!imageNode) return undefined;
+
+    return await ctx.db.patch(imageNode._id, args.updatedNode);
   },
 });

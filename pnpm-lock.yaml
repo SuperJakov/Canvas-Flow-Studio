@@ -29,6 +29,9 @@ importers:
       '@convex-dev/rate-limiter':
         specifier: ^0.2.12
         version: 0.2.12(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react@19.1.0)
+      '@convex-dev/workpool':
+        specifier: ^0.2.17
+        version: 0.2.17(convex-helpers@0.1.100(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react@19.1.0)(typescript@5.8.3)(zod@4.0.10))(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))
       '@google/genai':
         specifier: ^1.11.0
         version: 1.11.0
@@ -406,6 +409,12 @@ packages:
     peerDependenciesMeta:
       react:
         optional: true
+
+  '@convex-dev/workpool@0.2.17':
+    resolution: {integrity: sha512-Z2GjubsieZATdLYip+WTRLQNRmo+Jl9OoeN0GjsgIhLriHrNyddijosgGH656LtdmVs4SdqyqkwvMwabRixakA==}
+    peerDependencies:
+      convex: '>=1.25.0 <1.35.0'
+      convex-helpers: ^0.1.94
 
   '@emnapi/core@0.45.0':
     resolution: {integrity: sha512-DPWjcUDQkCeEM4VnljEOEcXdAD7pp8zSZsgOujk/LGIwCXWbXJngin+MO4zbH429lzeC3WbYLGjE2MaUOwzpyw==}
@@ -4793,6 +4802,11 @@ snapshots:
       convex: 1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
     optionalDependencies:
       react: 19.1.0
+
+  '@convex-dev/workpool@0.2.17(convex-helpers@0.1.100(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react@19.1.0)(typescript@5.8.3)(zod@4.0.10))(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))':
+    dependencies:
+      convex: 1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+      convex-helpers: 0.1.100(convex@1.25.4(@clerk/clerk-react@5.37.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react@19.1.0)(typescript@5.8.3)(zod@4.0.10)
 
   '@emnapi/core@0.45.0':
     dependencies:

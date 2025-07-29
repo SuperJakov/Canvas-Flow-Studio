@@ -197,7 +197,7 @@ export default function NodesConnectionsContent() {
         <div className="bg-muted/50 border-border-2 rounded-md border p-4">
           <div className="mb-3 flex items-center">
             <Lightbulb className="mr-2 h-5 w-5 text-yellow-400" />
-            <h4 className="text-lg font-medium text-white">Tips for Success</h4>
+            <h4 className="text-lg font-medium">Tips for Success</h4>
           </div>
           <ul className="list-disc space-y-2 pl-5">
             <li>Start with a simple Text Node to Image Node connection</li>
@@ -205,8 +205,6 @@ export default function NodesConnectionsContent() {
             <li>
               Use Comment Nodes to document complex parts of your workflow
             </li>
-            <li>Organize your nodes in a clear left-to-right layout</li>
-            <li>Break complex workflows into smaller, manageable segments</li>
           </ul>
         </div>
       </div>

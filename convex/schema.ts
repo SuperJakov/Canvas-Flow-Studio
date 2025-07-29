@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { vWorkIdValidator } from "@convex-dev/workpool";
 
 export const TextEditorNodeData = v.object({
   text: v.string(),
@@ -129,6 +130,8 @@ const imageNodes = defineTable({
   whiteboardId: v.id("whiteboards"),
   authorExternalId: v.string(),
   isGenerating: v.optional(v.boolean()),
+  imageDescription: v.optional(v.union(v.string(), v.null())),
+  poolId: v.optional(v.union(vWorkIdValidator, v.null())),
 })
   .index("by_userId", ["authorExternalId"])
   .index("by_nodeId", ["nodeId"])

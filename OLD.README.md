@@ -248,7 +248,8 @@ Our team will review all model recommendations and prioritize based on user dema
 
 - Ship 1, wait for cert
 
-- [] Fix select on whiteboard page
+- [] Finish WIP examples
+- [] Fix select on whiteboard page for light areas
 - [] Instructions shouldnt create new nodes
 - [] More clear status when nodes are running
 - [] Fixed `isNodeExecutable` function
@@ -256,5 +257,8 @@ Our team will review all model recommendations and prioritize based on user dema
 - [] Fix gallery
 - [] Better error handling when running nodes
 - [] Finish docs
-- [] Blog
+- [] Blog, 1 post
 - [] Website node
+- [] Stable credits system
+
+- Ship 2
