@@ -359,7 +359,7 @@ export async function executeNodeLogic(
 
       // Ensure progress is synced before execution
       recalculateExecutionProgress(get, set, actualStartNodeId);
-      
+
       await executeCurrentNode(get, set, currentNode);
       await processOutgoingEdges(
         get,
