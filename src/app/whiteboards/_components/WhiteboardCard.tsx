@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import type { Doc, Id } from "../../../convex/_generated/dataModel";
+import { api } from "../../../../convex/_generated/api";
+import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 import Link from "next/link";
 import Image from "next/image";
 import { MoreVertical, Grid3X3 } from "lucide-react";
@@ -175,7 +175,7 @@ export default function WhiteboardCard({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`h-8 w-8 rounded-full p-0 transition-opacity ${isMenuOpen ? "opacity-100" : "opacity-0"} group-hover:opacity-100 focus:opacity-100`}
+                    className={`h-8 w-8 rounded-full p-0 transition-opacity ${isMenuOpen ? "opacity-100" : "pointer-fine:opacity-0"} group-hover:opacity-100 focus:opacity-100`}
                     aria-label="More options"
                   >
                     <MoreVertical className="h-5 w-5" />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import type { Doc, Id } from "../../../convex/_generated/dataModel";
+import { api } from "../../../../convex/_generated/api";
+import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 import Link from "next/link";
 import { MoreVertical, Folder } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -143,7 +143,7 @@ export default function ProjectCard({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-full p-0 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+                    className={`h-8 w-8 rounded-full p-0 transition-opacity ${isMenuOpen ? "opacity-100" : "pointer-fine:opacity-0"} group-hover:opacity-100 focus:opacity-100`}
                   >
                     <MoreVertical className="h-5 w-5" />
                   </Button>

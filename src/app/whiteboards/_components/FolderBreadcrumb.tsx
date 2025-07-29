@@ -9,7 +9,11 @@ import {
 } from "~/components/ui/breadcrumb";
 import ProjectBreadcrumbItem from "./ProjectBreadcrumbItem";
 
-function ProjectBreadcrumb({ projectIds }: { projectIds?: Id<"projects">[] }) {
+export default function FolderBreadcrumb({
+  projectIds,
+}: {
+  projectIds?: Id<"projects">[];
+}) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -28,5 +32,3 @@ function ProjectBreadcrumb({ projectIds }: { projectIds?: Id<"projects">[] }) {
     </Breadcrumb>
   );
 }
-
-export default ProjectBreadcrumb;
