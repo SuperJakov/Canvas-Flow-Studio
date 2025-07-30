@@ -304,7 +304,7 @@ Ensure all elements are clearly represented and cohesively integrated.`;
       size: "1024x1024",
       quality: "low",
       stream: true,
-      partial_images: 1,
+      partial_images: 2,
     });
   } else {
     openAiResponse = await client.images.generate({
