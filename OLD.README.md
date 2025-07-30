@@ -259,7 +259,7 @@ Our team will review all model recommendations and prioritize based on user dema
 ---
 
 - [] Fix new nodes added by instruction node exceeding rate limit
-- [] Fix gallery
+- [x] Fix gallery
 - [] Better error handling when running nodes
 - [] Finish docs
 - [] Blog, 1 post

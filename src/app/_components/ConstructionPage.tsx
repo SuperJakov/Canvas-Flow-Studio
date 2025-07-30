@@ -2,18 +2,18 @@ import { type Metadata } from "next";
 import { Button } from "~/components/ui/button";
 import { Home } from "lucide-react";
 import Link from "next/link";
+import Head from "next/head";
 
 export const metadata: Metadata = {
   title: "Under Construction",
-  robots: {
-    index: false,
-    follow: true,
-  },
 };
 
 export default function ConstructionPage() {
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center p-4 text-center">
+      <Head>
+        <meta name="robots" content="noindex, follow" />
+      </Head>
       <h1 className="mb-6 text-4xl font-bold sm:text-5xl md:text-6xl">
         <span className="bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent">
           Under Construction
