@@ -252,6 +252,102 @@ Ensure all elements are clearly represented and cohesively integrated.`;
   };
 }
 
+async function* streamAIImage(
+  identity: UserIdentity,
+  textContents: string[],
+  style: StyleType,
+  inputImageBase64?: string,
+) {
+  const client = getClient();
+
+  const styleDescription = systemPrompts[style] ?? "";
+
+  const prompt = inputImageBase64
+    ? `Edit the provided image based on the following instructions:
+${textContents.map((text) => `- ${text}`).join("\n")}
+${styleDescription ? `Apply a ${styleDescription}.` : ""}
+Ensure these additions are clearly represented and cohesively integrated into the existing scene.`
+    : `Create an image that includes the following elements:
+${textContents.map((text) => `- ${text}`).join("\n")}
+${styleDescription ? `Use a ${styleDescription}.` : "Use a visually engaging style."}
+Ensure all elements are clearly represented and cohesively integrated.`;
+
+  console.log("Using prompt to generate/edit an image:", prompt);
+
+  let openAiResponse;
+
+  if (inputImageBase64) {
+    // Convert base64 to File object
+    const base64ToFile = (base64String: string, filename: string): File => {
+      // Remove data URI prefix if present
+      const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, "");
+
+      // Convert base64 to Uint8Array
+      const binaryString = atob(cleanBase64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Create Blob and then File
+      const blob = new Blob([bytes], { type: "image/png" });
+      return new File([blob], filename, { type: "image/png" });
+    };
+
+    const imageFile = base64ToFile(inputImageBase64, "image.png");
+
+    openAiResponse = await client.images.edit({
+      model: "gpt-image-1",
+      image: imageFile,
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+      stream: true,
+      partial_images: 1,
+    });
+  } else {
+    openAiResponse = await client.images.generate({
+      model: "gpt-image-1",
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+      stream: true,
+      partial_images: 2,
+    });
+  }
+  for await (const event of openAiResponse) {
+    switch (event.type) {
+      case "image_edit.completed":
+      case "image_generation.completed": {
+        const base64OfImage = event.b64_json;
+
+        if (!base64OfImage)
+          throw new Error("Image generation didn't return base-64");
+        yield {
+          base64OfImage,
+          isFinal: true,
+        };
+        break;
+      }
+      case "image_edit.partial_image":
+      case "image_generation.partial_image": {
+        const base64OfImage = event.b64_json;
+
+        if (!base64OfImage)
+          throw new Error("Image generation didn't return base-64");
+
+        yield {
+          base64OfImage,
+          isFinal: false,
+        };
+        break;
+      }
+    }
+  }
+}
+
 export const isGeneratingImage = query({
   args: {
     nodeId: v.string(),
@@ -278,14 +374,11 @@ export const generateAndStoreImage = action({
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId, style }) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+
     const remainingImageCredits = await ctx.runQuery(
       internal.credits.getRemainingCredits,
-      {
-        userId: identity.subject,
-        creditType: "image",
-      },
+      { userId: identity.subject, creditType: "image" },
     );
-    console.log("Remaining image credits", remainingImageCredits);
     if (remainingImageCredits < 1) {
       throw new Error("Not enough credits to generate an image.");
     }
@@ -300,35 +393,33 @@ export const generateAndStoreImage = action({
       const userPlanInfo = await ctx.runQuery(api.users.getCurrentUserPlanInfo);
       if (!userPlanInfo) throw new Error("Error when getting user's plan");
 
-      // Check if there's an existing poolId and cancel it
+      // Cancel any existing job for this node
       const existingImageNode = await ctx.runQuery(
         internal.imageNodes.getImageNodeByNodeId,
         { nodeId },
       );
-
+      if (existingImageNode?.isGenerating) {
+        throw new Error("Image is already being generated");
+      }
       if (existingImageNode?.poolId) {
         await imageDescriptionPool.cancel(ctx, existingImageNode.poolId);
         await ctx.runMutation(internal.imageNodes.editImageNode, {
           nodeId,
-          updatedNode: {
-            poolId: null,
-          },
+          updatedNode: { poolId: null },
         });
       }
       if (existingImageNode?.imageDescription) {
         await ctx.runMutation(internal.imageNodes.editImageNode, {
           nodeId,
-          updatedNode: {
-            imageDescription: null,
-          },
+          updatedNode: { imageDescription: null },
         });
       }
 
       await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
         isGenerating: true,
-        nodeId: nodeId,
+        nodeId,
         authorExternalId: identity.subject,
-        whiteboardId: whiteboardId,
+        whiteboardId,
       });
 
       const textContents = sourceNodes
@@ -350,16 +441,32 @@ export const generateAndStoreImage = action({
         throw new Error("Ambiguous request: more than one image supplied.");
       }
 
-      const { base64OfImage, inputTokenDetails } = await generateAIImage(
+      let finalBase64: string | undefined;
+      for await (const chunk of streamAIImage(
         identity,
         textContents,
         style,
         inputImageBase64,
-      );
+      )) {
+        const bytes = Uint8Array.from(atob(chunk.base64OfImage), (c) =>
+          c.charCodeAt(0),
+        );
+        const imageBlob = new Blob([bytes], { type: "image/png" });
+        const storageId = await ctx.storage.store(imageBlob);
+        await ctx.runMutation(internal.imageNodes.storeResult, {
+          storageId,
+          nodeId,
+          whiteboardId,
+          authorId: identity.subject,
+          isPartialImage: true,
+          isGenerating: true,
+        });
+        finalBase64 = chunk.isFinal ? chunk.base64OfImage : undefined;
+      }
+      if (!finalBase64) throw new Error("Image generation returned no data");
+      // -------------------------------------------
 
-      const bytes = Uint8Array.from(atob(base64OfImage), (c) =>
-        c.charCodeAt(0),
-      );
+      const bytes = Uint8Array.from(atob(finalBase64), (c) => c.charCodeAt(0));
       const imageBlob = new Blob([bytes], { type: "image/png" });
       const storageId = await ctx.storage.store(imageBlob);
 
@@ -368,6 +475,8 @@ export const generateAndStoreImage = action({
         nodeId,
         whiteboardId,
         authorId: identity.subject,
+        isPartialImage: false,
+        isGenerating: false,
       });
 
       await ctx.scheduler.runAfter(0, internal.imageLogs.logGeneration, {
@@ -380,18 +489,16 @@ export const generateAndStoreImage = action({
         prompt: textContents.join("\n"),
         quality: "low",
         resolution: "1024x1024",
-        inputTokenDetails,
+        // streamAIImage doesn’t expose token counts, so we skip inputTokenDetails
       });
 
       const poolId = await imageDescriptionPool.enqueueAction(
         ctx,
         internal.imageNodes.addImageDescription,
-        {
-          imageNodeId: nodeId,
-        },
+        { imageNodeId: nodeId },
         {
           retry: {
-            initialBackoffMs: 1000 * 60 * 60, // 1 hour
+            initialBackoffMs: 1000 * 60 * 60,
             base: 2,
             maxAttempts: 20,
           },
@@ -400,7 +507,7 @@ export const generateAndStoreImage = action({
       );
 
       await ctx.runMutation(internal.imageNodes.editImageNode, {
-        nodeId: nodeId,
+        nodeId,
         updatedNode: { poolId },
       });
     } catch (error) {
@@ -408,14 +515,13 @@ export const generateAndStoreImage = action({
     } finally {
       await ctx.runMutation(internal.imageNodes.markImageNodeAsGenerating, {
         isGenerating: false,
-        nodeId: nodeId,
+        nodeId,
         authorExternalId: identity.subject,
-        whiteboardId: whiteboardId,
+        whiteboardId,
       });
     }
   },
 });
-
 export const markImageNodeAsGenerating = internalMutation({
   args: {
     nodeId: v.string(),
@@ -461,6 +567,8 @@ export const storeResult = internalMutation({
     nodeId: v.string(),
     whiteboardId: v.string(),
     authorId: v.string(),
+    isPartialImage: v.boolean(),
+    isGenerating: v.boolean(),
   },
   handler: async (ctx, args) => {
     const normalizedWhiteboardId = ctx.db.normalizeId(
@@ -482,7 +590,12 @@ export const storeResult = internalMutation({
 
     if (existing) {
       // Update the existing node with the new imageUrl
-      await ctx.db.patch(existing._id, { imageUrl, storageId: args.storageId });
+      await ctx.db.patch(existing._id, {
+        imageUrl,
+        storageId: args.storageId,
+        isPartialImage: args.isPartialImage,
+        isGenerating: args.isGenerating,
+      });
     } else {
       // Insert a new image node record if it doesn't exist
       await ctx.db.insert("imageNodes", {
@@ -491,6 +604,8 @@ export const storeResult = internalMutation({
         storageId: args.storageId,
         whiteboardId: normalizedWhiteboardId,
         authorExternalId: args.authorId,
+        isPartialImage: args.isPartialImage,
+        isGenerating: args.isGenerating,
       });
     }
   },
@@ -515,6 +630,8 @@ export const uploadAndStoreImage = action({
       nodeId,
       whiteboardId,
       authorId: identity.subject,
+      isPartialImage: false,
+      isGenerating: false,
     });
   },
 });
@@ -629,5 +746,19 @@ export const editImageNode = internalMutation({
     if (!imageNode) return undefined;
 
     return await ctx.db.patch(imageNode._id, args.updatedNode);
+  },
+});
+
+export const getImageNode = query({
+  args: {
+    nodeId: v.string(),
+  },
+  handler: async (ctx, { nodeId }) => {
+    const imageNode = await ctx.db
+      .query("imageNodes")
+      .withIndex("by_nodeId", (q) => q.eq("nodeId", nodeId))
+      .first();
+
+    return imageNode;
   },
 });

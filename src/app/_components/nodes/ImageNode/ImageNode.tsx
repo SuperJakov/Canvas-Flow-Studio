@@ -301,6 +301,7 @@ export default function ImageNode({
               onImageLoad={handleImageLoad}
               onImageError={handleImageError}
               onOpenBanner={openBanner}
+              id={id}
             />
             <Handle type="source" position={Position.Bottom} />
           </div>

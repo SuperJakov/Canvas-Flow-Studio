@@ -132,6 +132,7 @@ const imageNodes = defineTable({
   isGenerating: v.optional(v.boolean()),
   imageDescription: v.optional(v.union(v.string(), v.null())),
   poolId: v.optional(v.union(vWorkIdValidator, v.null())),
+  isPartialImage: v.optional(v.boolean()),
 })
   .index("by_userId", ["authorExternalId"])
   .index("by_nodeId", ["nodeId"])

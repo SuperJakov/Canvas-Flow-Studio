@@ -6,8 +6,11 @@ import {
   Image as ImageIcon,
   ExternalLink,
 } from "lucide-react";
+import { useConvexQuery } from "~/helpers/convex";
+import { api } from "convex/_generated/api";
 
 interface ImageNodeContentProps {
+  id: string;
   url?: string | null;
   isRunning: boolean;
   isImageLoading: boolean;
@@ -22,9 +25,6 @@ interface ImageNodeContentProps {
 }
 
 export function ImageNodeContent({
-  url,
-  isRunning,
-  isImageLoading,
   isDownloading,
   isUploading,
   isRateLimited,
@@ -33,8 +33,13 @@ export function ImageNodeContent({
   onImageLoad,
   onImageError,
   onOpenBanner,
+  id,
 }: ImageNodeContentProps) {
-  if (isRunning) {
+  const imageNode = useConvexQuery(api.imageNodes.getImageNode, {
+    nodeId: id,
+  });
+
+  if (imageNode?.isGenerating && !imageNode.isPartialImage) {
     return (
       <div className="group relative flex h-[300px] w-[300px] items-center justify-center bg-gray-800">
         <div className="flex flex-col items-center text-gray-400">
@@ -53,25 +58,27 @@ export function ImageNodeContent({
     );
   }
 
-  if (url) {
+  if (imageNode?.imageUrl) {
     return (
       <div className="group relative flex h-[300px] w-[300px] items-center justify-center bg-gray-800">
-        {isImageLoading && (
+        {/* {isImageLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
             <div className="flex flex-col items-center text-gray-400">
               <Loader2 size={32} className="animate-spin" />
               <p className="mt-2 text-sm">Loading image...</p>
             </div>
           </div>
-        )}
+        )} */}
         <div className="relative h-full w-full">
           <Image
-            src={url}
+            src={imageNode?.imageUrl}
             alt="Generated"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain"
-            quality={75}
+            quality={imageNode.isPartialImage ? 50 : 90}
+            priority
+            loading="eager"
             onLoad={onImageLoad}
             onError={onImageError}
           />
