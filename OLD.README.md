@@ -251,7 +251,7 @@ Our team will review all model recommendations and prioritize based on user dema
 - [x] Fix progress bar total node count
 - [] Fix progress bar when multiple are running
 - [] Finish WIP examples
-- [] Fix select on whiteboard page for light areas
+- [x] Fix select on whiteboard page for light areas
 - [] Instructions shouldnt create new nodes
 - [] More clear status when nodes are running
 - [] Fixed `isNodeExecutable` function
