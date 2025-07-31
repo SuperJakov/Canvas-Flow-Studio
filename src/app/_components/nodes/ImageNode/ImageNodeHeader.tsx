@@ -10,7 +10,7 @@ import { PopoverTrigger } from "~/components/ui/popover";
 import { IMAGE_STYLES } from "./constants";
 import { isNodeExecutable } from "~/execution/executionLogic";
 import { useAtom } from "jotai";
-import { nodesAtom } from "~/app/whiteboard/atoms";
+import { edgesAtom, nodesAtom } from "~/app/whiteboard/atoms";
 
 interface ImageNodeHeaderProps {
   id: string;
@@ -46,9 +46,10 @@ export function ImageNodeHeader({
   const CurrentIcon = currentStyle.icon;
 
   const [nodes] = useAtom(nodesAtom);
+  const [edges] = useAtom(edgesAtom);
   const thisNode = nodes.find((n) => n.id === id);
   if (!thisNode) return null;
-  const isExecutable = isNodeExecutable(thisNode);
+  const isNodeExecutableResult = isNodeExecutable(thisNode, edges);
 
   return (
     <div className="flex items-center justify-between px-1 py-2">
@@ -73,23 +74,23 @@ export function ImageNodeHeader({
         </button>
         <button
           className={`cursor-pointer rounded p-1 ${
-            isExecutable
+            isNodeExecutableResult.isExecutable
               ? "text-gray-700 hover:bg-gray-500/20 hover:text-gray-900"
               : "cursor-not-allowed text-gray-400"
           }`}
           onClick={onToggleRunning}
           title={
-            isRateLimited
-              ? "Cannot run: rate limit reached"
-              : hasIncomingConnections
-                ? "Run node"
-                : "Cannot run: no incoming text connection"
+            isNodeExecutableResult.isExecutable
+              ? isRunning
+                ? "Stop Node"
+                : "Run Node"
+              : `Cannot run: ${isNodeExecutableResult.reason ?? "Unknown reason"}`
           }
-          disabled={!isExecutable}
+          disabled={!isNodeExecutableResult.isExecutable}
         >
           {isRunning ? (
             <Square size={18} />
-          ) : isExecutable ? (
+          ) : isNodeExecutableResult.isExecutable ? (
             <Play size={18} fill="currentColor" />
           ) : (
             <AlertCircle size={18} />

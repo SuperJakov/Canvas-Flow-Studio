@@ -34,10 +34,13 @@ export default function TextEditorNode({
   const [, executeNode] = useAtom(executeNodeAtom);
   const [nodes] = useAtom(nodesAtom);
   const [edges] = useAtom(edgesAtom);
-  const hasOutgoingConnections = edges.some((edge) => edge.source === id);
 
   const thisNode = nodes.find((node) => node.id === id);
-  const isNodeExecutable = thisNode ? isNodeExecutableFn(thisNode) : false;
+  const isNodeExecutableResult = thisNode
+    ? isNodeExecutableFn(thisNode, edges)
+    : null;
+  const isNodeExecutable = isNodeExecutableResult?.isExecutable ?? false;
+  const isNodeExecutableReason = isNodeExecutableResult?.reason;
 
   useEffect(() => {
     registerTextAction(id, modifyTextAction);
@@ -91,7 +94,7 @@ export default function TextEditorNode({
     ${selected ? "outline-blue-600" : "outline-gray-200"}
   `;
 
-  const runButtonEnabled = hasOutgoingConnections && isNodeExecutable;
+  const runButtonEnabled = isNodeExecutable;
 
   return (
     <div className={containerClasses}>
@@ -134,12 +137,10 @@ export default function TextEditorNode({
             onClick={toggleRunning}
             title={
               !isNodeExecutable
-                ? "Cannot run: node not executable"
-                : !hasOutgoingConnections
-                  ? "Cannot run: no connections"
-                  : isRunning
-                    ? "Stop node"
-                    : "Run node"
+                ? `Cannot run: ${isNodeExecutableReason ?? "Unknown reason"}`
+                : isRunning
+                  ? "Stop node"
+                  : "Run node"
             }
             disabled={!runButtonEnabled}
           >

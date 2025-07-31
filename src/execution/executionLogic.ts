@@ -45,10 +45,20 @@ export function validateWhiteboardId(get: Getter) {
   return whiteboardId;
 }
 
-export function isNodeExecutable(node: AppNode): boolean {
-  return (
-    !node.data.isLocked && !("isRunning" in node.data && node.data.isRunning)
-  );
+export function isNodeExecutable(node: AppNode, edges: AppEdge[]) {
+  const hasConnections =
+    edges.some((edge) => edge.source === node.id) ||
+    edges.some((edge) => edge.target === node.id);
+  if (!hasConnections)
+    return {
+      isExecutable: false,
+      reason: "No connections",
+    } as const;
+
+  return {
+    isExecutable:
+      !node.data.isLocked && !("isRunning" in node.data && node.data.isRunning),
+  } as const;
 }
 
 export function isNodeRateLimited(
@@ -318,7 +328,7 @@ async function processOutgoingEdges(
     );
     try {
       const nextNode = allNodes.find((n) => n.id === edge.target);
-      if (!nextNode || !isNodeExecutable(nextNode)) continue;
+      if (!nextNode || !isNodeExecutable(nextNode, allEdges)) continue;
 
       if (currentNode.type === "textEditor") {
         executeTextNode(get, set, currentNode, nextNode);
@@ -348,7 +358,7 @@ export async function executeNodeLogic(
     visited.add(nodeId);
 
     const currentNode = get(nodesAtom).find((n) => n.id === nodeId);
-    if (!currentNode || !isNodeExecutable(currentNode)) {
+    if (!currentNode || !isNodeExecutable(currentNode, get(edgesAtom))) {
       console.warn("Node is not executable:", currentNode);
       return;
     }
