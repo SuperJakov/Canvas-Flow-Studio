@@ -31,8 +31,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "~/components/ui/dialog";
-import CTASection from "../_components/homepage/CTASection";
 import posthog from "posthog-js";
+import Footer from "../_components/homepage/Footer";
 
 // Type guard to check if planInfo has subscription properties
 function hasSubscriptionProperties(
@@ -487,7 +487,7 @@ export default function PricingPage() {
 
         <FAQ />
 
-        {!auth.isAuthenticated && <CTASection />}
+        <Footer />
       </div>
       <Dialog open={showDisabledDialog} onOpenChange={setShowDisabledDialog}>
         <DialogContent>
