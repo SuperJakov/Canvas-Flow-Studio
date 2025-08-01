@@ -1,19 +1,19 @@
-# AI Flow Studio
+# Canvas Flow Studio
 
-AI Flow Studio is an innovative web application designed to empower users to create, visualize, and run complex Artificial Intelligence workflows through an intuitive drag-and-drop interface.
+Canvas Flow Studio is an innovative web application designed to empower users to create, visualize, and run complex Artificial Intelligence workflows through an intuitive drag-and-drop interface.
 
 > **Note:** This application is currently operating under a temporary name. A formal renaming is planned for the future as the project evolves.
 
 ## Overview
 
-AI Flow Studio democratizes access to AI capabilities by providing a dynamic digital canvas where users can visually connect different functional blocks (nodes) to build sophisticated AI-driven processes. Moving beyond traditional coding or complex setups, this application enables users to:
+Canvas Flow Studio democratizes access to AI capabilities by providing a dynamic digital canvas where users can visually connect different functional blocks (nodes) to build sophisticated AI-driven processes. Moving beyond traditional coding or complex setups, this application enables users to:
 
 - Start with basic inputs like text or images
 - Feed them into versatile "Instruction" nodes powered by various AI models
 - Process outputs and chain nodes together to achieve complex results
 - Visualize the entire workflow in a clear, intuitive interface
 
-Whether you're a creative professional, developer, researcher, or business user, AI Flow Studio enables you to experiment with, prototype, and deploy custom AI solutions without requiring deep technical expertise in specific AI models.
+Whether you're a creative professional, developer, researcher, or business user, Canvas Flow Studio enables you to experiment with, prototype, and deploy custom AI solutions without requiring deep technical expertise in specific AI models.
 
 ## Features
 
@@ -28,7 +28,7 @@ Whether you're a creative professional, developer, researcher, or business user,
 
 ## Technology Stack
 
-AI Flow Studio is built with a modern technology stack:
+Canvas Flow Studio is built with a modern technology stack:
 
 - **Frontend Framework**: [Next.js](https://nextjs.org/) - React framework with SSR/SSG capabilities
 - **UI Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
@@ -40,7 +40,7 @@ AI Flow Studio is built with a modern technology stack:
 
 ## AI Models
 
-AI Flow Studio integrates with powerful AI models to provide a wide range of capabilities:
+Canvas Flow Studio integrates with powerful AI models to provide a wide range of capabilities:
 
 | Category                          | Model                 | Description                                                                                          | Cost           | Speed            |
 | --------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------- | -------------- | ---------------- |
@@ -54,7 +54,7 @@ We continuously work to expand our supported models based on user needs and tech
 
 ## Pricing & Subscriptions
 
-AI Flow Studio offers multiple subscription tiers to accommodate different user needs:
+Canvas Flow Studio offers multiple subscription tiers to accommodate different user needs:
 
 - **Free (0€)**: A generous free tier for learning and experimenting with AI workflows
 - **Plus (4€/month)**: Increased rate limits and additional features for regular users
@@ -156,7 +156,7 @@ If the user uses all limits they can each month, we won't have any profit. Of co
 
 ## Contributing
 
-We welcome contributions to AI Flow Studio! Please feel free to submit pull requests, create issues, or suggest enhancements.
+We welcome contributions to Canvas Flow Studio! Please feel free to submit pull requests, create issues, or suggest enhancements.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -174,7 +174,7 @@ We're always looking to expand our supported AI models. To recommend a new model
    - Model name and provider
    - Key capabilities and use cases
    - Any API documentation links
-   - Why you believe this model would benefit AI Flow Studio users
+   - Why you believe this model would benefit Canvas Flow Studio users
 
 Our team will review all model recommendations and prioritize based on user demand and technical feasibility.
 
