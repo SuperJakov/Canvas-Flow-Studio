@@ -16,7 +16,7 @@ export default function NodesConnectionsContent() {
       <PageTitle>Nodes & Connections</PageTitle>
       <div>
         <p className="mb-6">
-          AI Flow Studio uses a simple node-based system. Each node has a
+          Canvas Flow Studio uses a simple node-based system. Each node has a
           specific purpose, and by connecting them together, you can create
           AI-powered workflows without any coding.
         </p>

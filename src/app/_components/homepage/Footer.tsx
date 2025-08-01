@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="flex flex-col items-center justify-between space-y-6 pb-4 md:flex-row md:space-y-0 md:space-x-6">
         <div className="text-center md:text-left">
           <h2 className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
-            AI Flow Studio
+            Canvas Flow Studio
           </h2>
           <p className="mt-1">Build AI-powered workflows visually.</p>
         </div>
@@ -28,7 +28,7 @@ export default function Footer() {
       <Separator />
 
       <p className="text-muted-foreground pt-4 text-center text-sm">
-        © {new Date().getFullYear()} AI Flow Studio. All rights reserved.
+        © {new Date().getFullYear()} Canvas Flow Studio. All rights reserved.
       </p>
     </footer>
   );

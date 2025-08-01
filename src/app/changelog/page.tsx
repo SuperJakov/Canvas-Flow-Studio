@@ -3,20 +3,20 @@ import { changelogs } from "./changelogs";
 import { formatDate, formatDistanceToNow, parseISO } from "date-fns";
 
 export const metadata: Metadata = {
-  title: "Changelog | Latest Updates & New Features - AI Flow Studio",
+  title: "Changelog | Latest Updates & New Features - Canvas Flow Studio",
   description:
-    "See every new feature, fix, and improvement in AI Flow Studio. Get release notes, version history, and stay ahead with the newest AI-driven workflow tools.",
+    "See every new feature, fix, and improvement in Canvas Flow Studio. Get release notes, version history, and stay ahead with the newest AI-driven workflow tools.",
   openGraph: {
-    title: "AI Flow Studio Changelog - Latest Updates & New Features",
+    title: "Canvas Flow Studio Changelog - Latest Updates & New Features",
     description:
-      "Explore the latest AI Flow Studio releases. Discover new AI workflow capabilities, bug fixes, and performance improvements in our detailed changelog.",
+      "Explore the latest Canvas Flow Studio releases. Discover new AI workflow capabilities, bug fixes, and performance improvements in our detailed changelog.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Flow Studio Changelog - Latest Updates & New Features",
+    title: "Canvas Flow Studio Changelog - Latest Updates & New Features",
     description:
-      "Track AI Flow Studio’s evolution. View release notes, new features, and improvements in our AI workflow platform.",
+      "Track Canvas Flow Studio’s evolution. View release notes, new features, and improvements in our AI workflow platform.",
   },
 };
 
@@ -24,7 +24,7 @@ export default function ChangelogPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "AI Flow Studio Changelog",
+    name: "Canvas Flow Studio Changelog",
     itemListOrder: "Descending",
     numberOfItems: changelogs.length,
     itemListElement: changelogs.map((log, index) => ({
@@ -48,8 +48,8 @@ export default function ChangelogPage() {
             Changelog
           </h1>
           <p className="text-muted-foreground mx-auto mt-3 max-w-md text-base sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
-            Stay up to date with the latest AI Flow Studio releases, new issue
-            fixes, and performance improvements.
+            Stay up to date with the latest Canvas Flow Studio releases, new
+            issue fixes, and performance improvements.
           </p>
         </header>
 

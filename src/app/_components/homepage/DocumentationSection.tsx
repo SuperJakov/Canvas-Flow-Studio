@@ -45,9 +45,9 @@ export default function DocumentationSection() {
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
             Explore our detailed guides, tutorials, and reference materials to
-            master AI Flow Studio and create powerful workflows. Dive deep into
-            features, best practices, and advanced configurations to unlock your
-            full potential.
+            master Canvas Flow Studio and create powerful workflows. Dive deep
+            into features, best practices, and advanced configurations to unlock
+            your full potential.
           </p>
         </div>
 

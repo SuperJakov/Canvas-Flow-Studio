@@ -60,7 +60,7 @@ export default function FeaturesSection() {
             <h2 className="text-4xl leading-tight font-bold whitespace-nowrap lg:text-5xl">
               <span className="block">What you&rsquo;ll unlock with</span>
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                AI Flow Studio
+                Canvas Flow Studio
               </span>
             </h2>
           </div>

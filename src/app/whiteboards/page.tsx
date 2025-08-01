@@ -4,9 +4,9 @@ import { getConvexToken } from "~/helpers/getConvexToken";
 import { RedirectToSignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Whiteboards | AI Flow Studio",
+  title: "Whiteboards | Canvas Flow Studio",
   description:
-    "Organize, create, and manage your AI-powered whiteboards and projects in AI Flow Studio.",
+    "Organize, create, and manage your AI-powered whiteboards and projects in Canvas Flow Studio.",
 };
 
 export default async function WhiteboardsPage() {

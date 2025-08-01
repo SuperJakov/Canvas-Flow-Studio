@@ -109,7 +109,7 @@ const templates = [
     href: "/template/describe-and-generate",
     title: "Describe and Generate",
     description:
-      "Learn the basics of AI Flow Studio by describing images and generating content with AI models.",
+      "Learn the basics of Canvas Flow Studio by describing images and generating content with AI models.",
     icon: Users,
     iconBg: "bg-gradient-to-r from-orange-600 to-amber-600",
     hoverClasses: "hover:border-orange-500/50 hover:shadow-orange-900/20",

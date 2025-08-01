@@ -14,7 +14,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { DiscordIcon } from "~/components/icons";
-import AppLogo from "public/AI Flow Studio logo.png";
+import AppLogo from "public/logo.png";
 import Image from "next/image";
 import posthog from "posthog-js";
 
@@ -104,7 +104,7 @@ export function Header() {
             <div className="flex items-center space-x-8">
               <Link href="/" onClick={navClick("home")}>
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
-                  AFS
+                  CFS
                 </span>
               </Link>
 
@@ -155,12 +155,14 @@ export function Header() {
                           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
                             <Image
                               src={AppLogo}
-                              alt="AI Flow Studio Logo"
+                              alt="Canvas Flow Studio Logo"
                               placeholder="blur"
                             />
                           </div>
                           <div className="flex-1">
-                            <h3 className="mb-1 font-bold">AI Flow Studio</h3>
+                            <h3 className="mb-1 font-bold">
+                              Canvas Flow Studio
+                            </h3>
                             <p className="text-muted-foreground text-sm">
                               Visual canvas
                             </p>
@@ -337,7 +339,7 @@ export function Header() {
                       });
                     }}
                   >
-                    AI Flow Studio
+                    Canvas Flow Studio
                   </Link>
                 </div>
               </div>

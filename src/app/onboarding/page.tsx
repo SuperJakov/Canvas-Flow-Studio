@@ -163,7 +163,8 @@ export default function OnBoardingPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            A quick and easy to follow tutorial on how to use AI Flow Studio.
+            A quick and easy to follow tutorial on how to use Canvas Flow
+            Studio.
           </motion.p>
         </motion.div>
 
@@ -326,7 +327,7 @@ export default function OnBoardingPage() {
                     className="text-muted-foreground mb-4"
                     variants={itemVariants}
                   >
-                    You now know how to generate images in AI Flow Studio.
+                    You now know how to generate images in Canvas Flow Studio.
                   </motion.p>
                 </motion.div>
 

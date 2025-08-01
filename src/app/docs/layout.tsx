@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
 export const metadata: Metadata = {
-  title: "Documentation | AI Flow Studio",
+  title: "Documentation | Canvas Flow Studio",
   description:
-    "Learn how to create, manage, and optimize your AI workflows with AI Flow Studio.",
+    "Learn how to create, manage, and optimize your AI workflows with Canvas Flow Studio.",
 };
 
 export default function DocsLayout({

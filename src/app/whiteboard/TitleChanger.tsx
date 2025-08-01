@@ -16,10 +16,10 @@ export default function TitleChanger({ id }: Props) {
   const title = rawTitle.length > 15 ? rawTitle.slice(0, 15) + "..." : rawTitle;
   useEffect(() => {
     if (title) {
-      document.title = `${title} | AI Flow Studio`;
+      document.title = `${title} | Canvas Flow Studio`;
       return;
     }
-    document.title = "AI Flow Studio";
+    document.title = "Canvas Flow Studio";
   }, [title]);
   const [, setCurrentWhiteboardId] = useAtom(currentWhiteboardIdAtom);
 

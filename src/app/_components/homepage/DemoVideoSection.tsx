@@ -104,7 +104,7 @@ export default function DemoImageSection(): JSX.Element {
           transition={{ duration: 0.6 }}
         >
           <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            See AI Flow Studio in Action
+            See Canvas Flow Studio in Action
           </span>
         </motion.h2>
 

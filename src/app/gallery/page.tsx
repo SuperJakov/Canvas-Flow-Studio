@@ -4,8 +4,8 @@ import GalleryClient from "./GalleryClient";
 import { RedirectToSignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Gallery | AI Flow Studio",
-  description: "All AI Flow Studio generated images",
+  title: "Gallery | Canvas Flow Studio",
+  description: "All Canvas Flow Studio generated images",
 };
 
 export default async function Gallery() {

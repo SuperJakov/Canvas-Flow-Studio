@@ -9,10 +9,11 @@ import { Toaster } from "~/components/ui/sonner";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "AI Flow Studio",
-  description: "TODO: Add a description for AI Flow Studio",
+  title: "Canvas Flow Studio",
+  description:
+    "Canvas Flow Studio is an app which is used to create AI-powered workflows through a visual, node-based interface.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
-  keywords: ["AI Flow Studio", "Whiteboard AI", "Nodes", "Flow"],
+  keywords: ["Canvas Flow Studio", "Whiteboard AI", "Nodes", "Flow"],
   verification: {
     google: "p4gzWQ-1iXVG0l_lfeyeSHMr_37F_pq6QH3hu8zmL40",
   },

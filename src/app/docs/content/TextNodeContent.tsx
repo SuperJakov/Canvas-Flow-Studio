@@ -13,8 +13,9 @@ export default function TextNodeContent() {
     <section id="first-flow" className="bg-background mb-16 scroll-mt-16">
       <PageTitle>Mastering the Text Node</PageTitle>
       <p>
-        The Text Node is a fundamental building block in AI Flow Studio. This
-        guide will walk you through its various interactions with other nodes.
+        The Text Node is a fundamental building block in Canvas Flow Studio.
+        This guide will walk you through its various interactions with other
+        nodes.
       </p>
 
       <Separator className="my-4" />
