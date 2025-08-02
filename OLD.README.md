@@ -46,7 +46,7 @@ Canvas Flow Studio integrates with powerful AI models to provide a wide range of
 | --------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------- | -------------- | ---------------- |
 | **Text Generation & Instruction** | Gemini 2.5 Flash Lite | Basic text generation and instruction following                                                      | Free           | ⚡⚡⚡⚡⚡       |
 |                                   | Gemini 2.5 Flash      | Advanced large language model for text generation, instruction following, and content transformation | Free           | ⚡⚡⚡⚡         |
-| **Image Generation**              | GPT Image Gen 1       | High-quality image generation from text prompts                                                      | $0.01/image    | ⚡⚡ (15s/image) |
+| **Image Generation**              | GPT Image 1           | High-quality image generation from text prompts                                                      | $0.01/image    | ⚡⚡ (15s/image) |
 | **Speech & Audio**                | Gemini 2.5 Flash      | Text analysis and processing for speech content                                                      | Free           | ⚡⚡⚡⚡         |
 |                                   | Azure AI TTS          | High-quality text-to-speech conversion with natural sounding voices                                  | Basically free | ⚡⚡⚡⚡         |
 
@@ -114,8 +114,8 @@ If the user uses all limits they can each month, we won't have any profit. Of co
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/SuperJakov/AI-Flow-Studio.git
-   cd ai-flow-studio
+   git clone https://github.com/SuperJakov/Canvas-Flow-Studio.git
+   cd canvas-flow-studio
    ```
 
 2. Install dependencies

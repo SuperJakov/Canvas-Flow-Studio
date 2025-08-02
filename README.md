@@ -6,7 +6,7 @@
 
 Canvas Flow Studio is a website which allows users to create whiteboards. It has a nice drag & drop UI. Users can use nodes and connect them to generate an AI workflow.
 
-> Please check out the docs at [https://ai-flow-studio-v2.vercel.app/docs](https://ai-flow-studio-v2.vercel.app/docs)
+> Please check out the docs at [https://www.canvasflowstudio.org/docs](https://www.canvasflowstudio.org/docs)
 
 ## Example whiteboards
 
@@ -23,3 +23,12 @@ Describe images, generate speech and image.
 Corporate life was never easier 😂. Checkmate.
 
 ![Company Meeting Example](public/company_meeting.png "Company Meeting Example")
+
+### Links
+
+| Page          | Path                                                     |
+| ------------- | -------------------------------------------------------- |
+| Home Page     | [/](https://www.canvasflowstudio.org)                    |
+| Documentation | [/docs](https://www.canvasflowstudio.org/docs)           |
+| Pricing       | [/pricing](https://www.canvasflowstudio.org/pricing)     |
+| Changelog     | [/changelog](https://www.canvasflowstudio.org/changelog) |
