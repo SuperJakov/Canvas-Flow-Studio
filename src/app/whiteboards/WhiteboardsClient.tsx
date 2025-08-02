@@ -13,6 +13,12 @@ import EmptyFolder from "./_components/EmptyFolder";
 import AllProjectsAndWhiteboards from "./_components/AllProjectsAndWhiteboards";
 import WhiteboardsOverview from "./_components/WhiteboardsOverview";
 import FolderBreadcrumb from "./_components/FolderBreadcrumb";
+import dynamic from "next/dynamic";
+
+const WhiteboardPreloader = dynamic(
+  () => import("./_components/WhiteboardPreloader").then((c) => c.default),
+  { ssr: false },
+);
 
 type Props = {
   projectIds?: Id<"projects">[];
@@ -44,6 +50,8 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   return (
     <div className="bg-background text-foreground min-h-screen pt-16">
       <div className="mx-auto max-w-7xl px-6 py-8">
+        <WhiteboardPreloader whiteboards={whiteboards} />
+
         <WhiteboardsOverview />
 
         <CreateNewSection
