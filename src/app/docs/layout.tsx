@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Documentation | Canvas Flow Studio",
   description:
     "Learn how to create, manage, and optimize your AI workflows with Canvas Flow Studio.",
+  keywords: ["Canvas Flow Studio", "Docs", "Documentation"],
 };
 
 export default function DocsLayout({
