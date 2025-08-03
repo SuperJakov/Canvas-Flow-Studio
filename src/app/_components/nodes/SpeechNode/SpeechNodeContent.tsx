@@ -110,7 +110,10 @@ export function SpeechNodeContent({
           <p className="mt-2">Generating speech...</p>
           <button
             type="button"
-            onClick={() => onOpenBanner("Streaming Speech")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenBanner("Streaming Speech");
+            }}
             className="group mt-2 flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
           >
             <span>Upgrade for streaming speech</span>
@@ -150,7 +153,10 @@ export function SpeechNodeContent({
           {!isRateLimited && (
             <button
               type="button"
-              onClick={() => onOpenBanner("Higher Quality Speech")}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenBanner("Higher Quality Speech");
+              }}
               className="group mt-2 flex cursor-pointer items-center gap-1 text-xs font-medium text-gray-500 transition-colors hover:text-white"
             >
               <span>Upgrade for higher quality</span>

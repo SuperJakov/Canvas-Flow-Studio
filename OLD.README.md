@@ -216,7 +216,7 @@ Our team will review all model recommendations and prioritize based on user dema
 
 - [x] Whiteboard previews on `/whiteboards`
 - [ ] Mobile responsive design
-- [ ] Docs
+- [x] Docs
 - [ ] Onboarding tutorial/guided tour
 - [ ] Workflow templates/starter examples
 - [ ] Workflow versioning
@@ -230,13 +230,13 @@ Our team will review all model recommendations and prioritize based on user dema
 
 - [x] Collaboration: Sharing whiteboards
 - [ ] Collaboration: Permissions, real-time collaboration
-- [ ] Projects
+- [x] Projects
 
 ---
 
 ### Launch Preparation
 
-- [ ] Rebrand our product & Get a domain
+- [x] Rebrand our product & Get a domain
 - [ ] Ship to production 🥳
 
 ### Post-Launch

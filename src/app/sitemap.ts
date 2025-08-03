@@ -1,14 +1,16 @@
 import type { MetadataRoute } from "next";
 import { getBaseUrl } from "~/helpers/baseurl";
 import { chapters } from "./docs/chapters";
+import { blogs } from "./_components/blog/blogs";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-const ROOT_ROUTES = ["/", "/pricing", "/changelog"] as const;
+const ROOT_ROUTES = ["/", "/pricing", "/changelog", "/blog"] as const;
 const PRIORITY_OVERRIDES: Record<string, number> = {
   "/": 1,
   "/docs/getting-started/introduction": 0.8,
   "/pricing": 0.7,
+  "/blog": 0.7,
   "/changelog": 0.6,
 };
 
@@ -23,6 +25,7 @@ type ChangeFrequency =
 
 const CHANGE_FREQUENCY_OVERRIDES: Record<string, ChangeFrequency> = {
   "/changelog": "daily",
+  "/blog": "daily",
 };
 
 /**
@@ -63,5 +66,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     docRoutes.map((route) => generateSitemapEntry(route)),
   );
 
-  return [...rootEntries, ...docEntries];
+  const blogRoutes = blogs.map((b) => `/blog/${b.slug}`);
+  const blogEntries = await Promise.all(
+    blogRoutes.map((route) => generateSitemapEntry(route)),
+  );
+
+  return [...rootEntries, ...docEntries, ...blogEntries];
 }
+
+export const dynamic = "error";
