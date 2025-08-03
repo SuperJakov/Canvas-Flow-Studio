@@ -1,7 +1,8 @@
 import { SignUpButton } from "@clerk/nextjs";
-import Image from "next/image";
 import Link from "next/link";
 import AppLogo from "public/logo.png";
+import EmailContactDialogContent from "../EmailContactDialogContent";
+import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 
 const Section = ({
   className = "",
@@ -44,19 +45,8 @@ const EmLink = ({
   </Link>
 );
 
-/********************
- * Post sections
- ********************/
 const LaunchHeader = () => (
   <header className="mb-12 flex items-center gap-4">
-    <div className="ring-border relative h-12 w-12 overflow-hidden rounded-lg ring-1">
-      <Image
-        src={AppLogo}
-        alt="Canvas Flow Studio logo"
-        fill
-        className="object-contain p-1"
-      />
-    </div>
     <div>
       <h1 className="text-foreground m-0 text-3xl font-bold tracking-tight">
         We launched Canvas Flow Studio! 🎉
@@ -182,12 +172,11 @@ const PostFooter = () => (
     <p>
       <em>
         Have questions? Reach out at{" "}
-        <a
-          href="mailto:support@canvasflowstudio.org"
-          className="text-foreground hover:text-foreground/80 font-medium underline underline-offset-4"
-        >
-          support@canvasflowstudio.org
-        </a>{" "}
+        <DialogTrigger>
+          <span className="text-primary hover:text-primary/80 cursor-pointer font-semibold underline underline-offset-4 transition-colors hover:no-underline">
+            support@canvasflowstudio.org
+          </span>{" "}
+        </DialogTrigger>
         .
       </em>
     </p>
@@ -196,15 +185,18 @@ const PostFooter = () => (
 
 const CanvasFlowStudioLaunchContent = () => (
   <article className="prose max-w-none">
-    <LaunchHeader />
-    <Intro />
-    <WhatIs />
-    <KeyFeatures />
-    <WhatsNext />
-    <GetStarted />
-    <Thanks />
-    <hr className="border-border my-10" />
-    <PostFooter />
+    <Dialog>
+      <LaunchHeader />
+      <Intro />
+      <WhatIs />
+      <KeyFeatures />
+      <WhatsNext />
+      <GetStarted />
+      <Thanks />
+      <hr className="border-border my-10" />
+      <PostFooter />
+      <EmailContactDialogContent />
+    </Dialog>
   </article>
 );
 
