@@ -2,12 +2,49 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { blogs } from "../../_components/blog/blogs";
 import Link from "next/link";
+import type { Metadata } from "next";
+import { getBaseUrl } from "~/helpers/baseurl";
 
 type Props = {
   params: Promise<{
     postSlug: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { postSlug } = await params;
+  const post = blogs.find((p) => p.slug === postSlug);
+
+  if (!post) {
+    return {
+      title: "Blog Post Not Found | Canvas Flow Studio",
+      description: "The requested blog post could not be found.",
+    };
+  }
+
+  const baseUrl = getBaseUrl();
+
+  return {
+    title: `${post.title} | Canvas Flow Studio`,
+    description: `Read about ${post.title} on Canvas Flow Studio's blog`,
+    keywords: post.tags,
+    authors: [{ name: post.author.name }],
+    openGraph: {
+      title: post.title,
+      description: `Read about ${post.title} on Canvas Flow Studio's blog`,
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author.name],
+      images: [post.thumbnail.src ?? `${baseUrl}/logo.png`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: `Read about ${post.title} on Canvas Flow Studio's blog`,
+      images: [post.thumbnail.src ?? `${baseUrl}/logo.png`],
+    },
+  };
+}
 
 function BlogPost({ post }: { post: (typeof blogs)[number] }) {
   const Content = post.content;
@@ -142,10 +179,45 @@ function BlogPost({ post }: { post: (typeof blogs)[number] }) {
 
 export default async function BlogPostPage({ params }: Props) {
   const { postSlug } = await params;
-
   const post = blogs.find((p) => p.slug === postSlug);
+  const baseUrl = getBaseUrl();
 
   if (!post) redirect("/blog");
 
-  return <BlogPost post={post} />;
+  // Generate JSON-LD schema
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: `Read about ${post.title} on Canvas Flow Studio's blog`,
+    image: post.thumbnail || `${baseUrl}/logo.png`,
+    datePublished: post.date,
+    author: {
+      "@type": "Person",
+      name: post.author.name,
+      jobTitle: post.author.role,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Canvas Flow Studio",
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${baseUrl}/blog/${post.slug}`,
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BlogPost post={post} />
+    </>
+  );
 }

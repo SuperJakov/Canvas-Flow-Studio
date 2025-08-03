@@ -224,4 +224,4 @@ export const blogs = [
     tags: ["announcement", "product", "launch"],
     content: CanvasFlowStudioLaunchContent,
   },
-] as const;
+];

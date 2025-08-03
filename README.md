@@ -32,3 +32,4 @@ Corporate life was never easier 😂. Checkmate.
 | Documentation | [/docs](https://www.canvasflowstudio.org/docs)           |
 | Pricing       | [/pricing](https://www.canvasflowstudio.org/pricing)     |
 | Changelog     | [/changelog](https://www.canvasflowstudio.org/changelog) |
+| Blog          | [/blog](https://www.canvasflowstudio.org/blog)           |
