@@ -126,10 +126,10 @@ export function Header() {
                     modal={false}
                   >
                     <DropdownMenuTrigger asChild>
-                      <div className="flex cursor-pointer items-center space-x-1 text-gray-300 transition hover:text-white">
+                      <button className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center space-x-1 transition">
                         <span>Product</span>
                         <ChevronDown className="h-4 w-4" />
-                      </div>
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       className="w-80 p-0"
@@ -175,7 +175,7 @@ export function Header() {
 
                 <Link
                   href="/pricing"
-                  className="text-gray-300 transition hover:text-white"
+                  className="text-muted-foreground hover:text-foreground transition"
                   prefetch={true}
                   onClick={navClick("pricing")}
                 >
@@ -184,7 +184,7 @@ export function Header() {
 
                 <Link
                   href="/blog"
-                  className="text-gray-300 transition hover:text-white"
+                  className="text-muted-foreground hover:text-foreground transition"
                   onClick={navClick("blog")}
                 >
                   Blog
@@ -192,7 +192,7 @@ export function Header() {
 
                 <Link
                   href="/docs"
-                  className="text-gray-300 transition hover:text-white"
+                  className="text-muted-foreground hover:text-foreground transition"
                   onClick={navClick("docs")}
                 >
                   Docs
@@ -215,10 +215,10 @@ export function Header() {
                     modal={false}
                   >
                     <DropdownMenuTrigger asChild>
-                      <div className="flex cursor-pointer items-center space-x-1 text-gray-300 transition hover:text-white">
+                      <button className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center space-x-1 transition">
                         <span>Community</span>
                         <ChevronDown className="h-4 w-4" />
-                      </div>
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       className="w-80 p-0"
