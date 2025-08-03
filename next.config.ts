@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
       {
         source: "/relay-uYWY/static/:path*",
         destination: "https://eu-assets.i.posthog.com/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            // This value tells browsers to cache the asset for 5 days.
+            // 'immutable' means the file will not change, so no re-validation is needed.
+            value: "public, max-age=432000, immutable",
+          },
+        ],
       },
       {
         source: "/relay-uYWY/:path*",
