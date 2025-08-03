@@ -13,6 +13,7 @@ function BlogPost({ post }: { post: (typeof blogs)[number] }) {
             alt={post.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            placeholder="blur"
           />
         </div>
 

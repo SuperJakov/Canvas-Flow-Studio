@@ -12,6 +12,7 @@ export default function TopSection() {
             width={80}
             height={80}
             className="h-16 w-16 object-contain md:h-20 md:w-20"
+            placeholder="blur"
           />
           <h1 className="text-primary text-5xl font-bold md:text-6xl lg:text-7xl">
             Blog
