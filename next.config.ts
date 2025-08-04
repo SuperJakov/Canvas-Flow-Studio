@@ -16,11 +16,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
+
+  async headers() {
     return [
       {
         source: "/relay-uYWY/static/:path*",
-        destination: "https://eu-assets.i.posthog.com/static/:path*",
         headers: [
           {
             key: "Cache-Control",
@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
             value: "public, max-age=432000, immutable",
           },
         ],
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/relay-uYWY/static/:path*",
+        destination: "https://eu-assets.i.posthog.com/static/:path*",
       },
       {
         source: "/relay-uYWY/:path*",

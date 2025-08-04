@@ -27,6 +27,7 @@ import { StyleSelector } from "./StyleSelector";
 import { RateLimitBanner } from "./RateLimitBanner";
 import type { Style } from "./constants";
 import { Popover } from "~/components/ui/popover";
+import ImageNodeFooter from "./ImageNodeFooter";
 
 export default function ImageNode({
   id,
@@ -279,15 +280,8 @@ export default function ImageNode({
               id={id}
               isLocked={isLocked}
               isRunning={isRunning}
-              hasIncomingConnections={hasIncomingConnections}
-              isRateLimited={isRateLimited}
-              selectedStyle={data.style}
               onToggleLock={toggleLock}
               onToggleRunning={toggleRunning}
-              onStylePopoverTrigger={(e) => {
-                e.stopPropagation();
-                setIsPopoverOpen(true);
-              }}
             />
           )}
 
@@ -306,6 +300,14 @@ export default function ImageNode({
               onImageError={handleImageError}
               onOpenBanner={openBanner}
               id={id}
+            />
+            <ImageNodeFooter
+              selectedStyle={data.style}
+              onOpenStyleSelector={(e) => {
+                e.stopPropagation();
+                setIsPopoverOpen((prev) => !prev);
+              }}
+              isStyleDropDownOpen={isPopoverOpen}
             />
             <Handle type="source" position={Position.Bottom} />
           </div>

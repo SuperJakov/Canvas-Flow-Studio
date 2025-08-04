@@ -62,3 +62,6 @@ export const IMAGE_STYLES = [
 ] as const;
 
 export type Style = (typeof IMAGE_STYLES)[number]["id"];
+
+export const imageQualities = ["low", "medium", "high"] as const;
+export type ImageQuality = (typeof imageQualities)[number];
