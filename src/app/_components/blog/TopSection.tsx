@@ -18,7 +18,7 @@ export default function TopSection() {
             Blog
           </h1>
         </div>
-        <p className="text-xl font-light text-gray-600 md:text-2xl dark:text-gray-400">
+        <p className="text-muted-foreground text-xl font-light md:text-2xl">
           Thoughts Worth Sharing.
         </p>
       </div>
