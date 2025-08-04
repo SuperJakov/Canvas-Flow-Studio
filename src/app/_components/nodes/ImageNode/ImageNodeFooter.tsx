@@ -71,7 +71,7 @@ export default function ImageNodeFooter({
   const styleText = selectedImageStyle?.name ?? "Select style";
 
   return (
-    <div className="flex items-center justify-between gap-2 pt-1">
+    <div className="flex items-center justify-between gap-2 pt-2">
       <div className="flex items-center gap-2">
         {/* Hidden measurement spans */}
         <span
