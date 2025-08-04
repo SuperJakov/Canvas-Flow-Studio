@@ -176,7 +176,13 @@ export default async function BlogPostPage({ params }: Props) {
     "@type": "BlogPosting",
     headline: post.title,
     description: `Read about ${post.title} on Canvas Flow Studio's blog`,
-    image: post.thumbnail || `${baseUrl}/logo.png`,
+    image: {
+      "@type": "ImageObject",
+      url: new URL(post.thumbnail.src, getBaseUrl()).toString(),
+      width: post.thumbnail.width,
+      height: post.thumbnail.height,
+      caption: post.title,
+    },
     datePublished: post.date,
     author: {
       "@type": "Person",

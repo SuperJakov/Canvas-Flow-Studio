@@ -191,6 +191,7 @@ export default function DemoImageSection(): JSX.Element {
           <Progress
             className="mx-auto mt-6 h-1 w-32"
             value={((currentImageIndex + 1) / demoImages.length) * 100}
+            aria-label="Demo slideshow progress"
           />
         )}
       </div>

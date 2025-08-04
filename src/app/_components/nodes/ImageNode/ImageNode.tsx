@@ -50,6 +50,9 @@ export default function ImageNode({
   const imageGenRateLimit = useConvexQuery(
     api.imageNodes.getImageGenerationRateLimit,
   );
+  const imageNode = useConvexQuery(api.imageNodes.getImageNode, {
+    nodeId: id,
+  });
   const isRateLimited = imageGenRateLimit
     ? imageGenRateLimit.isRateLimited
     : false;
@@ -158,9 +161,10 @@ export default function ImageNode({
       const blob = await response.blob();
       const downloadUrl = URL.createObjectURL(blob);
 
+      const filename = `${imageNode?.imageDescription ?? "images"}.png`;
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = `image-${id}.png`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

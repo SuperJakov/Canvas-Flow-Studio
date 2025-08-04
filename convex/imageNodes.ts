@@ -259,9 +259,14 @@ async function* streamAIImage(
   inputImageBase64?: string,
 ) {
   const client = getClient();
-
+  const envQuality = process.env.DEFAULT_IMAGE_GENERATION_QUALITY; // TODO: Let user select the quality
+  const quality: "low" | "medium" | "high" =
+    envQuality === "low" || envQuality === "medium" || envQuality === "high"
+      ? envQuality
+      : "low";
   const styleDescription = systemPrompts[style] ?? "";
 
+  console.log("Using quality:", quality);
   const prompt = inputImageBase64
     ? `Edit the provided image based on the following instructions:
 ${textContents.map((text) => `- ${text}`).join("\n")}
@@ -302,7 +307,7 @@ Ensure all elements are clearly represented and cohesively integrated.`;
       prompt,
       n: 1,
       size: "1024x1024",
-      quality: "low",
+      quality: quality,
       stream: true,
       partial_images: 2,
     });
@@ -312,7 +317,7 @@ Ensure all elements are clearly represented and cohesively integrated.`;
       prompt,
       n: 1,
       size: "1024x1024",
-      quality: "low",
+      quality: quality,
       stream: true,
       partial_images: 2,
     });
