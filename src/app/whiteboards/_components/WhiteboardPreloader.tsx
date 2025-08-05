@@ -2,12 +2,6 @@ import type { Id } from "convex/_generated/dataModel";
 import { useConvexQuery } from "~/helpers/convex";
 import { api } from "convex/_generated/api";
 
-type Props = {
-  whiteboards: {
-    _id: Id<"whiteboards">;
-  }[];
-};
-
 // Child component that preloads a single whiteboard
 function PreloadWhiteboard({ id }: { id: Id<"whiteboards"> }) {
   const preloadedWhiteboard = useConvexQuery(api.whiteboards.getWhiteboard, {
@@ -18,7 +12,16 @@ function PreloadWhiteboard({ id }: { id: Id<"whiteboards"> }) {
   return null;
 }
 
-export default function WhiteboardPreloader({ whiteboards }: Props) {
+type Props = {
+  lastProjectId: Id<"projects"> | undefined;
+};
+
+export default function WhiteboardPreloader({ lastProjectId }: Props) {
+  const whiteboards = useConvexQuery(api.whiteboards.listWhiteboards, {
+    projectId: lastProjectId,
+  });
+
+  if (!whiteboards) return null;
   const preloadAmount = 5;
 
   return (

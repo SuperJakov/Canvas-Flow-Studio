@@ -13,20 +13,16 @@ import {
 } from "~/components/ui/popover";
 import { useConvexQuery } from "~/helpers/convex";
 import Loading from "~/app/loading";
+import { useAtom } from "jotai";
+import { errorMessageAtom, upgradeBannerAtom } from "../atoms";
 
 type Props = {
-  setFeatureName: (name: string) => void;
-  setShowUpgradeBanner: (booL: boolean) => void;
-  setErrorMessage: (message: string | null) => void;
   lastProjectId: Id<"projects"> | undefined;
 };
 
-export default function CreateNewSection({
-  setFeatureName,
-  setShowUpgradeBanner,
-  setErrorMessage,
-  lastProjectId,
-}: Props) {
+export default function CreateNewSection({ lastProjectId }: Props) {
+  const [, setUpgradeBanner] = useAtom(upgradeBannerAtom);
+  const [, setErrorMessage] = useAtom(errorMessageAtom);
   const projectCountLimit = useConvexQuery(api.projects.getProjectCountLimit);
   const isProjectLimitReached = projectCountLimit
     ? projectCountLimit.currentProjectCount >= projectCountLimit.maxProjectCount
@@ -57,8 +53,10 @@ export default function CreateNewSection({
     setProjectPopoverOpen(false);
     setWhiteboardPopoverOpen(false);
 
-    setFeatureName(featureName);
-    setShowUpgradeBanner(true);
+    setUpgradeBanner({
+      featureName,
+      isOpen: true,
+    });
   }
 
   const handleCreateProject = async () => {
