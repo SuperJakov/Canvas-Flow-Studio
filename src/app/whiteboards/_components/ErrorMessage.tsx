@@ -1,3 +1,5 @@
+"use client";
+
 import { useAtom } from "jotai";
 import { errorMessageAtom } from "../atoms";
 import { AlertCircle } from "lucide-react";

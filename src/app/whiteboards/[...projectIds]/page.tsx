@@ -1,6 +1,6 @@
 import { api } from "convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-import WhiteboardsClient from "../WhiteboardsClient";
+import WhiteboardsClient from "../Whiteboards";
 import { redirect } from "next/navigation";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { RedirectToSignIn } from "@clerk/nextjs";

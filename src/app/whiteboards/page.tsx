@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import WhiteboardsClient from "./WhiteboardsClient";
+import WhiteboardsClient from "./Whiteboards";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { RedirectToSignIn } from "@clerk/nextjs";
 

@@ -1,18 +1,19 @@
-"use client";
-
 import type { Id } from "../../../convex/_generated/dataModel";
-import UpgradeBanner from "../whiteboard/UpgradeBanner";
 import CreateNewSection from "./_components/CreateNewSection";
 import WhiteboardsOverview from "./_components/WhiteboardsOverview";
 import dynamic from "next/dynamic";
 import FolderView from "./_components/FolderView";
-import ErrorMessage from "./_components/ErrorMessage";
-import { useAtom } from "jotai";
-import { upgradeBannerAtom } from "./atoms";
 
-const WhiteboardPreloader = dynamic(
-  () => import("./_components/WhiteboardPreloader").then((c) => c.default),
-  { ssr: false },
+const WhiteboardPreloader = dynamic(() =>
+  import("./_components/WhiteboardPreloader").then((c) => c.default),
+);
+
+const ErrorMessage = dynamic(() =>
+  import("./_components/ErrorMessage").then((c) => c.default),
+);
+
+const WhiteboardsUpgradeBanner = dynamic(() =>
+  import("./_components/WhiteboardsUpgradeBanner").then((c) => c.default),
 );
 
 type Props = {
@@ -23,8 +24,6 @@ export default function WhiteboardsClient({ projectIds }: Props) {
   const lastProjectId = projectIds
     ? projectIds[projectIds.length - 1]
     : undefined;
-
-  const [upgradeBanner, setUpgradeBanner] = useAtom(upgradeBannerAtom);
 
   return (
     <div className="bg-background text-foreground min-h-screen pt-16">
@@ -40,13 +39,7 @@ export default function WhiteboardsClient({ projectIds }: Props) {
         <FolderView projectIds={projectIds} />
       </div>
 
-      <UpgradeBanner
-        isOpen={upgradeBanner.isOpen}
-        onCloseAction={() =>
-          setUpgradeBanner((prev) => ({ ...prev, isOpen: false }))
-        }
-        featureName={upgradeBanner.featureName}
-      />
+      <WhiteboardsUpgradeBanner />
     </div>
   );
 }

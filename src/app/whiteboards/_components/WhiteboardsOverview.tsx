@@ -1,3 +1,5 @@
+"use client";
+
 import { api } from "convex/_generated/api";
 import Loading from "~/app/loading";
 import { useConvexQuery } from "~/helpers/convex";

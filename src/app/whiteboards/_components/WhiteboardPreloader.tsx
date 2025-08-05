@@ -1,3 +1,4 @@
+"use client";
 import type { Id } from "convex/_generated/dataModel";
 import { useConvexQuery } from "~/helpers/convex";
 import { api } from "convex/_generated/api";
