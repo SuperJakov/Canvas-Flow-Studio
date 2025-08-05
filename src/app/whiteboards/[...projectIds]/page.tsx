@@ -1,6 +1,6 @@
 import { api } from "convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-import WhiteboardsClient from "../Whiteboards";
+import Whiteboards from "../Whiteboards";
 import { redirect } from "next/navigation";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { RedirectToSignIn } from "@clerk/nextjs";
@@ -61,7 +61,7 @@ export default async function ProjectWhiteboardsPage({ params }: Props) {
         projectIds,
       },
     );
-    return <WhiteboardsClient projectIds={normalizedProjectIds} />;
+    return <Whiteboards projectIds={normalizedProjectIds} />;
   } catch (error) {
     console.error(error);
     redirect("/whiteboards");

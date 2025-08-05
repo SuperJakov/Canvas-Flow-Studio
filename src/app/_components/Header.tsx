@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "~/components/ui/button";
@@ -17,6 +16,20 @@ import { DiscordIcon } from "~/components/icons";
 import AppLogo from "public/logo.png";
 import Image from "next/image";
 import posthog from "posthog-js";
+import dynamic from "next/dynamic";
+
+const SignInButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.SignInButton),
+  { ssr: false },
+);
+const SignUpButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.SignUpButton),
+  { ssr: false },
+);
+const UserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false },
+);
 
 export function Header() {
   const pathname = usePathname();
