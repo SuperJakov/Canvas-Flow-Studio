@@ -25,42 +25,16 @@ const demoImages: DemoImage[] = [
   { src: CompanyMeeting, alt: "Company Meeting" },
 ];
 
+const slideshowImageQuality = 85; // Has to be the same for preloaded and loaded images so it doesn't refetch
+
 export default function DemoImageSection(): JSX.Element {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
-
-  // Preload all images
-  useEffect(() => {
-    const preloadImages = async () => {
-      const imagePromises = demoImages.map((demoImage) => {
-        return new Promise<void>((resolve, reject) => {
-          const img = new window.Image();
-          img.onload = () => resolve();
-          img.onerror = () =>
-            reject(new Error(`Failed to load image: ${demoImage.alt}`));
-          img.src =
-            typeof demoImage.src === "string"
-              ? demoImage.src
-              : demoImage.src.src;
-        });
-      });
-
-      try {
-        await Promise.all(imagePromises);
-        setImagesLoaded(true);
-      } catch (error) {
-        console.warn("Some images failed to preload:", error);
-        // Still set as loaded to allow component to function
-        setImagesLoaded(true);
-      }
-    };
-
-    void preloadImages();
-  }, []);
+  const [imagesLoaded, setImagesLoaded] = useState<number>(0);
+  const allImagesLoaded = imagesLoaded === demoImages.length;
 
   useEffect(() => {
-    // Only start the slideshow after images are loaded
-    if (!imagesLoaded) return;
+    // Only start the slideshow after all images are loaded
+    if (!allImagesLoaded) return;
 
     const interval: NodeJS.Timeout = setInterval(() => {
       setCurrentImageIndex(
@@ -69,7 +43,7 @@ export default function DemoImageSection(): JSX.Element {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [imagesLoaded]);
+  }, [allImagesLoaded]);
 
   const slideVariants: Variants = {
     enter: {
@@ -92,6 +66,10 @@ export default function DemoImageSection(): JSX.Element {
       scale: 0.8,
       rotateY: -45,
     },
+  };
+
+  const handleImageLoad = () => {
+    setImagesLoaded((prev) => prev + 1);
   };
 
   return (
@@ -127,67 +105,70 @@ export default function DemoImageSection(): JSX.Element {
         >
           <div className="relative aspect-video w-full">
             {/* Show loading state while images are preloading */}
-            {!imagesLoaded && (
-              <div className="bg-background absolute inset-0 flex items-center justify-center">
+            {!allImagesLoaded && (
+              <div className="bg-background absolute inset-0 z-10 flex items-center justify-center">
                 <div className="flex items-center space-x-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-500 border-t-transparent"></div>
-                  <span className="text-sm">Loading demo images...</span>
+                  <span className="text-sm">
+                    Loading demo images... ({imagesLoaded}/{demoImages.length})
+                  </span>
                 </div>
               </div>
             )}
 
-            {/* Hidden preload images */}
-            <div className="pointer-events-none absolute -left-full opacity-0">
+            {/* Hidden preload images using Next.js Image component */}
+            <div
+              className="pointer-events-none absolute -left-[9999px] opacity-0"
+              aria-hidden="true"
+            >
               {demoImages.map((demoImage, index) => (
                 <Image
-                  key={index}
+                  key={`preload-${index}`}
                   src={demoImage.src}
-                  alt={`Preload ${demoImage.alt}`}
-                  width={1}
-                  height={1}
-                  priority={index < 3} // Prioritize first 3 images
+                  alt={demoImage.alt}
+                  priority={true}
                   loading="eager"
+                  onLoad={handleImageLoad}
+                  quality={slideshowImageQuality}
                 />
               ))}
             </div>
 
             {/* Main slideshow */}
-            {imagesLoaded && (
-              <AnimatePresence initial={false} mode="wait">
-                <motion.div
-                  key={currentImageIndex}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    x: { type: "spring", stiffness: 300, damping: 30 },
-                    opacity: { duration: 0.4 },
-                    scale: { duration: 0.4 },
-                    rotateY: { duration: 0.6 },
-                  }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src={
-                      demoImages[currentImageIndex]?.src ?? "/placeholder.png"
-                    }
-                    alt={demoImages[currentImageIndex]?.alt ?? "Demo image"}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
-                  />
+            <AnimatePresence initial={false} mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.4 },
+                  rotateY: { duration: 0.6 },
+                }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={demoImages[currentImageIndex]?.src ?? "/placeholder.png"}
+                  alt={demoImages[currentImageIndex]?.alt ?? "Demo image"}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                  priority={currentImageIndex === 0}
+                  quality={slideshowImageQuality}
+                />
 
-                  {/* Subtle overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-                </motion.div>
-              </AnimatePresence>
-            )}
+                {/* Subtle overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+              </motion.div>
+            </AnimatePresence>
           </div>
         </motion.div>
 
         {/* Progress indicator */}
-        {imagesLoaded && (
+        {allImagesLoaded && (
           <Progress
             className="mx-auto mt-6 h-1 w-32"
             value={((currentImageIndex + 1) / demoImages.length) * 100}
