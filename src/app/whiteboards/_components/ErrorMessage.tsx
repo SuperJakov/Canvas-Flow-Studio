@@ -9,8 +9,8 @@ export default function ErrorMessage() {
 
   return (
     errorMessage && (
-      <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-        <div className="flex items-center gap-2 text-red-800">
+      <div className="border-destructive/50 bg-destructive/10 mb-6 rounded-lg border p-4">
+        <div className="text-destructive flex items-center gap-2">
           <AlertCircle className="h-5 w-5 flex-shrink-0" />
           <p className="font-medium">{errorMessage}</p>
         </div>
