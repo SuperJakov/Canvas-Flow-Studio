@@ -140,6 +140,7 @@ export default function ImageNodeFooter({
           e.stopPropagation();
           onOpenStyleSelector?.(e);
         }}
+        asChild
       >
         <Button
           ref={styleButtonRef}
