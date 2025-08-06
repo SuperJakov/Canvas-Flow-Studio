@@ -165,7 +165,7 @@ export default function HeroSection() {
             </span>
           </span>
         </h1>
-        <p className="text-muted-foreground mb-10 text-xl">
+        <p className="text-muted-foreground mx-auto mb-10 max-w-2xl text-xl">
           Create, visualize, and run complex AI workflows through an intuitive
           drag-and-drop interface. No coding required.
         </p>
