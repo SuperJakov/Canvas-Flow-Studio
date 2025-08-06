@@ -104,7 +104,7 @@ export function Header() {
   const navClick = (label: string) => () => capture("nav click", { label });
 
   return (
-    <>
+    <nav>
       <header
         className="fixed z-50 w-full backdrop-blur-sm"
         style={{
@@ -474,6 +474,6 @@ export function Header() {
           </div>
         </div>
       )}
-    </>
+    </nav>
   );
 }

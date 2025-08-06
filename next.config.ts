@@ -24,9 +24,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            // This value tells browsers to cache the asset for 5 days.
-            // 'immutable' means the file will not change, so no re-validation is needed.
-            value: "public, max-age=432000, immutable",
+            // Serve from cache for 1 day, then revalidate in background for up to 7 days
+            value: "public, max-age=86400, stale-while-revalidate=604800",
           },
         ],
       },
