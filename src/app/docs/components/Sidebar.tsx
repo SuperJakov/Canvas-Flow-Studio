@@ -57,8 +57,7 @@ export default function DocsSidebar({
                 <SidebarMenuItem key={chapter.slug}>
                   <SidebarMenuButton
                     asChild
-                    isActive={activeChapter === chapter.slug}
-                    className="text-wrap"
+                    className="font-bold text-wrap transition"
                   >
                     <Link
                       href={`/docs/${chapter.slug}/${chapter.sections[0]?.slug ?? ""}`}
