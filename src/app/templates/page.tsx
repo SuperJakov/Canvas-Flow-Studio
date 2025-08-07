@@ -18,7 +18,7 @@ export default function Templates() {
   const templates = getAllTemplates();
 
   return (
-    <main className="text-foreground container mx-auto px-4 py-8">
+    <main className="text-foreground container mx-auto px-4 py-8 pt-18">
       <h1 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
         <span className="animate-[gradient-x_5s_ease_infinite] bg-gradient-to-r from-cyan-400 to-blue-500 bg-[length:200%_200%] bg-clip-text text-transparent">
           Get Started with an Example
