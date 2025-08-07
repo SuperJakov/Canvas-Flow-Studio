@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "next build --turbopack",
-    "check": "next lint && tsgo --noEmit",
+    "check": "pnpm lint && pnpm typecheck",
     "dev": "next dev --turbo",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "cross-env SKIP_ENV_VALIDATION=true next lint",
+    "lint:fix": "cross-env SKIP_ENV_VALIDATION=true next lint --fix",
     "preview": "pnpm build && pnpm start",
     "start": "next start",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "cross-env SKIP_ENV_VALIDATION=true tsgo --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "^2.6.0",
@@ -74,6 +74,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@typescript/native-preview": "7.0.0-dev.20250731.1",
+    "cross-env": "^10.0.0",
     "eslint": "^9.32.0",
     "eslint-config-next": "^15.4.4",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
