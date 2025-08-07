@@ -12,6 +12,8 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    env:
+      SKIP_ENV_VALIDATION: "true"
     permissions:
       actions: read
       contents: read
