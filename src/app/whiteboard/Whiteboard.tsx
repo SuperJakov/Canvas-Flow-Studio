@@ -19,11 +19,10 @@ import { edgesAtom, isExecutingNodeAtom, nodesAtom } from "./atoms";
 import { useAtom } from "jotai";
 import { useDnD } from "./DnDContext";
 import { v4 as uuidv4 } from "uuid";
-import { useMutation } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
+import type { Preloaded } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import Link from "next/link";
 import { debounce } from "lodash";
-import Loading from "../loading";
 import SharingPopup from "./SharingPopup";
 import WhiteboardPreviewCreator from "./WhiteboardPreviewCreator";
 import Portal from "../_components/Portal";
@@ -33,6 +32,7 @@ import { deepEqual } from "fast-equals";
 
 type Props = {
   id: string;
+  preloadedWhiteboard: Preloaded<typeof api.whiteboards.getWhiteboard>;
 };
 
 function stripInternal<T extends AppNode>(node: T): T {
@@ -116,11 +116,8 @@ function bringSelectedNodesToFront(nodes: AppNode[]): AppNode[] {
   });
 }
 
-export default function Whiteboard({ id }: Props) {
-  const whiteboardData = useConvexQuery(
-    api.whiteboards.getWhiteboard,
-    id ? { id } : "skip",
-  );
+export default function Whiteboard({ id, preloadedWhiteboard }: Props) {
+  const whiteboardData = usePreloadedQuery(preloadedWhiteboard);
   const nodeCountLimit = useConvexQuery(api.whiteboards.getNodeCountLimit);
   const user = useConvexQuery(api.users.current);
   const [nodes, setNodes] = useAtom(nodesAtom);
@@ -414,22 +411,6 @@ export default function Whiteboard({ id }: Props) {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   };
-
-  if (id && whiteboardData === undefined) {
-    return <Loading />;
-  }
-  if (id && whiteboardData === null) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <p>
-          Whiteboard not found or access denied.{" "}
-          <Link href="/whiteboards" className="underline">
-            Go to whiteboards page to create a new one.
-          </Link>
-        </p>
-      </div>
-    );
-  }
 
   return (
     <>
