@@ -50,7 +50,7 @@ function BlogPost({ post }: { post: (typeof blogs)[number] }) {
   const Content = post.content;
 
   return (
-    <article className="mx-auto max-w-4xl px-4 py-8 pt-18">
+    <article className="mx-auto max-w-4xl px-4 py-8 pt-16">
       {/* Header */}
       <header className="mb-8">
         {/* Tags */}
