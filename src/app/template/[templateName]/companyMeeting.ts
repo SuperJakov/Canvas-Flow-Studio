@@ -1,6 +1,4 @@
-import type { Template } from "./templates";
-
-export const companyMeetingTemplate: Template = {
+export const companyMeetingTemplate = {
   title: "Company Meeting",
   nodes: [
     {
@@ -57,7 +55,7 @@ export const companyMeetingTemplate: Template = {
       width: 265,
       height: 159,
     },
-  ],
+  ] as const,
   edges: [
     {
       source: "1470c22b-5b4c-4e15-ba51-a353908abe54",
@@ -77,5 +75,5 @@ export const companyMeetingTemplate: Template = {
       id: "bdbca356-13eb-4ca1-a2e1-7d58004afd37",
       type: "default",
     },
-  ],
+  ] as const,
 };

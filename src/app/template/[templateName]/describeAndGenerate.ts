@@ -1,6 +1,4 @@
-import type { Template } from "./templates";
-
-export const describeAndGenerateTemplate: Template = {
+export const describeAndGenerateTemplate = {
   title: "Describe and Generate",
   nodes: [
     {
@@ -121,7 +119,7 @@ export const describeAndGenerateTemplate: Template = {
       width: 280,
       zIndex: 29,
     },
-  ],
+  ] as const,
   edges: [
     {
       id: "bc924752-beb7-4934-b3cf-7f458398cd8e",
@@ -153,5 +151,5 @@ export const describeAndGenerateTemplate: Template = {
       target: "178d3e95-9971-464f-8236-f1607f65b039",
       type: "default",
     },
-  ],
+  ] as const,
 };

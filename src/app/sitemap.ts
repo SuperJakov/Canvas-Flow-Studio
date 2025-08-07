@@ -5,7 +5,13 @@ import { blogs } from "./_components/blog/blogs";
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
-const ROOT_ROUTES = ["/", "/pricing", "/changelog", "/blog"] as const;
+const ROOT_ROUTES = [
+  "/",
+  "/pricing",
+  "/changelog",
+  "/blog",
+  "/templates",
+] as const;
 const PRIORITY_OVERRIDES: Record<string, number> = {
   "/": 1,
   "/docs/getting-started/introduction": 0.8,

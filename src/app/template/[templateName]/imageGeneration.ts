@@ -1,6 +1,4 @@
-import type { Template } from "./templates";
-
-export const imageGenerationTemplate: Template = {
+export const imageGenerationTemplate = {
   title: "Image Generation",
   nodes: [
     {
@@ -59,7 +57,7 @@ export const imageGenerationTemplate: Template = {
       },
       zIndex: 8,
     },
-  ],
+  ] as const,
   edges: [
     {
       id: "0fb01747-e7f3-4b93-8ddd-1bba5a8f0f8e",
@@ -79,5 +77,5 @@ export const imageGenerationTemplate: Template = {
       id: "2f0a501f-ca80-4ee5-b5cf-43607570691d",
       type: "default",
     },
-  ],
+  ] as const,
 };
