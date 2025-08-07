@@ -40,8 +40,8 @@ const RateLimitHeader = () => (
 const Intro = () => (
   <section className="border-border bg-card rounded-xl border p-6 shadow-sm">
     <BodyP>
-      We&apos;re excited to announce that we are increasing the rate limits for our
-      free users. We want to make sure that everyone has the opportunity to
+      We&apos;re excited to announce that we are increasing the rate limits for
+      our free users. We want to make sure that everyone has the opportunity to
       experience the full power of Canvas Flow Studio.
     </BodyP>
   </section>
