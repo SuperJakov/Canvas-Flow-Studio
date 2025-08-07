@@ -66,10 +66,13 @@ function BlogPost({ post }: { post: (typeof blogs)[number] }) {
 }
 
 export default function AllBlogPosts() {
+  const sortedBlogs = blogs.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="space-y-6">
-        {blogs.map((post) => (
+      <div className="flex flex-col gap-4">
+        {sortedBlogs.map((post) => (
           <BlogPost post={post} key={post.slug} />
         ))}
       </div>
