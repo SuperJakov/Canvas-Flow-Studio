@@ -1,6 +1,6 @@
 import { api } from "../../../../convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
-import { notFound, redirect } from "next/navigation";
+import { preloadQuery } from "convex/nextjs";
+import { notFound } from "next/navigation";
 import WhiteboardPage from "../WhiteboardPage";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import { RedirectToSignIn } from "@clerk/nextjs";
@@ -15,29 +15,24 @@ export default async function WhiteboardPageWithId({ params }: Props) {
   const { id } = await params;
 
   const token = await getConvexToken();
-  if (!token) return <RedirectToSignIn signInFallbackRedirectUrl={"/"} />;
-
-  let whiteboard = null;
-  try {
-    whiteboard = await fetchQuery(
-      api.whiteboards.getWhiteboard,
-      { id: id },
-      { token },
-    );
-  } catch (err) {
-    // User does not have access to whiteboard
-    console.error("User does not have access to whiteboard", err);
-    redirect("/");
+  if (!token) {
+    return <RedirectToSignIn signInFallbackRedirectUrl="/" />;
   }
 
-  const normalizedId = await fetchQuery(api.whiteboards.normalizeWhiteboardId, {
-    whiteboardId: id,
-  });
+  const preloadedWhiteboard = await preloadQuery(
+    api.whiteboards.getWhiteboard,
+    {
+      id,
+    },
+    {
+      token,
+    },
+  );
 
-  if (!whiteboard || !normalizedId) {
+  if (!preloadedWhiteboard) {
     console.log("Whiteboard not found:", id);
     notFound();
   }
-  // Whiteboard id has been validated by the query
-  return <WhiteboardPage id={normalizedId} />;
+
+  return <WhiteboardPage preloadedWhiteboard={preloadedWhiteboard} />;
 }
