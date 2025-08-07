@@ -3,6 +3,7 @@ import Link from "next/link";
 import AppLogo from "public/logo.png";
 import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
+import RateLimitIncreaseContent from "./increasing-free-tier-limits";
 
 const Section = ({
   className = "",
@@ -215,5 +216,20 @@ export const blogs = [
     readingTime: "5 min read",
     tags: ["announcement", "product", "launch"],
     content: CanvasFlowStudioLaunchContent,
+  },
+  {
+    slug: "increasing-free-tier-limits",
+    title: "We're Increasing Our Free Tier Limits!",
+    date: "2025-08-07T19:00:00.216Z",
+    excerpt: "Great news! We're increasing the rate limits for our free users.",
+    thumbnail: AppLogo,
+    author: {
+      name: "Jakov",
+      avatar: null,
+      role: "Founder",
+    },
+    readingTime: "2 min read",
+    tags: ["announcement", "product", "rate limits"],
+    content: RateLimitIncreaseContent,
   },
 ];

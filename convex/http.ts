@@ -36,18 +36,18 @@ http.route({
             data: event.data,
           });
 
-          console.log("Adding 10 image credits...");
+          console.log("Adding 20 image credits...");
           await ctx.scheduler.runAfter(0, internal.credits.addCredits, {
             userId: event.data.id,
             creditType: "image",
-            creditAmount: 10,
+            creditAmount: 20,
             type: "signup",
           });
           console.log("Adding 3 speech credits...");
           await ctx.scheduler.runAfter(0, internal.credits.addCredits, {
             userId: event.data.id,
             creditType: "speech",
-            creditAmount: 3,
+            creditAmount: 5,
             type: "signup",
           });
           break;

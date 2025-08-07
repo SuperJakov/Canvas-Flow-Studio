@@ -17,11 +17,11 @@ export const plans: Plan[] = [
         { name: "Nodes per whiteboard", value: "10" },
       ],
       content: [
-        { name: "Text Credits", value: "10/month" },
-        { name: "Image Credits", value: "10/month" },
+        { name: "Text Credits", value: "20/month" },
+        { name: "Image Credits", value: "20/month" },
         { name: "Image Quality", value: "Low" },
-        { name: "Instruction Use", value: "20/month" },
-        { name: "Speech Credits", value: "3/month" },
+        { name: "Instruction Use", value: "40/month" },
+        { name: "Speech Credits", value: "5/month" },
       ],
       integrations: [
         { name: "Weather Use", value: "1/month" },

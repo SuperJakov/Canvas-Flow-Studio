@@ -21,7 +21,7 @@ export const getRateLimitConfigForPlan = (plan: Tier) => {
       return { kind: "fixed window" as const, period: MONTH, rate: 200 };
     case "Free":
     default:
-      return { kind: "fixed window" as const, period: MONTH, rate: 20 };
+      return { kind: "fixed window" as const, period: MONTH, rate: 40 };
   }
 };
 
