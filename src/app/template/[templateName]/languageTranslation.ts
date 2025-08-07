@@ -1,6 +1,4 @@
-import type { Template } from "./templates";
-
-export const languageTranslationTemplate: Template = {
+export const languageTranslationTemplate = {
   title: "Language Translation",
   nodes: [
     {
@@ -52,7 +50,7 @@ export const languageTranslationTemplate: Template = {
       data: { isLocked: true, text: "Example text, you can modify it!" },
       zIndex: 19,
     },
-  ],
+  ] as const,
   edges: [
     {
       id: "67f97e3a-0f6a-4db9-b537-473b4b683557",
@@ -72,5 +70,5 @@ export const languageTranslationTemplate: Template = {
       id: "ee544cf7-7954-45df-bb81-43b1eaa84120",
       type: "default",
     },
-  ],
+  ] as const,
 };

@@ -37,8 +37,8 @@ export default async function TemplatePage({ params }: Props) {
       {
         id: newWhiteboardId,
         title: template.title,
-        edges: template.edges,
-        nodes: template.nodes,
+        edges: [...template.edges],
+        nodes: [...template.nodes],
       },
       {
         token,
