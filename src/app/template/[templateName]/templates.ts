@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export type Template = {
-  title:string;
+  title: string;
   description?: string;
   icon?: React.ElementType;
   iconBg?: string;

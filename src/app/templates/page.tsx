@@ -57,7 +57,9 @@ export default function Templates() {
                     template.workInProgress ? "grayscale" : ""
                   }`}
                 >
-                  {template.icon && <template.icon className="h-6 w-6 text-white" />}
+                  {template.icon && (
+                    <template.icon className="h-6 w-6 text-white" />
+                  )}
                 </div>
                 <h3
                   className={`mb-2 text-xl font-semibold ${template.titleClasses} transition-all duration-300 ${
