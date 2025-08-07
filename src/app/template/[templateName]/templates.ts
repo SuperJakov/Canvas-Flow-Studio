@@ -52,3 +52,10 @@ export function getTemplate(name: string): Template | undefined {
     edges,
   };
 }
+
+export function getAllTemplates() {
+  return Object.entries(templates).map(([name, template]) => ({
+    name,
+    title: template.title,
+  }));
+}
