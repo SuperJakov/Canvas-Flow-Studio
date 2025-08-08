@@ -252,6 +252,16 @@ const transactions = defineTable({
   creditType: CreditType,
 });
 
+const chatMessages = defineTable({
+  isUser: v.boolean(),
+  message: v.string(),
+  sessionId: v.string(),
+}).index("by_sessionId", ["sessionId"]);
+
+const docs = defineTable({
+  content: v.string(),
+});
+
 const schema = defineSchema({
   users,
   subscriptions,
@@ -261,6 +271,8 @@ const schema = defineSchema({
   imageLogs,
   projects,
   transactions,
+  chatMessages,
+  docs,
 });
 
 export default schema;

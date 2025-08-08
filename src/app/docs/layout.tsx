@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SidebarProvider } from "~/components/ui/sidebar";
+import Chatbot from "./components/Chatbot";
 
 export const metadata: Metadata = {
   title: "Documentation | Canvas Flow Studio",
@@ -17,6 +18,7 @@ export default function DocsLayout({
     <SidebarProvider>
       <div className="bg-background min-h-screen">
         <div className="container mx-auto">{children}</div>
+        <Chatbot />
       </div>
     </SidebarProvider>
   );

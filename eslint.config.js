@@ -37,6 +37,7 @@ export default tseslint.config(
       ],
       // React Compiler rule
       "react-compiler/react-compiler": "error",
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
   {
