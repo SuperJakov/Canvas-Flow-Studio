@@ -11,17 +11,21 @@ import { useCopyWhiteboard } from "./utils";
 import { usePreloadedQuery } from "convex/react";
 import type { Preloaded } from "convex/react";
 import type { api } from "../../../convex/_generated/api";
+import ProgressBarSkeleton from "./skeletons/ProgressBarSkeleton";
+import SidebarSkeleton from "./skeletons/SidebarSkeleton";
+import WhiteboardHeaderSkeleton from "./skeletons/WhiteboardHeaderSkeleton";
 
 const WhiteboardHeader = dynamic(
   () => import("./WhiteboardHeader").then((c) => c.default),
-  { ssr: false },
+  { ssr: false, loading: () => <WhiteboardHeaderSkeleton /> },
 );
 const Sidebar = dynamic(() => import("./Sidebar").then((c) => c.default), {
   ssr: false,
+  loading: () => <SidebarSkeleton />,
 });
 const ProgressBar = dynamic(
   () => import("./ProgressBar").then((c) => c.default),
-  { ssr: false },
+  { ssr: false, loading: () => <ProgressBarSkeleton /> },
 );
 
 type Props = {
