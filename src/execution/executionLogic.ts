@@ -122,6 +122,7 @@ function executeTextNode(
       case "image":
       case "speech":
       case "instruction":
+      case "website":
         break;
       default:
         throw new Error(
