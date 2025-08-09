@@ -83,3 +83,24 @@ export function unregisterImageDescriptionAction(nodeId: string) {
 export function getImageDescriptionAction(nodeId: string) {
   return imageDescriptionActionMap.get(nodeId);
 }
+
+export type GenerateAndStoreWebsiteAction = ReactAction<
+  typeof api.websiteNodes.generateAndStoreWebsite
+>;
+
+const websiteActionMap = new Map<string, GenerateAndStoreWebsiteAction>();
+
+export function registerWebsiteAction(
+  nodeId: string,
+  fn: GenerateAndStoreWebsiteAction,
+) {
+  websiteActionMap.set(nodeId, fn);
+}
+
+export function unregisterWebsiteAction(nodeId: string) {
+  websiteActionMap.delete(nodeId);
+}
+
+export function getWebsiteAction(nodeId: string) {
+  return websiteActionMap.get(nodeId);
+}

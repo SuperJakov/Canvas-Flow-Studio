@@ -382,6 +382,21 @@ export default function Whiteboard({ id, preloadedWhiteboard }: Props) {
           zIndex: newZIndex,
         };
         break;
+      case "website":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            srcDoc: null,
+            internal: {
+              isRunning: false,
+            },
+          },
+          zIndex: newZIndex,
+        };
+        break;
       case "instruction":
         newNode = {
           id: newNodeId,

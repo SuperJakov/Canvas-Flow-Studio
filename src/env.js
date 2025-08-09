@@ -10,6 +10,9 @@ export const env = createEnv({
     STRIPE_PUBLISHABLE_KEY: z.string(),
     PLUS_MONTHLY_SUBSCRIPTION_PRODUCT_ID: z.string(),
     PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID: z.string(),
+    AZURE_OPENAI_WEBSITE_ENDPOINT: z.string().url(),
+    AZURE_OPENAI_WEBSITE_API_KEY: z.string(),
+    AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME: z.string(),
   },
 
   client: {
@@ -33,6 +36,10 @@ export const env = createEnv({
       process.env.PLUS_MONTHLY_SUBSCRIPTION_PRODUCT_ID,
     PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID:
       process.env.PRO_MONTHLY_SUBSCRIPTION_PRODUCT_ID,
+    AZURE_OPENAI_WEBSITE_ENDPOINT: process.env.AZURE_OPENAI_WEBSITE_ENDPOINT,
+    AZURE_OPENAI_WEBSITE_API_KEY: process.env.AZURE_OPENAI_WEBSITE_API_KEY,
+    AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME:
+      process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

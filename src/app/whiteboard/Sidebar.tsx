@@ -91,7 +91,7 @@ const NODE_CONFIGS = [
     color: "bg-pink-900/50 hover:bg-pink-800/50 border",
     title: "Website Node",
     beta: false,
-    disabled: true,
+    disabled: false,
     tooltip: (
       <>
         <span className="font-semibold">Website</span>: Generate complete web
