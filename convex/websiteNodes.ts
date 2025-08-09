@@ -47,23 +47,75 @@ export const generateAndStoreWebsite = action({
 
     try {
       const textContents = sourceNodes.map((n) => n.data.text);
+      const instruction = `
+      You are an expert web developer with a specialization in using Tailwind CSS to create modern, visually appealing, and responsive websites. Your task is to create a single, self-contained HTML file based on the user's request, strictly following the requirements below.
+      
+      **Core Philosophy: Tailwind First**
+      
+      You **must** use Tailwind CSS for all styling, layout, and design. Your primary goal is to leverage its utility classes to build the entire interface. You should only write custom CSS in a \`<style>\` tag for effects that are genuinely not possible with Tailwind's utility classes (e.g., complex multi-step animations, or very specific pseudo-element styling).
+      
+      **Key Requirements:**
+      
+      1.  **Single File Output:** The final output must be a single HTML file.
+      2.  **Mandatory Libraries:** You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
+      
+          * **Tailwind CSS (Required for ALL styling):**
+              \`<script src="https://cdn.tailwindcss.com"></script>\`
+      
+          * **GSAP (For advanced animations):**
+              \`<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>\`
+      
+          * **Chart.js (For charts and graphs):**
+              \`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>\`
+      
+      3.  **Custom Fonts:**
+          * To use custom fonts, you **must** import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
+              \`<link rel="preconnect" href="https://fonts.googleapis.com">\`
+              \`<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\`
+              \`<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">\`
+          * You will then need to extend the Tailwind configuration to make the font available. Place a \`<script>\` tag immediately after the Tailwind CSS script tag to configure it. For example:
+              \`\`\`html
+              <script src="https://cdn.tailwindcss.com"></script>
+              <script>
+                tailwind.config = {
+                  theme: {
+                    extend: {
+                      fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                      }
+                    }
+                  }
+                }
+              </script>
+              \`\`\`
+      
+      4.  **Responsiveness:** The website **must** be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
+      5.  **Content and Structure:** Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
+      6. This will be embedded into another website. Don't add any elements which might redirect the user (e.g. <a>) or lag the site.
+      
+      Please provide only the complete HTML code for the file, without any explanations or markdown formatting.`;
+
       const prompt = `
-          You are an expert web developer. Your task is to create a single, self-contained HTML file based on the user's request.
-          The HTML file should not have any external dependencies for CSS or JavaScript. All styles and scripts must be embedded within the HTML file.
-          The user's request is as follows:
-          ---
-          ${textContents.join("\n")}
-          ---
-          Please provide only the HTML code, without any explanations or markdown formatting.
-      `;
+      The user's request is as follows:
+      ${textContents.join("\n")}`;
 
       const client = getClient();
-      const response = await client.chat.completions.create({
-        model: process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME!,
-        messages: [{ role: "user", content: prompt }],
+
+      const response = await client.responses.create({
+        model: "gpt-5",
+        reasoning: { effort: "medium" },
+        instructions: instruction,
+        input: prompt,
+        max_output_tokens: 40000,
       });
 
-      const htmlContent = response.choices[0]?.message?.content;
+      console.log("Output tokens", response.usage?.output_tokens);
+      console.log(
+        "Output tokens details",
+        response.usage?.output_tokens_details,
+      );
+
+      const htmlContent = response.output_text;
       if (!htmlContent) {
         throw new Error("Failed to generate website content.");
       }

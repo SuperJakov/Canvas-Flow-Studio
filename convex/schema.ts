@@ -175,7 +175,6 @@ const websiteNodes = defineTable({
   authorExternalId: v.string(),
   isGenerating: v.optional(v.boolean()),
   srcDoc: v.union(v.string(), v.null()),
-  poolId: v.optional(v.union(vWorkIdValidator, v.null())),
 })
   .index("by_userId", ["authorExternalId"])
   .index("by_nodeId", ["nodeId"])
