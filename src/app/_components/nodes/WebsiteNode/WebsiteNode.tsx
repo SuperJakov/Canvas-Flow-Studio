@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, NodeResizer, Position, type NodeProps } from "@xyflow/react";
 import { useAction } from "convex/react";
 import { useParams } from "next/navigation";
 import { api } from "../../../../../convex/_generated/api";
@@ -94,7 +94,7 @@ export default function WebsiteNode({
   }
 
   return (
-    <div className="relative">
+    <div className="h-full w-full">
       <Portal>
         <UpgradeBanner
           isOpen={isBannerOpen}
@@ -104,10 +104,17 @@ export default function WebsiteNode({
       </Portal>
 
       <div
-        className={`overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
+        className={`h-full w-full overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
           selected ? "outline-blue-600" : "outline-white"
         }`}
       >
+        <NodeResizer
+          isVisible={selected && !isLocked}
+          minWidth={300}
+          minHeight={200}
+          maxWidth={800}
+          maxHeight={600}
+        />
         <WebsiteNodeHeader
           id={id}
           isLocked={isLocked}
@@ -116,7 +123,7 @@ export default function WebsiteNode({
           onToggleRunning={toggleRunning}
         />
 
-        <div className="bg-gray-800 p-2">
+        <div className="h-full w-full bg-gray-800">
           <Handle type="target" position={Position.Top} />
           <WebsiteNodeContent id={id} />
           <Handle type="source" position={Position.Bottom} />

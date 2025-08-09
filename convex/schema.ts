@@ -102,6 +102,8 @@ const WebsiteNodeSchema = v.object({
     x: v.number(),
     y: v.number(),
   }),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
   zIndex: v.optional(v.number()),
 });
 

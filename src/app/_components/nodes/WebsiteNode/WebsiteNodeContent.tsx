@@ -13,7 +13,7 @@ export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
 
   if (websiteNode?.isGenerating) {
     return (
-      <div className="group relative flex h-[300px] w-[400px] items-center justify-center bg-gray-800">
+      <div className="group relative flex h-full w-full items-center justify-center bg-gray-800">
         <div className="flex flex-col items-center text-gray-400">
           <Loader2 size={48} className="animate-spin" />
           <p className="mt-2">Generating website...</p>
@@ -24,7 +24,7 @@ export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
 
   if (websiteNode?.srcDoc) {
     return (
-      <div className="group relative flex h-[300px] w-[400px] items-center justify-center bg-gray-800">
+      <div className="group relative flex h-full w-full items-center justify-center bg-gray-800">
         <iframe
           srcDoc={websiteNode.srcDoc}
           className="h-full w-full"
@@ -35,7 +35,7 @@ export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
   }
 
   return (
-    <div className="group relative flex h-[300px] w-[400px] items-center justify-center bg-gray-800">
+    <div className="group relative flex h-full w-full items-center justify-center bg-gray-800">
       <div className="flex flex-col items-center text-gray-400">
         <Globe size={48} />
         <p className="mt-2">No website generated yet</p>
