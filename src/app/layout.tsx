@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   verification: {
     google: "p4gzWQ-1iXVG0l_lfeyeSHMr_37F_pq6QH3hu8zmL40",
   },
+  manifest: "/manifest.json",
 };
 
 const nunito = Nunito({
