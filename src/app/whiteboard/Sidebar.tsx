@@ -86,7 +86,7 @@ const NODE_CONFIGS = [
     ),
   },
   {
-    key: "websiteNode",
+    key: "website",
     icon: Globe,
     color: "bg-pink-900/50 hover:bg-pink-800/50 border",
     title: "Website Node",
