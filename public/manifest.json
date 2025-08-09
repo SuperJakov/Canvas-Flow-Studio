@@ -1,0 +1,21 @@
+{
+  "name": "Canvas Flow Studio",
+  "short_name": "CFS",
+  "description": "Canvas Flow Studio is an app which is used to create AI-powered workflows through a visual, node-based interface.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1823",
+  "theme_color": "#e0ddef",
+  "icons": [
+    {
+      "src": "/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

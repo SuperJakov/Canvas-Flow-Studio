@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
+import nextPwa from "next-pwa";
 import { withSentryConfig } from "@sentry/nextjs";
 import "./src/env.js";
+
+const withPwa = nextPwa({
+  dest: "public",
+  register: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -52,7 +59,8 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default withSentryConfig(nextConfig, {
+// eslint-disable-next-line
+const configWithSentry = withSentryConfig(withPwa(nextConfig), {
   org: "y-fq",
   project: "ai-flow-studio",
   // Only print logs for uploading source maps in CI
@@ -64,3 +72,5 @@ export default withSentryConfig(nextConfig, {
     enabled: true,
   },
 });
+
+export default configWithSentry;
