@@ -26,18 +26,11 @@ export default function WebsiteNode({
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
   const generateAndStoreWebsiteAction = useAction(
-    // @ts-expect-error: Convex API not generated yet
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     api.websiteNodes.generateAndStoreWebsite,
   );
-  useConvexQuery(
-    // @ts-expect-error: Convex API not generated yet
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    api.websiteNodes.isGeneratingWebsite,
-    {
-      nodeId: id,
-    },
-  );
+  useConvexQuery(api.websiteNodes.isGeneratingWebsite, {
+    nodeId: id,
+  });
 
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
@@ -111,7 +104,7 @@ export default function WebsiteNode({
       </Portal>
 
       <div
-        className={`overflow-hidden rounded bg-purple-200 shadow-md outline-2 ${
+        className={`overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
           selected ? "outline-blue-600" : "outline-white"
         }`}
       >

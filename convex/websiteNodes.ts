@@ -20,7 +20,7 @@ function getClient(): AzureOpenAI {
   const endpoint = process.env.AZURE_OPENAI_WEBSITE_ENDPOINT;
   const apiKey = process.env.AZURE_OPENAI_WEBSITE_API_KEY;
   const deploymentName = process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME;
-  const apiVersion = "2024-02-01";
+  const apiVersion = "2025-04-01-preview";
 
   if (!endpoint || !apiKey || !deploymentName) {
     throw new Error("Missing Azure OpenAI Website environment variables.");
