@@ -7,17 +7,10 @@ interface WebsiteNodeContentProps {
 }
 
 export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const websiteNode = useConvexQuery(
-    // @ts-expect-error: Convex API not generated yet
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    api.websiteNodes.getWebsiteNode,
-    {
-      nodeId: id,
-    },
-  );
+  const websiteNode = useConvexQuery(api.websiteNodes.getWebsiteNode, {
+    nodeId: id,
+  });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (websiteNode?.isGenerating) {
     return (
       <div className="group relative flex h-[300px] w-[400px] items-center justify-center bg-gray-800">
@@ -29,13 +22,10 @@ export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (websiteNode?.srcDoc) {
     return (
       <div className="group relative flex h-[300px] w-[400px] items-center justify-center bg-gray-800">
         <iframe
-          // @ts-expect-error: Convex API not generated yet
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           srcDoc={websiteNode.srcDoc}
           className="h-full w-full"
           sandbox="allow-scripts"

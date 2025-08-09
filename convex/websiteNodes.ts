@@ -1,14 +1,8 @@
 import { v } from "convex/values";
-import {
-  action,
-  internalMutation,
-  internalQuery,
-  query,
-} from "./_generated/server";
+import { action, internalMutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { AzureOpenAI } from "openai";
 import { TextEditorNodeData } from "./schema";
-import { api } from "./_generated/api";
 
 const TextEditorExecutionSchema = v.object({
   type: v.literal("textEditor"),
