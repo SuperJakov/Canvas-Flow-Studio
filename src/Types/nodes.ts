@@ -52,6 +52,15 @@ export type SpeechNodeData = {
   };
 };
 
+export type WebsiteNodeData = {
+  isLocked: boolean;
+  zIndex?: number;
+  internal?: {
+    isRunning: boolean;
+  };
+  srcDoc: string | null;
+};
+
 export type PreviewImageNodeData = {
   imageUrl: string | null;
   zIndex?: number;
@@ -81,6 +90,7 @@ export type InstructionNodeType = StrictNode<
 >;
 export type CommentNodeType = StrictNode<CommentNodeData, "comment">;
 export type SpeechNodeType = StrictNode<SpeechNodeData, "speech">;
+export type WebsiteNodeType = StrictNode<WebsiteNodeData, "website">;
 
 export type PreviewImageNodeType = StrictNode<
   PreviewImageNodeData,
@@ -96,7 +106,8 @@ export type AppNode =
   | ImageNodeType
   | InstructionNodeType
   | CommentNodeType
-  | SpeechNodeType;
+  | SpeechNodeType
+  | WebsiteNodeType;
 
 /**
  * Nodes for the preview whiteboard. Only includes preview nodes.
