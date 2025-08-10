@@ -33,10 +33,12 @@ export default function WhiteboardCard({
 
   useEffect(() => {
     if (isEditing) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          inputRef.current?.focus();
+          inputRef.current?.select();
+        });
+      });
     }
   }, [isEditing]);
 
@@ -103,9 +105,11 @@ export default function WhiteboardCard({
   const handleRenameClick = (e: Event) => {
     e.preventDefault();
     e.stopPropagation();
-    setEditedTitle(whiteboard.title ?? "");
-    setIsEditing(true);
     setMenuOpen(false);
+    requestAnimationFrame(() => {
+      setEditedTitle(whiteboard.title ?? "");
+      setIsEditing(true);
+    });
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
