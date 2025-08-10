@@ -191,6 +191,7 @@ const users = defineTable({
   plan: v.optional(
     v.union(v.literal("Free"), v.literal("Plus"), v.literal("Pro")),
   ),
+  lastCreditTopUp: v.optional(v.int64()),
 })
   .index("byExternalId", ["externalId"])
   // Index for finding users via Stripe customer ID (useful for webhooks)

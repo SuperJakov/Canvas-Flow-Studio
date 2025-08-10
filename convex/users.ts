@@ -1,5 +1,6 @@
 import { internalQuery, query, type QueryCtx } from "./_generated/server";
 import { internalMutation } from "./functions";
+import { api } from "./_generated/api";
 import type { UserJSON } from "@clerk/backend";
 import { v, type Validator } from "convex/values";
 
@@ -25,6 +26,52 @@ export const upsertFromClerk = internalMutation({
     } else {
       await ctx.db.patch(user._id, userAttributes);
     }
+  },
+});
+
+export const getUserCreditCycle = query({
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return null;
+
+    const plan = user.plan ?? "Free";
+    let nextRefillDate: number | null = null;
+
+    if (plan === "Free") {
+      if (user.lastCreditTopUp) {
+        nextRefillDate = Number(user.lastCreditTopUp) + 30 * 24 * 60 * 60 * 1000;
+      }
+    } else {
+      const subscription = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_userExternalId", (q) =>
+          q.eq("userExternalId", user.externalId)
+        )
+        .first();
+      if (subscription && subscription.current_period_end) {
+        nextRefillDate = Number(subscription.current_period_end);
+      }
+    }
+
+    const imageCredits = await ctx.runQuery(api.credits.getRemainingCreditsPublic, {
+      creditType: "image",
+    });
+    const speechCredits = await ctx.runQuery(api.credits.getRemainingCreditsPublic, {
+      creditType: "speech",
+    });
+    const websiteCredits = await ctx.runQuery(api.credits.getRemainingCreditsPublic, {
+      creditType: "website",
+    });
+
+    return {
+      plan,
+      nextRefillDate,
+      credits: {
+        image: imageCredits,
+        speech: speechCredits,
+        website: websiteCredits,
+      },
+    };
   },
 });
 
@@ -142,5 +189,20 @@ export const getCurrentUserPlan = query({
     const user = await getCurrentUser(ctx);
     if (!user) return null;
     return user.plan ?? "Free"; // Default to "Free" if plan is not set
+  },
+});
+
+export const setLastCreditTopUp = internalMutation({
+  args: {
+    userId: v.string(),
+    timestamp: v.number(),
+  },
+  handler: async (ctx, { userId, timestamp }) => {
+    const user = await userByExternalId(ctx, userId);
+    if (user) {
+      await ctx.db.patch(user._id, {
+        lastCreditTopUp: BigInt(timestamp),
+      });
+    }
   },
 });
