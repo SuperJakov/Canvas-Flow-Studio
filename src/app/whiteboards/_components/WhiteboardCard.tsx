@@ -100,7 +100,7 @@ export default function WhiteboardCard({
     await convexDeleteWhiteboard({ id: whiteboard._id });
   };
 
-  const handleRenameClick = (e: React.MouseEvent) => {
+  const handleRenameClick = (e: Event) => {
     e.preventDefault();
     e.stopPropagation();
     setEditedTitle(whiteboard.title ?? "");
@@ -198,16 +198,18 @@ export default function WhiteboardCard({
                   align="end"
                   sideOffset={8}
                   onClick={(e) => e.stopPropagation()}
+                  onCloseAutoFocus={(e) => e.preventDefault()}
                 >
                   <DropdownMenuItem
-                    onClick={handleRenameClick}
-                    className="cursor-pointer rounded-md px-2 py-1.5 text-sm hover:bg-gray-100"
+                    onSelect={handleRenameClick}
+                    className="cursor-pointer"
                   >
                     Rename
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleDeleteClick}
-                    className="cursor-pointer rounded-md px-2 py-1.5 text-sm text-red-500 hover:bg-red-50"
+                    className="cursor-pointer"
+                    variant="destructive"
                   >
                     Delete
                   </DropdownMenuItem>
