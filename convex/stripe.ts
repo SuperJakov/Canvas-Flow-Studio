@@ -10,7 +10,7 @@ type Tier = "Plus" | "Pro";
 
 // Initialize Stripe with the secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
+  apiVersion: "2025-07-30.basil",
 });
 
 const priceIds: Record<Tier, string> = {
@@ -668,7 +668,7 @@ export const reactivateSubscription = action({
 
     // Initialize Stripe
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-06-30.basil",
+      apiVersion: "2025-07-30.basil",
     });
 
     // Get the user's Stripe customer ID from your database
