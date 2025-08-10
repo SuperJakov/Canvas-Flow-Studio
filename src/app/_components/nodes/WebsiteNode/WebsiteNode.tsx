@@ -17,6 +17,7 @@ import UpgradeBanner from "~/app/whiteboard/UpgradeBanner";
 import Portal from "../../Portal";
 import { WebsiteNodeHeader } from "./WebsiteNodeHeader";
 import { WebsiteNodeContent } from "./WebsiteNodeContent";
+import { RateLimitBanner } from "../ImageNode/RateLimitBanner";
 
 export default function WebsiteNode({
   id,
@@ -31,6 +32,12 @@ export default function WebsiteNode({
   useConvexQuery(api.websiteNodes.isGeneratingWebsite, {
     nodeId: id,
   });
+  const websiteGenRateLimit = useConvexQuery(
+    api.websiteNodes.getWebsiteGenerationRateLimit,
+  );
+  const isRateLimited = websiteGenRateLimit
+    ? websiteGenRateLimit.isRateLimited
+    : false;
 
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
@@ -40,6 +47,10 @@ export default function WebsiteNode({
 
   const closeBanner = () => {
     setIsBannerOpen(false);
+  };
+
+  const openBanner = () => {
+    setIsBannerOpen(true);
   };
 
   useLayoutEffect(() => {
@@ -82,6 +93,8 @@ export default function WebsiteNode({
         updatedData: { internal: { isRunning: false } },
         nodeType: "website",
       });
+    } else if (isRateLimited) {
+      openBanner();
     } else {
       void executeNode({ nodeId: id });
     }
@@ -99,7 +112,7 @@ export default function WebsiteNode({
         <UpgradeBanner
           isOpen={isBannerOpen}
           onCloseAction={closeBanner}
-          featureName=""
+          featureName="Website Generation"
         />
       </Portal>
 
@@ -115,13 +128,17 @@ export default function WebsiteNode({
           maxWidth={800}
           maxHeight={600}
         />
-        <WebsiteNodeHeader
-          id={id}
-          isLocked={isLocked}
-          isRunning={isRunning}
-          onToggleLock={toggleLock}
-          onToggleRunning={toggleRunning}
-        />
+        {isRateLimited ? (
+          <RateLimitBanner onUpgradeClick={openBanner} />
+        ) : (
+          <WebsiteNodeHeader
+            id={id}
+            isLocked={isLocked}
+            isRunning={isRunning}
+            onToggleLock={toggleLock}
+            onToggleRunning={toggleRunning}
+          />
+        )}
 
         <div className="h-full w-full bg-gray-800">
           <Handle type="target" position={Position.Top} />
