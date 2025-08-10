@@ -112,7 +112,7 @@ export default function WebsiteNode({
         <UpgradeBanner
           isOpen={isBannerOpen}
           onCloseAction={closeBanner}
-          featureName="Website Generation"
+          featureName="Higher Website Generation Limits"
         />
       </Portal>
 
