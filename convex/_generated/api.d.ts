@@ -22,6 +22,7 @@ import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as textNodes from "../textNodes.js";
 import type * as users from "../users.js";
+import type * as websiteNodes from "../websiteNodes.js";
 import type * as whiteboards from "../whiteboards.js";
 
 import type {
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   subscriptions: typeof subscriptions;
   textNodes: typeof textNodes;
   users: typeof users;
+  websiteNodes: typeof websiteNodes;
   whiteboards: typeof whiteboards;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
