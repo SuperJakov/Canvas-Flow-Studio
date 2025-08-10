@@ -38,6 +38,21 @@ export const generateAndStoreWebsite = action({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    const remainingCredits = await ctx.runQuery(
+      internal.credits.getRemainingCredits,
+      { userId: identity.subject, creditType: "website" },
+    );
+
+    if (remainingCredits < 1) {
+      throw new Error("Not enough credits to generate a website.");
+    }
+
+    await ctx.runMutation(internal.credits.spendCredits, {
+      userId: identity.subject,
+      creditType: "website",
+      creditAmount: 1,
+    });
+
     await ctx.runMutation(internal.websiteNodes.markWebsiteNodeAsGenerating, {
       isGenerating: true,
       nodeId,
@@ -242,5 +257,26 @@ export const isGeneratingWebsite = query({
       .first();
 
     return !!websiteNode?.isGenerating;
+  },
+});
+
+export const getWebsiteGenerationRateLimit = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const remainingCredits = await ctx.runQuery(
+      internal.credits.getRemainingCredits,
+      {
+        userId: identity.subject,
+        creditType: "website",
+      },
+    );
+    if (remainingCredits < 1) {
+      return {
+        isRateLimited: true,
+      };
+    }
+    return { isRateLimited: false };
   },
 });

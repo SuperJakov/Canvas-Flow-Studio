@@ -24,14 +24,19 @@ const priceIdToTier: Record<string, Tier> = {
 };
 
 // Credit amounts for each tier
-const tierCredits: Record<Tier, Record<"image" | "speech", number>> = {
+const tierCredits: Record<
+  Tier,
+  Record<"image" | "speech" | "website", number>
+> = {
   Plus: {
     image: 250,
     speech: 35,
+    website: 35,
   },
   Pro: {
     image: 650,
     speech: 100,
+    website: 100,
   },
 };
 
@@ -417,12 +422,21 @@ const addCreditsForSubscription = async (
       creditAmount: creditAmount.speech,
       type: creditType,
     });
+    await ctx.runMutation(internal.credits.addCredits, {
+      userId: clerkUserId,
+      creditType: "website",
+      creditAmount: creditAmount.website,
+      type: creditType,
+    });
 
     console.log(
       `[Credits] Added ${creditAmount.image} image credits for ${tier} subscription to user ${clerkUserId}`,
     );
     console.log(
       `[Credits] Added ${creditAmount.speech} speech credits for ${tier} subscription to user ${clerkUserId}`,
+    );
+    console.log(
+      `[Credits] Added ${creditAmount.website} website credits for ${tier} subscription to user ${clerkUserId}`,
     );
   } catch (error) {
     console.error(

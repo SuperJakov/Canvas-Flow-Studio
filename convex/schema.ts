@@ -254,7 +254,11 @@ const projects = defineTable({
   .index("by_userId", ["userExternalId"])
   .index("by_user_and_parent", ["userExternalId", "parentProject"]);
 
-export const CreditType = v.union(v.literal("image"), v.literal("speech"));
+export const CreditType = v.union(
+  v.literal("image"),
+  v.literal("speech"),
+  v.literal("website"),
+);
 
 const transactions = defineTable({
   amount: v.number(), // Positive for additions, negative for usage/deductions
