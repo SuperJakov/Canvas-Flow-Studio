@@ -1,3 +1,6 @@
-export { default } from "./WebsiteNode";
-export { WebsiteNodeHeader } from "./WebsiteNodeHeader";
-export { WebsiteNodeContent } from "./WebsiteNodeContent";
+import WebsiteNode from "./WebsiteNode";
+
+export default WebsiteNode;
+export * from "./WebsiteNodeHeader";
+export * from "./WebsiteNodeContent";
+export * from "./WebsiteNodeFooter";

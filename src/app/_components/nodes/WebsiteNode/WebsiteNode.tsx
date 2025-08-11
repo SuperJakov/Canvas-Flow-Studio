@@ -18,6 +18,7 @@ import Portal from "../../Portal";
 import { WebsiteNodeHeader } from "./WebsiteNodeHeader";
 import { WebsiteNodeContent } from "./WebsiteNodeContent";
 import { RateLimitBanner } from "../ImageNode/RateLimitBanner";
+import WebsiteNodeFooter from "./WebsiteNodeFooter";
 
 export default function WebsiteNode({
   id,
@@ -145,6 +146,7 @@ export default function WebsiteNode({
           <WebsiteNodeContent id={id} />
           <Handle type="source" position={Position.Bottom} />
         </div>
+        <WebsiteNodeFooter nodeId={id} />
       </div>
     </div>
   );
