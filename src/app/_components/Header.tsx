@@ -97,7 +97,11 @@ export function Header() {
     }, 250);
   };
 
-  if (pathname === "/whiteboard" || pathname.startsWith("/whiteboard/")) {
+  if (
+    pathname === "/whiteboard" ||
+    pathname.startsWith("/whiteboard/") ||
+    pathname.startsWith("/website")
+  ) {
     return null;
   }
 
