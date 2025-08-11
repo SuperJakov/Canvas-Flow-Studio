@@ -123,10 +123,10 @@ export default function WebsiteNode({
       >
         <NodeResizer
           isVisible={selected && !isLocked}
-          minWidth={300}
-          minHeight={200}
-          maxWidth={800}
-          maxHeight={600}
+          minWidth={600}
+          minHeight={400}
+          maxWidth={1000}
+          maxHeight={800}
         />
         {isRateLimited ? (
           <RateLimitBanner onUpgradeClick={openBanner} />
