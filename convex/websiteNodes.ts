@@ -35,6 +35,8 @@ export const generateAndStoreWebsite = action({
     whiteboardId: v.string(),
   },
   handler: async (ctx, { sourceNodes, nodeId, whiteboardId }) => {
+    console.time("generateAndStoreWebsite");
+
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
@@ -65,26 +67,26 @@ export const generateAndStoreWebsite = action({
       const instruction = `
       You are an expert web developer with a specialization in using Tailwind CSS to create modern, visually appealing, and responsive websites. Your task is to create a single, self-contained HTML file based on the user's request, strictly following the requirements below.
       
-      **Core Philosophy: Tailwind First**
+      Core Philosophy: Tailwind First
       
-      You **must** use Tailwind CSS for all styling, layout, and design. Your primary goal is to leverage its utility classes to build the entire interface. You should only write custom CSS in a \`<style>\` tag for effects that are genuinely not possible with Tailwind's utility classes (e.g., complex multi-step animations, or very specific pseudo-element styling).
+      You must use Tailwind CSS for all styling, layout, and design. Your primary goal is to leverage its utility classes to build the entire interface. You should only write custom CSS in a \`<style>\` tag for effects that are genuinely not possible with Tailwind's utility classes.
       
-      **Key Requirements:**
+      Key Requirements:
       
-      1.  **Single File Output:** The final output must be a single HTML file.
-      2.  **Mandatory Libraries:** You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
+      1.  Single File Output: The final output must be a single HTML file.
+      2.  Mandatory Libraries: You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
       
-          * **Tailwind CSS (Required for ALL styling):**
+          * Tailwind CSS (Required for ALL styling):
               \`<script src="https://cdn.tailwindcss.com"></script>\`
       
-          * **GSAP (For advanced animations):**
+          * GSAP (For advanced animations):
               \`<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>\`
       
-          * **Chart.js (For charts and graphs):**
+          * Chart.js (For charts and graphs):
               \`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>\`
       
-      3.  **Custom Fonts:**
-          * To use custom fonts, you **must** import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
+      3.  Custom Fonts:
+          * To use custom fonts, you must import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
               \`<link rel="preconnect" href="https://fonts.googleapis.com">\`
               \`<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\`
               \`<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">\`
@@ -104,8 +106,8 @@ export const generateAndStoreWebsite = action({
               </script>
               \`\`\`
       
-      4.  **Responsiveness:** The website **must** be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
-      5.  **Content and Structure:** Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
+      4.  Responsiveness: The website must be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
+      5.  Content and Structure: Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
       6. This will be embedded into another website. Don't add any elements which might redirect the user (e.g. <a>) or lag the site.
       
       Please provide only the complete HTML code for the file, without any explanations or markdown formatting.`;
@@ -116,6 +118,7 @@ export const generateAndStoreWebsite = action({
 
       const client = getClient();
 
+      console.time("apiCall");
       const response = await client.responses.create({
         model: "gpt-5",
         reasoning: { effort: "medium" },
@@ -123,6 +126,7 @@ export const generateAndStoreWebsite = action({
         input: prompt,
         max_output_tokens: 40000,
       });
+      console.timeEnd("apiCall");
 
       console.log("Output tokens", response.usage?.output_tokens);
       console.log(
@@ -151,6 +155,7 @@ export const generateAndStoreWebsite = action({
         authorExternalId: identity.subject,
         whiteboardId,
       });
+      console.timeEnd("generateAndStoreWebsite");
     }
   },
 });

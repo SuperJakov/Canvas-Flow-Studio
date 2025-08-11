@@ -117,7 +117,7 @@ export default function WebsiteNode({
       </Portal>
 
       <div
-        className={`h-full w-full overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
+        className={`flex h-full w-full flex-col overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
           selected ? "outline-blue-600" : "outline-white"
         }`}
       >
@@ -140,7 +140,7 @@ export default function WebsiteNode({
           />
         )}
 
-        <div className="h-full w-full bg-gray-800">
+        <div className="w-full flex-1 bg-gray-800">
           <Handle type="target" position={Position.Top} />
           <WebsiteNodeContent id={id} />
           <Handle type="source" position={Position.Bottom} />
