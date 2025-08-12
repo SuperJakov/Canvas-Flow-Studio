@@ -91,12 +91,29 @@ const InstructionNodeSchema = v.object({
   zIndex: v.optional(v.number()),
 });
 
+const WebsiteNodeSchema = v.object({
+  id: v.string(),
+  type: v.literal("website"),
+  data: v.object({
+    isLocked: v.boolean(),
+    srcDoc: v.union(v.string(), v.null()),
+  }),
+  position: v.object({
+    x: v.number(),
+    y: v.number(),
+  }),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
+  zIndex: v.optional(v.number()),
+});
+
 export const AppNode = v.union(
   TextEditorSchema,
   ImageNodeSchema,
   CommentNodeSchema,
   SpeechNodeSchema,
   InstructionNodeSchema,
+  WebsiteNodeSchema,
 );
 
 export const AppEdge = v.object({
@@ -150,6 +167,18 @@ const speechNodes = defineTable({
   .index("by_nodeId", ["nodeId"])
   .index("by_whiteboardId", ["whiteboardId"])
   .index("by_storageId", ["storageId"])
+  .index("by_nodeId_and_whiteboardId", ["nodeId", "whiteboardId"]);
+
+const websiteNodes = defineTable({
+  nodeId: v.string(),
+  whiteboardId: v.id("whiteboards"),
+  authorExternalId: v.string(),
+  isGenerating: v.optional(v.boolean()),
+  srcDoc: v.union(v.string(), v.null()),
+})
+  .index("by_userId", ["authorExternalId"])
+  .index("by_nodeId", ["nodeId"])
+  .index("by_whiteboardId", ["whiteboardId"])
   .index("by_nodeId_and_whiteboardId", ["nodeId", "whiteboardId"]);
 
 const users = defineTable({
@@ -225,7 +254,11 @@ const projects = defineTable({
   .index("by_userId", ["userExternalId"])
   .index("by_user_and_parent", ["userExternalId", "parentProject"]);
 
-export const CreditType = v.union(v.literal("image"), v.literal("speech"));
+export const CreditType = v.union(
+  v.literal("image"),
+  v.literal("speech"),
+  v.literal("website"),
+);
 
 const transactions = defineTable({
   amount: v.number(), // Positive for additions, negative for usage/deductions
@@ -258,6 +291,7 @@ const schema = defineSchema({
   whiteboards,
   imageNodes,
   speechNodes,
+  websiteNodes,
   imageLogs,
   projects,
   transactions,

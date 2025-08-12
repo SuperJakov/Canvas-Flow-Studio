@@ -6,6 +6,7 @@ import { speechGenerationExecutor } from "./SpeechGenerationExecutor";
 import { textModificationExecutor } from "./TextModificationExecutor";
 import { instructionNodeExecutor } from "./InstructionNodeExecutor";
 import { imageDescriptionExecutor } from "./ImageDescriptionExecutor";
+import { websiteGenerationExecutor } from "./WebsiteGenerationExecutor";
 
 const executorRegistry: IExecutor[] = [
   // More specific executors should come first to be matched first.
@@ -15,6 +16,7 @@ const executorRegistry: IExecutor[] = [
   // General-purpose executors
   imageGenerationExecutor,
   speechGenerationExecutor,
+  websiteGenerationExecutor,
   instructionNodeExecutor,
 ];
 
