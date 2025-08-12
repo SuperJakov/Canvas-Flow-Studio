@@ -10,10 +10,12 @@ import Loading from "../loading";
 import { useCopyWhiteboard } from "./utils";
 import { usePreloadedQuery } from "convex/react";
 import type { Preloaded } from "convex/react";
+import { useWhiteboardBreakpoint } from "~/hooks/use-whiteboard-breakpoint";
 import type { api } from "../../../convex/_generated/api";
 import ProgressBarSkeleton from "./skeletons/ProgressBarSkeleton";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import WhiteboardHeaderSkeleton from "./skeletons/WhiteboardHeaderSkeleton";
+import { WhiteboardUnsupported } from "./WhiteboardUnsupported";
 
 const WhiteboardHeader = dynamic(
   () => import("./WhiteboardHeader").then((c) => c.default),
@@ -35,6 +37,11 @@ type Props = {
 export default function WhiteboardPage({ preloadedWhiteboard }: Props) {
   const { isCopying } = useCopyWhiteboard();
   const whiteboard = usePreloadedQuery(preloadedWhiteboard);
+  const isUnsupported = useWhiteboardBreakpoint();
+
+  if (isUnsupported) {
+    return <WhiteboardUnsupported />;
+  }
 
   if (whiteboard === null) {
     return <div>Whiteboard not found</div>;
