@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Home } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 
@@ -16,7 +16,10 @@ export function WhiteboardUnsupported() {
           Please use a larger screen to continue.
         </p>
         <Button asChild>
-          <Link href="/">Go to Home</Link>
+          <Link href="/">
+            <Home className="mr-2 h-4 w-4" />
+            Go to Home
+          </Link>
         </Button>
       </div>
     </div>
