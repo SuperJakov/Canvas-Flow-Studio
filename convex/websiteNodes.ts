@@ -128,7 +128,6 @@ Please provide only the complete HTML code for the file, without any explanation
 
       console.time("apiCall");
       const response = await client.responses.create({
-        model: "gpt-5",
         reasoning: { effort: "medium" },
         instructions: instruction,
         input: prompt,
