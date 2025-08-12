@@ -1,32 +1,16 @@
 import { v } from "convex/values";
 import { action, internalMutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { AzureOpenAI } from "openai";
 import { TextEditorNodeData } from "./schema";
+import { generateText } from "ai";
+import { azure } from "@ai-sdk/azure";
+import { google } from "@ai-sdk/google";
 
 const TextEditorExecutionSchema = v.object({
   type: v.literal("textEditor"),
   id: v.string(),
   data: TextEditorNodeData,
 });
-
-function getClient(): AzureOpenAI {
-  const endpoint = process.env.AZURE_OPENAI_WEBSITE_ENDPOINT;
-  const apiKey = process.env.AZURE_OPENAI_WEBSITE_API_KEY;
-  const deploymentName = process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME;
-  const apiVersion = "2025-04-01-preview";
-
-  if (!endpoint || !apiKey || !deploymentName) {
-    throw new Error("Missing Azure OpenAI Website environment variables.");
-  }
-
-  return new AzureOpenAI({
-    endpoint,
-    apiKey,
-    apiVersion,
-    deployment: deploymentName,
-  });
-}
 
 export const generateAndStoreWebsite = action({
   args: {
@@ -73,32 +57,33 @@ You must use Tailwind CSS for all styling, layout, and design. Your primary goal
 
 Key Requirements:
 
-1.  Single File Output: The final output must be a single HTML file.
-2.  Mandatory Libraries: You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
+1.  **Single File Output**: The final output must be a single HTML file.
 
-    * Tailwind CSS (Required for ALL styling):
+2.  **Mandatory Libraries**: You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
+
+    *   **Tailwind CSS (Required for ALL styling)**:
         \`<script src="https://cdn.tailwindcss.com"></script>\`
 
-    * Lucide Icons (For icons):
+    *   **Lucide Icons (For icons)**:
         \`<script src="https://unpkg.com/lucide@latest"></script>\`
         *(After including, you must call \`lucide.createIcons();\` in a script tag at the end of your \`<body>\` to render the icons.)*
 
-    * GSAP (For advanced animations):
+    *   **GSAP (For advanced animations)**:
         \`<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>\`
 
-    * Chart.js (For charts and graphs):
+    *   **Chart.js (For charts and graphs)**:
         \`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>\`
 
-3.  Icons: You must use the **Lucide** icon library to enhance the user interface. After including the CDN link in the \`<head>\`, insert icons using the \`<i data-lucide="...">\` element. For example, to add a "home" icon, you would use \`<i data-lucide="home"></i>\`. Remember to call \`lucide.createIcons();\` at the end of the body.
+3.  **Icons**: You must use the **Lucide** icon library to enhance the user interface. After including the CDN link in the \`<head>\`, insert icons using the \`<i data-lucide="...">\` element. For example, to add a "home" icon, you would use \`<i data-lucide="home"></i>\`. Remember to call \`lucide.createIcons();\` at the end of the body.
 
-4.  Images: If the user does not provide specific image URLs, you must use placeholder images to ensure the layout is complete. Use the service \`https://placehold.co/\`. For example: \`<img src="https://placehold.co/600x400/EEE/31343C?text=Placeholder" alt="Placeholder Image">\`.
+4.  **Images**: If the user does not provide specific image URLs, you must use placeholder images to ensure the layout is complete. Use the service \`https://placehold.co/\`. For example: \`<img src="https://placehold.co/600x400/EEE/31343C?text=Placeholder" alt="Placeholder Image">\`.
 
-5.  Custom Fonts:
-    * To use custom fonts, you must import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
+5.  **Custom Fonts**:
+    *   To use custom fonts, you must import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
         \`<link rel="preconnect" href="https://fonts.googleapis.com">\`
         \`<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\`
         \`<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">\`
-    * You will then need to extend the Tailwind configuration to make the font available. Place a \`<script>\` tag immediately after the Tailwind CSS script tag to configure it. For example:
+    *   You will then need to extend the Tailwind configuration to make the font available. Place a \`<script>\` tag immediately after the Tailwind CSS script tag to configure it. For example:
         \`\`\`html
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -114,35 +99,38 @@ Key Requirements:
         </script>
         \`\`\`
 
-6.  Responsiveness: The website must be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
-7.  Content and Structure: Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
-8.  No Redirection or Lag: This will be embedded into another website. Do not add any elements which might redirect the user (e.g. \`<a>\` tags with \`href\` attributes) or cause performance issues.
+6.  **Responsiveness**: The website must be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
+
+7.  **Content and Structure**: Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
+
+8.  **Strict Anti-Redirection Rules**: This content will be embedded in an iframe on another website. It is critical that the user is not redirected away.
+    *   Do not use \`<a>\` tags with \`href\` attributes. If you need to create a link, use a \`<button>\` or a styled \`<span>\` and handle clicks with JavaScript, but without changing \`window.location\`.
+    *   Do not use any JavaScript that modifies \`window.location\`, \`window.top.location\`, or \`window.parent.location\`.
+    *   Do not include any \`<form>\` tags that could trigger a page reload or navigation.
 
 Please provide only the complete HTML code for the file, without any explanations or markdown formatting.`;
 
       const prompt = `
-      The user's request is as follows:
-      ${textContents.join("\n")}`;
+The user's request is composed of the following sections:
+${textContents
+  .map((text, index) => `\n[Section ${index + 1}]\n${text}`)
+  .join("")}
+`;
 
-      const client = getClient();
+      const model = process.env.WEBSITE_GENERATION_MODEL ?? "azure";
+      const modelInstance =
+        model === "gemini"
+          ? google("models/gemini-2.5-pro-flash")
+          : azure(process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME!);
 
       console.time("apiCall");
-      const response = await client.responses.create({
-        model: "gpt-5",
-        reasoning: { effort: "medium" },
-        instructions: instruction,
-        input: prompt,
-        max_output_tokens: 40000,
+      const { text: htmlContent } = await generateText({
+        model: modelInstance,
+        system: instruction,
+        prompt: prompt,
       });
       console.timeEnd("apiCall");
 
-      console.log("Output tokens", response.usage?.output_tokens);
-      console.log(
-        "Output tokens details",
-        response.usage?.output_tokens_details,
-      );
-
-      const htmlContent = response.output_text;
       if (!htmlContent) {
         throw new Error("Failed to generate website content.");
       }
