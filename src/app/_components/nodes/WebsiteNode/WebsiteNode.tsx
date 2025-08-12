@@ -18,6 +18,7 @@ import Portal from "../../Portal";
 import { WebsiteNodeHeader } from "./WebsiteNodeHeader";
 import { WebsiteNodeContent } from "./WebsiteNodeContent";
 import { RateLimitBanner } from "../ImageNode/RateLimitBanner";
+import WebsiteNodeFooter from "./WebsiteNodeFooter";
 
 export default function WebsiteNode({
   id,
@@ -117,16 +118,16 @@ export default function WebsiteNode({
       </Portal>
 
       <div
-        className={`h-full w-full overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
+        className={`flex h-full w-full flex-col overflow-hidden rounded bg-pink-200 shadow-md outline-2 ${
           selected ? "outline-blue-600" : "outline-white"
         }`}
       >
         <NodeResizer
           isVisible={selected && !isLocked}
-          minWidth={300}
-          minHeight={200}
-          maxWidth={800}
-          maxHeight={600}
+          minWidth={600}
+          minHeight={400}
+          maxWidth={1000}
+          maxHeight={800}
         />
         {isRateLimited ? (
           <RateLimitBanner onUpgradeClick={openBanner} />
@@ -140,11 +141,12 @@ export default function WebsiteNode({
           />
         )}
 
-        <div className="h-full w-full bg-gray-800">
+        <div className="w-full flex-1 bg-gray-800">
           <Handle type="target" position={Position.Top} />
           <WebsiteNodeContent id={id} />
           <Handle type="source" position={Position.Bottom} />
         </div>
+        <WebsiteNodeFooter nodeId={id} />
       </div>
     </div>
   );
