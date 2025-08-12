@@ -91,7 +91,7 @@
   "packageManager": "pnpm@10.13.1",
   "pnpm": {
     "overrides": {
-      "next": "15.4.2-canary.18"
+      "next": "15.4.2-canary.40"
     }
   }
 }
