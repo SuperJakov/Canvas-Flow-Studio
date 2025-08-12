@@ -50,6 +50,13 @@ http.route({
             creditAmount: 5,
             type: "signup",
           });
+          console.log("Adding 15 website credits...");
+          await ctx.scheduler.runAfter(0, internal.credits.addCredits, {
+            userId: event.data.id,
+            creditType: "website",
+            creditAmount: 15,
+            type: "signup",
+          });
           break;
 
         case "user.updated":

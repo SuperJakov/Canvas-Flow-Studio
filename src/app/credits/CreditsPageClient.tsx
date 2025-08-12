@@ -11,8 +11,15 @@ export default function CreditsPageClient() {
   const speechCredits = useConvexQuery(api.credits.getRemainingCreditsPublic, {
     creditType: "speech",
   });
+  const websiteCredits = useConvexQuery(api.credits.getRemainingCreditsPublic, {
+    creditType: "website",
+  });
 
-  if (imageCredits === undefined || speechCredits === undefined)
+  if (
+    imageCredits === undefined ||
+    speechCredits === undefined ||
+    websiteCredits === undefined
+  )
     return <Loading />;
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-4">
@@ -22,6 +29,7 @@ export default function CreditsPageClient() {
       </p>
       <p className="text-lg">Image Credits: {imageCredits}</p>
       <p className="text-lg">Speech Credits: {speechCredits}</p>
+      <p className="text-lg">Website Credits: {websiteCredits}</p>
     </div>
   );
 }

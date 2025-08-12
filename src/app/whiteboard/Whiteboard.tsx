@@ -54,7 +54,11 @@ function stripNodeForDb<T extends AppNode>(node: T): T {
   } as const;
 
   // Only include width/height for nodes that are resizable
-  if (node.type === "textEditor" || node.type === "comment") {
+  if (
+    node.type === "textEditor" ||
+    node.type === "comment" ||
+    node.type === "website"
+  ) {
     const nodeWithDimensions = node as Extract<
       T,
       { width?: number; height?: number }
@@ -379,6 +383,23 @@ export default function Whiteboard({ id, preloadedWhiteboard }: Props) {
               isRunning: false,
             },
           },
+          zIndex: newZIndex,
+        };
+        break;
+      case "website":
+        newNode = {
+          id: newNodeId,
+          type: dndType,
+          position,
+          data: {
+            isLocked: false,
+            srcDoc: null,
+            internal: {
+              isRunning: false,
+            },
+          },
+          width: 400,
+          height: 300,
           zIndex: newZIndex,
         };
         break;

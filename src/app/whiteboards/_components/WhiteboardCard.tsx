@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Doc, Id } from "../../../../convex/_generated/dataModel";
@@ -29,6 +29,16 @@ export default function WhiteboardCard({
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(whiteboard.title ?? "");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 0);
+    }
+  }, [isEditing]);
 
   const convexEditWhiteboard = useMutation(
     api.whiteboards.editWhiteboard,
@@ -157,7 +167,7 @@ export default function WhiteboardCard({
                     if (e.key === "Enter") void handleSaveTitle();
                     if (e.key === "Escape") setIsEditing(false);
                   }}
-                  autoFocus
+                  ref={inputRef}
                   onClick={(e) => {
                     e.preventDefault(); // Prevent link redirecting
                     e.stopPropagation();
