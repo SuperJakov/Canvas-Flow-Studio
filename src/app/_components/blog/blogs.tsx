@@ -24,19 +24,6 @@ type Blog = {
   content: FC;
 };
 
-const LaunchHeader = () => (
-  <header className="mb-12 flex items-center gap-4">
-    <div>
-      <h1 className="text-foreground m-0 text-3xl font-bold tracking-tight">
-        We launched Canvas Flow Studio! 🎉
-      </h1>
-      <p className="text-muted-foreground m-0 mt-1 text-sm">
-        A new era of collaborative visual creation
-      </p>
-    </div>
-  </header>
-);
-
 const Intro = () => (
   <section className="border-border bg-card rounded-xl border p-6 shadow-sm">
     <BodyP>
@@ -165,7 +152,6 @@ const PostFooter = () => (
 const CanvasFlowStudioLaunchContent = () => (
   <article className="prose max-w-none">
     <Dialog>
-      <LaunchHeader />
       <Intro />
       <WhatIs />
       <KeyFeatures />
@@ -212,7 +198,7 @@ export const blogs: Blog[] = [
   },
   {
     slug: "introducing-website-node",
-    title: "Introducing the Website Node and New Templates! 🚀",
+    title: "Introducing the Website Node and New Templates!",
     date: "2025-08-13T19:00:00.216Z",
     excerpt:
       "Generate entire websites and kickstart your projects with templates.",

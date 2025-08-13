@@ -3,21 +3,6 @@ import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { BodyP, H2, Section } from "./common";
 
-function RateLimitHeader() {
-  return (
-    <header className="mb-12 flex items-center gap-4">
-      <div>
-        <h1 className="text-foreground m-0 text-3xl font-bold tracking-tight">
-          We are increasing rate limits for free users! 🎉
-        </h1>
-        <p className="text-muted-foreground m-0 mt-1 text-sm">
-          More creative power for everyone
-        </p>
-      </div>
-    </header>
-  );
-}
-
 function Intro() {
   return (
     <section className="border-border bg-card rounded-xl border p-6 shadow-sm">
@@ -111,7 +96,6 @@ export default function RateLimitIncreaseContent() {
   return (
     <article className="prose max-w-none">
       <Dialog>
-        <RateLimitHeader />
         <Intro />
         <NewLimits />
         <ContinuousImprovements />

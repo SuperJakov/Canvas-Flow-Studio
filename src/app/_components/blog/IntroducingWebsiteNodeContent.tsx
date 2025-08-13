@@ -3,21 +3,6 @@ import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import { BodyP, H2, Section } from "./common";
 
-function PostHeader() {
-  return (
-    <header className="mb-12 flex items-center gap-4">
-      <div>
-        <h1 className="text-foreground m-0 text-3xl font-bold tracking-tight">
-          Introducing the Website Node and New Templates! 🚀
-        </h1>
-        <p className="text-muted-foreground m-0 mt-1 text-sm">
-          Generate entire websites and kickstart your projects with templates.
-        </p>
-      </div>
-    </header>
-  );
-}
-
 function Intro() {
   return (
     <section className="border-border bg-card rounded-xl border p-6 shadow-sm">
@@ -120,7 +105,7 @@ export default function IntroducingWebsiteNodeContent() {
   return (
     <article className="prose max-w-none">
       <Dialog>
-        <PostHeader />
+        {/* <PostHeader /> */}
         <Intro />
         <WebsiteNodeSection />
         <TemplatesSection />
