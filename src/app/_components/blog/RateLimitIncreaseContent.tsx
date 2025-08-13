@@ -134,7 +134,7 @@ function PostFooter() {
   );
 }
 
-function RateLimitIncreaseContent() {
+export default function RateLimitIncreaseContent() {
   return (
     <article className="prose max-w-none">
       <Dialog>
@@ -150,5 +150,3 @@ function RateLimitIncreaseContent() {
     </article>
   );
 }
-
-export default RateLimitIncreaseContent;

@@ -3,7 +3,8 @@ import Link from "next/link";
 import AppLogo from "public/logo.png";
 import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
-import RateLimitIncreaseContent from "./increasing-free-tier-limits";
+import RateLimitIncreaseContent from "./RateLimitIncreaseContent";
+import IntroducingWebsiteNodeContent from "./IntroducingWebsiteNodeContent";
 
 const Section = ({
   className = "",
@@ -231,5 +232,20 @@ export const blogs = [
     readingTime: "2 min read",
     tags: ["announcement", "product", "rate limits"],
     content: RateLimitIncreaseContent,
+  },
+  {
+    slug: "introducing-website-node",
+    title: "Introducing the Website Node",
+    date: "2025-08-13T19:00:00.216Z",
+    excerpt: "Website is a new type of node used for generating websites.",
+    thumbnail: AppLogo,
+    author: {
+      name: "Jakov",
+      avatar: null,
+      role: "Founder",
+    },
+    readingTime: "5 min read",
+    tags: ["announcement", "product", "website"],
+    content: <IntroducingWebsiteNodeContent />,
   },
 ];
