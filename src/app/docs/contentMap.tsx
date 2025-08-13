@@ -6,14 +6,12 @@ import TextNodeContent from "./content/TextNodeContent";
 import { type chapters } from "./chapters";
 import PageTitle from "./components/PageTitle";
 
-// Extract the structure from chapters to create a type
 type ChapterStructure = {
   [K in (typeof chapters)[number] as K["slug"]]: {
     [S in K["sections"][number] as S["slug"]]: React.ComponentType;
   };
 };
 
-// Now TypeScript will enforce that contentMap matches the exact structure
 export const contentMap: ChapterStructure = {
   "getting-started": {
     introduction: IntroductionContent,
