@@ -1,34 +1,7 @@
 import { SignUpButton } from "@clerk/nextjs";
 import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
-
-function Section({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return <section className={`mt-12 ${className}`.trim()}>{children}</section>;
-}
-
-function H2({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-foreground text-2xl font-bold tracking-tight">
-      {children}
-    </h2>
-  );
-}
-
-function BodyP({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return <p className={`text-foreground ${className}`.trim()}>{children}</p>;
-}
+import { BodyP, H2, Section } from "./common";
 
 function RateLimitHeader() {
   return (

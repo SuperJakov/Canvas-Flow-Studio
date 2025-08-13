@@ -1,51 +1,28 @@
 import { SignUpButton } from "@clerk/nextjs";
-import Link from "next/link";
 import AppLogo from "public/logo.png";
 import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
 import RateLimitIncreaseContent from "./RateLimitIncreaseContent";
 import IntroducingWebsiteNodeContent from "./IntroducingWebsiteNodeContent";
+import { BodyP, Card, EmLink, H2, Section } from "./common";
+import type { StaticImageData } from "next/image";
+import type { FC } from "react";
 
-const Section = ({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => <section className={`mt-12 ${className}`.trim()}>{children}</section>;
-
-const Card = ({ children }: { children: React.ReactNode }) => (
-  <div className="border-border bg-card rounded-lg border p-5">{children}</div>
-);
-
-const H2 = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-foreground text-2xl font-bold tracking-tight">
-    {children}
-  </h2>
-);
-
-const BodyP = ({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => <p className={`text-foreground ${className}`.trim()}>{children}</p>;
-
-const EmLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) => (
-  <Link
-    href={href}
-    className="text-primary hover:text-primary/80 underline underline-offset-4"
-  >
-    {children}
-  </Link>
-);
+type Blog = {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  thumbnail: StaticImageData;
+  author: {
+    name: string;
+    avatar: StaticImageData | null;
+    role: string;
+  };
+  readingTime: string;
+  tags: string[];
+  content: FC;
+};
 
 const LaunchHeader = () => (
   <header className="mb-12 flex items-center gap-4">
@@ -202,7 +179,7 @@ const CanvasFlowStudioLaunchContent = () => (
   </article>
 );
 
-export const blogs = [
+export const blogs: Blog[] = [
   {
     slug: "canvas-flow-studio-launch",
     title: "We launched!",
@@ -235,9 +212,10 @@ export const blogs = [
   },
   {
     slug: "introducing-website-node",
-    title: "Introducing the Website Node",
+    title: "Introducing the Website Node and New Templates! 🚀",
     date: "2025-08-13T19:00:00.216Z",
-    excerpt: "Website is a new type of node used for generating websites.",
+    excerpt:
+      "Generate entire websites and kickstart your projects with templates.",
     thumbnail: AppLogo,
     author: {
       name: "Jakov",
@@ -245,7 +223,7 @@ export const blogs = [
       role: "Founder",
     },
     readingTime: "5 min read",
-    tags: ["announcement", "product", "website"],
-    content: <IntroducingWebsiteNodeContent />,
+    tags: ["announcement", "product", "website", "templates"],
+    content: IntroducingWebsiteNodeContent,
   },
 ];
