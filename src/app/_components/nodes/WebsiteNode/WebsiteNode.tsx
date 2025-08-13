@@ -24,6 +24,7 @@ export default function WebsiteNode({
   id,
   data,
   selected,
+  dragging,
 }: NodeProps<WebsiteNodeType>) {
   const [, updateNodeData] = useAtom(updateNodeDataAtom);
   const [, executeNode] = useAtom(executeNodeAtom);
@@ -43,6 +44,7 @@ export default function WebsiteNode({
   const isLocked = data.isLocked ?? false;
   const isRunning = data?.internal?.isRunning ?? false;
   const [isBannerOpen, setIsBannerOpen] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const params = useParams();
   const whiteboardId = params?.id as string | undefined;
 
@@ -128,6 +130,8 @@ export default function WebsiteNode({
           minHeight={400}
           maxWidth={1000}
           maxHeight={800}
+          onResizeStart={() => setIsResizing(true)}
+          onResizeEnd={() => setIsResizing(false)}
         />
         {isRateLimited ? (
           <RateLimitBanner onUpgradeClick={openBanner} />
@@ -143,7 +147,11 @@ export default function WebsiteNode({
 
         <div className="w-full flex-1 bg-gray-800">
           <Handle type="target" position={Position.Top} />
-          <WebsiteNodeContent id={id} />
+          <WebsiteNodeContent
+            id={id}
+            isDragging={dragging}
+            isResizing={isResizing}
+          />
           <Handle type="source" position={Position.Bottom} />
         </div>
         <WebsiteNodeFooter nodeId={id} />
