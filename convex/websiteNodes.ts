@@ -4,6 +4,11 @@ import { internal } from "./_generated/api";
 import { AzureOpenAI } from "openai";
 import { TextEditorNodeData } from "./schema";
 
+const VALID_REASONING_EFFORTS = ["low", "medium", "high"] as const;
+
+// Derives the union type from the array above ("low" | "medium" | "high")
+type ReasoningEffort = (typeof VALID_REASONING_EFFORTS)[number];
+
 const TextEditorExecutionSchema = v.object({
   type: v.literal("textEditor"),
   id: v.string(),
@@ -67,14 +72,23 @@ export const generateAndStoreWebsite = action({
       const instruction = `
 You are an expert web developer with a specialization in using Tailwind CSS to create modern, visually appealing, and responsive websites. Your task is to create a single, self-contained HTML file based on the user's request, strictly following the requirements below.
 
-Core Philosophy: Tailwind First
+**Design Philosophy: Aesthetics are Paramount**
+
+Your goal is to produce a design that is not just functional but **beautiful and professional**. Pay meticulous attention to visual details to ensure a high-quality user experience. This includes:
+* **Visual Hierarchy:** Guide the user's eye to the most important elements.
+* **Spacing & Alignment:** Use consistent padding, margins, and alignment for a clean, organized look.
+* **Typography:** Choose readable and elegant fonts that complement the design.
+* **Color Palette:** Select and apply a harmonious and modern color scheme.
+The final output should look like a polished, high-end website.
+
+**Core Philosophy: Tailwind First**
 
 You must use Tailwind CSS for all styling, layout, and design. Your primary goal is to leverage its utility classes to build the entire interface. You should only write custom CSS in a \`<style>\` tag for effects that are genuinely not possible with Tailwind's utility classes.
 
-Key Requirements:
+**Key Requirements:**
 
-1.  Single File Output: The final output must be a single HTML file.
-2.  Mandatory Libraries: You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
+1.  **Single File Output:** The final output must be a single HTML file.
+2.  **Mandatory Libraries:** You must include the following libraries in the \`<head>\` section of the HTML if you use them. Do not use any other external libraries.
 
     * Tailwind CSS (Required for ALL styling):
         \`<script src="https://cdn.tailwindcss.com"></script>\`
@@ -89,11 +103,11 @@ Key Requirements:
     * Chart.js (For charts and graphs):
         \`<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>\`
 
-3.  Icons: You must use the **Lucide** icon library to enhance the user interface. After including the CDN link in the \`<head>\`, insert icons using the \`<i data-lucide="...">\` element. For example, to add a "home" icon, you would use \`<i data-lucide="home"></i>\`. Remember to call \`lucide.createIcons();\` at the end of the body.
+3.  **Icons:** You must use the **Lucide** icon library to enhance the user interface. After including the CDN link in the \`<head>\`, insert icons using the \`<i data-lucide="...">\` element. For example, to add a "home" icon, you would use \`<i data-lucide="home"></i>\`. Remember to call \`lucide.createIcons();\` at the end of the body.
 
-4.  Images: If the user does not provide specific image URLs, you must use placeholder images to ensure the layout is complete. Use the service \`https://placehold.co/\`. For example: \`<img src="https://placehold.co/600x400/EEE/31343C?text=Placeholder" alt="Placeholder Image">\`.
+4.  **Images:** If the user does not provide specific image URLs, you must use placeholder images to ensure the layout is complete. Use the service \`https://placehold.co/\`. For example: \`<img src="https://placehold.co/600x400/EEE/31343C?text=Placeholder" alt="Placeholder Image">\`.
 
-5.  Custom Fonts:
+5.  **Custom Fonts:**
     * To use custom fonts, you must import them from Google Fonts by adding a \`<link>\` tag in the \`<head>\`. For example:
         \`<link rel="preconnect" href="https://fonts.googleapis.com">\`
         \`<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\`
@@ -114,9 +128,9 @@ Key Requirements:
         </script>
         \`\`\`
 
-6.  Responsiveness: The website must be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
-7.  Content and Structure: Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
-8.  No Redirection or Lag: This will be embedded into another website. Do not add any elements which might redirect the user (e.g. \`<a>\` tags with \`href\` attributes) or cause performance issues.
+6.  **Responsiveness:** The website must be fully responsive. Use Tailwind's responsive prefixes (e.g., \`md:\`, \`lg:\`) to ensure a great experience on all screen sizes.
+7.  **Content and Structure:** Interpret the user's request to create a logical content structure using appropriate semantic HTML tags (e.g., \`<header>\`, \`<main>\`, \`<footer>\`).
+8.  **No Redirection or Lag:** This will be embedded into another website. Do not add any elements which might redirect the user (e.g. \`<a>\` tags with \`href\` attributes) or cause performance issues.
 
 Please provide only the complete HTML code for the file, without any explanations or markdown formatting.`;
 
@@ -125,17 +139,31 @@ Please provide only the complete HTML code for the file, without any explanation
       ${textContents.join("\n")}`;
 
       const client = getClient();
-
+      console.log(
+        "deploymentName",
+        process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME,
+      );
       console.time("apiCall");
+      const envEffort = process.env.WEBSITE_MODEL_REASONING_EFFORT ?? "";
+      const reasoningEffort: ReasoningEffort = isValidReasoningEffort(envEffort)
+        ? envEffort
+        : "medium";
+
+      // Now, `reasoningEffort` is guaranteed to be "low", "medium", or "high".
+      console.log(`Using reasoning effort: ${reasoningEffort}`);
+
       const response = await client.responses.create({
-        model: "gpt-5",
-        reasoning: { effort: "medium" },
+        reasoning: {
+          effort: reasoningEffort,
+        },
         instructions: instruction,
         input: prompt,
         max_output_tokens: 40000,
+        model: process.env.AZURE_OPENAI_WEBSITE_DEPLOYMENT_NAME,
       });
       console.timeEnd("apiCall");
 
+      console.log("Used model", response.model);
       console.log("Output tokens", response.usage?.output_tokens);
       console.log(
         "Output tokens details",
@@ -293,3 +321,8 @@ export const getWebsiteGenerationRateLimit = query({
     return { isRateLimited: false };
   },
 });
+
+function isValidReasoningEffort(value: string): value is ReasoningEffort {
+  // @ts-expect-error Temporary
+  return VALID_REASONING_EFFORTS.includes(value);
+}
