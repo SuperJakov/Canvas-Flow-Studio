@@ -53,8 +53,70 @@ function TemplatesSection() {
       </ul>
       <BodyP className="mt-3">
         You can find these templates on the home page or the{" "}
-        <Link href="/templates">templates page</Link>.
+        <Link
+          href="/templates"
+          className="text-primary hover:text-primary/80 cursor-pointer font-semibold underline underline-offset-4 transition-colors hover:no-underline"
+        >
+          templates page
+        </Link>
+        .
       </BodyP>
+    </Section>
+  );
+}
+
+function HowWebsiteNodeWorks() {
+  return (
+    <Section>
+      <H2>How It Works</H2>
+      <BodyP className="mt-3">
+        The Website Node currently generates{" "}
+        <strong>single-page websites</strong>. The AI handles the design,
+        including placeholder images, icons, and fonts to create a polished
+        look. Currently, placeholder images can only include text. In the
+        future, it will be able to use any image from the internet.
+      </BodyP>
+      <BodyP className="mt-3">
+        Generation takes between <strong>3 to 8 minutes</strong>. This time
+        ensures a high-quality result, and we&apos;re actively working on making
+        it faster.
+      </BodyP>
+      <BodyP className="mt-3">
+        Once complete, you can open the website in a new tab to preview it.
+      </BodyP>
+
+      <blockquote className="border-border mt-6 border-l-4 pl-6">
+        <BodyP>
+          To learn more, check out the{" "}
+          <Link
+            href="/docs/core-concepts/website-node"
+            className="text-primary hover:text-primary/80 cursor-pointer font-semibold underline underline-offset-4 transition-colors hover:no-underline"
+          >
+            documentation for website node
+          </Link>
+          .
+        </BodyP>
+      </blockquote>
+    </Section>
+  );
+}
+
+function FutureOfWebsiteNode() {
+  return (
+    <Section>
+      <H2>Future of the Website Node</H2>{" "}
+      <BodyP className="mt-3">
+        We are actively developing the Website Node to expand its capabilities.
+        Future updates will introduce a quality selector, allowing you to choose
+        from different generation models at varying costs.{" "}
+      </BodyP>{" "}
+      <BodyP className="mt-3">
+        Currently, each generation is set to <strong>Low</strong> quality and
+        costs 1 website credit. A <strong>Medium</strong> quality option (4
+        credits) will be available soon. We also plan to introduce a{" "}
+        <strong>High</strong> quality tier capable of generating multi-page
+        websites in a future release.{" "}
+      </BodyP>{" "}
     </Section>
   );
 }
@@ -104,6 +166,8 @@ export default function IntroducingWebsiteNodeContent() {
         <Intro />
         <WebsiteNodeSection />
         <TemplatesSection />
+        <HowWebsiteNodeWorks />
+        <FutureOfWebsiteNode />
         <GetStarted />
         <hr className="border-border my-10" />
         <PostFooter />

@@ -3,15 +3,15 @@ import type { Metadata } from "next";
 import { chapters } from "../../chapters";
 
 type Props = {
-  params: {
+  params: Promise<{
     chapterSlug: string;
     sectionSlug: string;
-  };
+  }>;
 };
 
 // Generate dynamic metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { chapterSlug, sectionSlug } = params;
+  const { chapterSlug, sectionSlug } = await params;
 
   const chapter = chapters.find((c) => c.slug === chapterSlug);
   if (!chapter) {
@@ -32,10 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DocsSectionPage({ params }: Props) {
-  return (
-    <DocsPage
-      activeChapter={params.chapterSlug}
-      activeSection={params.sectionSlug}
-    />
-  );
+  const { chapterSlug, sectionSlug } = await params;
+
+  return <DocsPage activeChapter={chapterSlug} activeSection={sectionSlug} />;
 }
