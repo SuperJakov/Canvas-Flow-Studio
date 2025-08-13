@@ -59,7 +59,6 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-// eslint-disable-next-line
 const configWithSentry = withSentryConfig(withPwa(nextConfig), {
   org: "y-fq",
   project: "ai-flow-studio",
