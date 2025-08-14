@@ -32,13 +32,13 @@ export default function DocsPage({ activeChapter, activeSection }: Props) {
       />
 
       {/* Main content area */}
-      <main className="bg-background flex-1 px-6 md:px-8 lg:px-12">
+      <div className="bg-background flex-1 px-6 md:px-8 lg:px-12">
         <MobileMenuButton />
         <ChapterContent
           activeChapter={activeChapter}
           activeSection={activeSection}
         />
-      </main>
+      </div>
     </div>
   );
 }

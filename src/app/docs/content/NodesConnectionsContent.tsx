@@ -12,7 +12,7 @@ import PageTitle from "../components/PageTitle";
 
 export default function NodesConnectionsContent() {
   return (
-    <section id="nodes-connections" className="mb-16 scroll-mt-16">
+    <main id="nodes-connections" className="mb-16 scroll-mt-16">
       <PageTitle>Nodes & Connections</PageTitle>
       <div>
         <p className="mb-6">
@@ -205,6 +205,6 @@ export default function NodesConnectionsContent() {
           </ul>
         </div>
       </div>
-    </section>
+    </main>
   );
 }

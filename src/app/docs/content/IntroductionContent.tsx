@@ -5,7 +5,7 @@ import PageTitle from "../components/PageTitle";
 
 export default function IntroductionContent() {
   return (
-    <section id="introduction" className="bg-background mb-16 scroll-mt-16">
+    <main id="introduction" className="bg-background mb-16 scroll-mt-16">
       <PageTitle>Introduction</PageTitle>
       <div>
         <p>Welcome to Canvas Flow Studio documentation!</p>
@@ -57,6 +57,6 @@ export default function IntroductionContent() {
           of the process.
         </p>
       </div>
-    </section>
+    </main>
   );
 }

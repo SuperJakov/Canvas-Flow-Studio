@@ -36,7 +36,7 @@ function Step({
 
 export default function FirstFlowContent() {
   return (
-    <section id="first-flow" className="bg-background mb-16 scroll-mt-16">
+    <main id="first-flow" className="bg-background mb-16 scroll-mt-16">
       <PageTitle>Creating Your First Flow</PageTitle>
       <div>
         <div>
@@ -143,6 +143,6 @@ export default function FirstFlowContent() {
           </CardContent>
         </Card>
       </div>
-    </section>
+    </main>
   );
 }
