@@ -6,7 +6,6 @@ import Providers from "./_components/providers";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Header } from "./_components/Header";
 import { Toaster } from "~/components/ui/sonner";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Canvas Flow Studio",
@@ -32,14 +31,16 @@ export default function RootLayout({
     <html lang="en" className={nunito.variable}>
       <ConvexAuthNextjsServerProvider>
         <Providers>
-          <body className="dark">
+          <head>
             {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
-              <Script
-                src="https://unpkg.com/react-scan/dist/auto.global.js"
-                strategy="afterInteractive"
+              <script
                 crossOrigin="anonymous"
+                src="//unpkg.com/react-scan/dist/auto.global.js"
+                async={true}
               />
             )}
+          </head>
+          <body className="dark">
             <Header />
             {children}
             <Toaster />

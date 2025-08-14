@@ -23,7 +23,7 @@ export default async function WebsiteNodePage(props: Props) {
       nodeId,
     },
   );
-  if (!preloadedWebsiteNode) redirect("/whiteboards");
+  if (!preloadedWebsiteNode._valueJSON) redirect("/whiteboards");
 
   return <WebsiteNodePageClient preloadedWebsiteNode={preloadedWebsiteNode} />;
 }
