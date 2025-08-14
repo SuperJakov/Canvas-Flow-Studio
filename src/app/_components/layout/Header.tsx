@@ -15,7 +15,7 @@ import {
 import { MobileNav } from "./MobileNav";
 import { AuthButtons } from "./AuthButtons";
 
-const excludedPaths = ["/whiteboard", "/website"];
+const excludedPaths = ["/whiteboard/", "/website"];
 
 export function Header() {
   const pathname = usePathname();
