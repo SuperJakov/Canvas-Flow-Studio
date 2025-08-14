@@ -1,24 +1,87 @@
-import { type Metadata } from "next";
-import { getAllTemplates } from "../template/[templateName]/templates";
+"use client";
+
 import Link from "next/link";
+import {
+  Calendar,
+  FileText,
+  Image as ImageIcon,
+  MessageSquare,
+  PieChart,
+  Users,
+} from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
+import posthog from "posthog-js";
 
-export const metadata: Metadata = {
-  title: "Templates | Canvas Flow Studio",
-  description:
-    "Explore our collection of pre-built templates to kickstart your creative process. From image generation to language translation, find the perfect starting point for your next project.",
-  robots: {
-    index: true,
-    follow: true,
+const templates = [
+  {
+    href: "/template/describe-and-generate",
+    title: "Describe and Generate",
+    description:
+      "Learn the basics of Canvas Flow Studio by describing images and generating content with AI models.",
+    icon: Users,
+    hoverClasses: "hover:border-orange-500/50 hover:shadow-orange-900/20",
+    hoverColorClass: "group-hover:text-orange-400",
+    workInProgress: false,
   },
-};
+  {
+    href: "/template/company-meeting",
+    title: "Company Meeting",
+    description:
+      "Generate meeting minutes, action items, and follow-ups from meeting transcripts.",
+    icon: Calendar,
+    hoverClasses: "hover:border-blue-500/50 hover:shadow-blue-900/20",
+    hoverColorClass: "group-hover:text-blue-400",
+    workInProgress: false,
+  },
+  {
+    href: "/template/content-creation",
+    title: "Content Creation",
+    description:
+      "Create blog posts, social media content, and visuals from a single topic.",
+    icon: FileText,
+    hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
+    hoverColorClass: "group-hover:text-purple-400",
+    workInProgress: false,
+  },
+  {
+    href: "/template/image-generation",
+    title: "Image Generation",
+    description:
+      "Generate and refine images based on text descriptions and use different styles.",
+    icon: ImageIcon,
+    hoverClasses: "hover:border-pink-500/50 hover:shadow-pink-900/20",
+    hoverColorClass: "group-hover:text-pink-400",
+    workInProgress: false,
+  },
+  {
+    href: "/template/language-translation",
+    title: "Language Translation",
+    description:
+      "Translate and localize content between multiple languages while preserving context.",
+    icon: MessageSquare,
+    hoverClasses: "hover:border-green-500/50 hover:shadow-green-900/20",
+    hoverColorClass: "group-hover:text-green-400",
+    workInProgress: false,
+  },
+  {
+    href: "/template/data-analysis",
+    title: "Data Analysis",
+    description:
+      "Extract insights, generate visualizations, and create reports from your data.",
+    icon: PieChart,
+    hoverClasses: "hover:border-teal-500/50 hover:shadow-teal-900/20",
+    hoverColorClass: "group-hover:text-teal-400",
+    workInProgress: true,
+  },
+];
 
 export default function Templates() {
-  const templates = getAllTemplates();
-
   return (
-    <main className="text-foreground container mx-auto px-4 py-8 pt-18">
+    <main
+      className="text-foreground container mx-auto px-4 py-8 pt-20 sm:px-6 lg:px-8"
+      id="templates"
+    >
       <h1 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
         <span className="animate-[gradient-x_5s_ease_infinite] bg-gradient-to-r from-cyan-400 to-blue-500 bg-[length:200%_200%] bg-clip-text text-transparent">
           Get Started with an Example
@@ -30,8 +93,13 @@ export default function Templates() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {templates.map((template) => (
           <Link
-            key={template.name}
-            href={`/template/${template.name}`}
+            key={template.href}
+            href={template.href}
+            onClick={() =>
+              posthog.capture("template click", {
+                template: template.title,
+              })
+            }
             className={`group transition ${template.hoverClasses} ${
               template.workInProgress ? "pointer-events-none" : ""
             }`}
@@ -53,16 +121,18 @@ export default function Templates() {
                   </Badge>
                 )}
                 <div
-                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${template.iconBg} shadow-lg ${
+                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${
                     template.workInProgress ? "grayscale" : ""
                   }`}
                 >
-                  {template.icon && (
-                    <template.icon className="h-6 w-6 text-white" />
-                  )}
+                  <template.icon
+                    className={`text-primary h-8 w-8 transition-all duration-300 ${template.hoverColorClass}`}
+                  />
                 </div>
                 <h3
-                  className={`mb-2 text-xl font-semibold ${template.titleClasses} transition-all duration-300 ${
+                  className={`mb-2 text-xl font-semibold ${
+                    template.hoverColorClass
+                  } transition-all duration-300 ${
                     template.workInProgress ? "text-gray-500" : ""
                   }`}
                 >

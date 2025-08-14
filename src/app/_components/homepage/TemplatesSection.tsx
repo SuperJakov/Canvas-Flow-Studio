@@ -62,10 +62,14 @@ export default function TemplatesSection() {
                     template.workInProgress ? "grayscale" : ""
                   }`}
                 >
-                  <template.icon className="text-primary h-8 w-8" />
+                  <template.icon
+                    className={`text-primary h-8 w-8 transition-all duration-300 ${template.hoverColorClass}`}
+                  />
                 </div>
                 <h3
-                  className={`mb-2 text-xl font-semibold ${template.titleClasses} transition-all duration-300 ${
+                  className={`mb-2 text-xl font-semibold ${
+                    template.hoverColorClass
+                  } transition-all duration-300 ${
                     template.workInProgress ? "text-gray-500" : ""
                   }`}
                 >
@@ -91,7 +95,7 @@ const templates = [
       "Learn the basics of Canvas Flow Studio by describing images and generating content with AI models.",
     icon: Users,
     hoverClasses: "hover:border-orange-500/50 hover:shadow-orange-900/20",
-    titleClasses: "group-hover:text-orange-400",
+    hoverColorClass: "group-hover:text-orange-400",
   },
   {
     href: "/template/company-meeting",
@@ -100,7 +104,7 @@ const templates = [
       "Generate meeting minutes, action items, and follow-ups from meeting transcripts.",
     icon: Calendar,
     hoverClasses: "hover:border-blue-500/50 hover:shadow-blue-900/20",
-    titleClasses: "group-hover:text-blue-400",
+    hoverColorClass: "group-hover:text-blue-400",
   },
   {
     href: "/template/content-creation",
@@ -109,7 +113,7 @@ const templates = [
       "Create blog posts, social media content, and visuals from a single topic.",
     icon: FileText,
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
-    titleClasses: "group-hover:text-purple-400",
+    hoverColorClass: "group-hover:text-purple-400",
     workInProgress: false,
   },
   {
@@ -119,7 +123,7 @@ const templates = [
       "Generate and refine images based on text descriptions and use different styles.",
     icon: ImageIcon,
     hoverClasses: "hover:border-pink-500/50 hover:shadow-pink-900/20",
-    titleClasses: "group-hover:text-pink-400",
+    hoverColorClass: "group-hover:text-pink-400",
   },
   {
     href: "/template/language-translation",
@@ -128,7 +132,7 @@ const templates = [
       "Translate and localize content between multiple languages while preserving context.",
     icon: MessageSquare,
     hoverClasses: "hover:border-green-500/50 hover:shadow-green-900/20",
-    titleClasses: "group-hover:text-green-400",
+    hoverColorClass: "group-hover:text-green-400",
   },
   {
     href: "/template/data-analysis",
@@ -137,7 +141,7 @@ const templates = [
       "Extract insights, generate visualizations, and create reports from your data.",
     icon: PieChart,
     hoverClasses: "hover:border-teal-500/50 hover:shadow-teal-900/20",
-    titleClasses: "group-hover:text-teal-400",
+    hoverColorClass: "group-hover:text-teal-400",
     workInProgress: true,
   },
 ];
