@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Providers from "./_components/providers";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { Header } from "./_components/Header";
+import { Header } from "./_components/layout/Header";
 import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
