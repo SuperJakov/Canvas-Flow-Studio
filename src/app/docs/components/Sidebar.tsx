@@ -48,61 +48,63 @@ export default function DocsSidebar({
 
   return (
     <Sidebar className="pt-16 md:pt-16">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Documentation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {chapters.map((chapter) => (
-                <SidebarMenuItem key={chapter.slug}>
-                  <SidebarMenuButton
-                    asChild
-                    className="font-bold text-wrap transition"
-                  >
-                    <Link
-                      href={`/docs/${chapter.slug}/${chapter.sections[0]?.slug ?? ""}`}
-                      prefetch={true}
-                      className="break-words whitespace-normal"
-                      onClick={handleLinkClick}
+      <nav aria-label="Documentation">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Documentation</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {chapters.map((chapter) => (
+                  <SidebarMenuItem key={chapter.slug}>
+                    <SidebarMenuButton
+                      asChild
+                      className="font-bold text-wrap transition"
                     >
-                      {chapter.title}
-                    </Link>
-                  </SidebarMenuButton>
-                  <SidebarMenuSub>
-                    {chapter.sections.map((section) => (
-                      <SidebarMenuSubItem key={section.slug}>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={
-                            activeChapter === chapter.slug &&
-                            activeSection === section.slug
-                          }
-                          className="text-wrap"
-                        >
-                          <Link
-                            href={`/docs/${chapter.slug}/${section.slug}`}
-                            aria-current={
+                      <Link
+                        href={`/docs/${chapter.slug}/${chapter.sections[0]?.slug ?? ""}`}
+                        prefetch={true}
+                        className="break-words whitespace-normal"
+                        onClick={handleLinkClick}
+                      >
+                        {chapter.title}
+                      </Link>
+                    </SidebarMenuButton>
+                    <SidebarMenuSub>
+                      {chapter.sections.map((section) => (
+                        <SidebarMenuSubItem key={section.slug}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={
                               activeChapter === chapter.slug &&
                               activeSection === section.slug
-                                ? "page"
-                                : undefined
                             }
-                            className="break-words whitespace-normal"
-                            onClick={handleLinkClick}
+                            className="text-wrap"
                           >
-                            <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                            <span className="flex-1">{section.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+                            <Link
+                              href={`/docs/${chapter.slug}/${section.slug}`}
+                              aria-current={
+                                activeChapter === chapter.slug &&
+                                activeSection === section.slug
+                                  ? "page"
+                                  : undefined
+                              }
+                              className="break-words whitespace-normal"
+                              onClick={handleLinkClick}
+                            >
+                              <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                              <span className="flex-1">{section.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </nav>
       <div className="mt-auto p-4">
         <Button className="w-full" variant={"ghost"} id="feedback-button">
           {/* Posthog will activate survey */}

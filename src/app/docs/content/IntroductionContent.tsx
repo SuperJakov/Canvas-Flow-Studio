@@ -5,16 +5,16 @@ import PageTitle from "../components/PageTitle";
 
 export default function IntroductionContent() {
   return (
-    <section id="introduction" className="bg-background mb-16 scroll-mt-16">
+    <main id="introduction" className="bg-background mb-16 scroll-mt-16">
       <PageTitle>Introduction</PageTitle>
       <div>
         <p>Welcome to Canvas Flow Studio documentation!</p>
 
         <Separator className="my-6" />
 
-        <h3 className="pb-2 text-2xl font-black">
+        <h2 className="pb-2 text-2xl font-black">
           What is Canvas Flow Studio?
-        </h3>
+        </h2>
 
         <p>
           Canvas Flow Studio is an app which is used to create AI-powered
@@ -57,6 +57,6 @@ export default function IntroductionContent() {
           of the process.
         </p>
       </div>
-    </section>
+    </main>
   );
 }

@@ -1,16 +1,15 @@
 "use client";
 
 import { Delete } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import PageTitle from "../components/PageTitle";
 
 export default function CanvasContent() {
   return (
-    <section id="canvas" className="mb-16 scroll-mt-16">
+    <main id="canvas" className="mb-16 w-full scroll-mt-16">
       <PageTitle>Understanding the Canvas</PageTitle>
-      <div>
+      <div className="w-full">
         <p>
           The whiteboard canvas is your creative place for building AI
           whiteboards. Let&apos;s explore its key components:
@@ -18,11 +17,11 @@ export default function CanvasContent() {
 
         <Separator className="my-6" />
 
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader className="pb-2">
+        <div className="mb-8 grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+          <Card className="gap-2.5">
+            <CardHeader>
               <div className="inline-flex items-center gap-1">
-                <CardTitle className="text-xl font-semibold">Sidebar</CardTitle>
+                <CardTitle>Sidebar</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -40,8 +39,8 @@ export default function CanvasContent() {
                 </li>
                 <li>
                   <strong className="text-yellow-400">Instruction node</strong>{" "}
-                  <Badge variant="outline">Beta</Badge> - Modify other nodes and
-                  generate a new one. Edit speeches, images, or text.
+                  - Modify other nodes and generate a new one. Edit speeches,
+                  images, or text.
                 </li>
                 <li>
                   <strong className="text-orange-400">Comment node</strong> -
@@ -52,11 +51,9 @@ export default function CanvasContent() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold">
-                Canvas Area
-              </CardTitle>
+          <Card className="gap-2.5">
+            <CardHeader>
+              <CardTitle>Canvas Area</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -85,11 +82,9 @@ export default function CanvasContent() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold">
-                Connections
-              </CardTitle>
+          <Card className="gap-2.5">
+            <CardHeader>
+              <CardTitle>Connections</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -106,18 +101,16 @@ export default function CanvasContent() {
           </Card>
         </div>
 
-        <Card className="mb-6">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xl font-semibold">
-              Canvas Controls
-            </CardTitle>
+        <Card className="gap-2.5">
+          <CardHeader>
+            <CardTitle>Canvas Controls</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <h4 className="mb-2 text-lg font-medium text-white">
+                <h3 className="mb-2 text-lg font-medium text-white">
                   Navigation
-                </h4>
+                </h3>
                 <ul className="space-y-2">
                   <li>
                     <strong className="text-blue-400">Pan</strong>: Click and
@@ -130,7 +123,7 @@ export default function CanvasContent() {
                 </ul>
               </div>
               <div>
-                <h4 className="mb-2 text-lg font-medium text-white">Editing</h4>
+                <h3 className="mb-2 text-lg font-medium text-white">Editing</h3>
                 <ul className="space-y-2">
                   <li>
                     <strong className="text-purple-400">Select</strong>: Click
@@ -149,6 +142,6 @@ export default function CanvasContent() {
           </CardContent>
         </Card>
       </div>
-    </section>
+    </main>
   );
 }

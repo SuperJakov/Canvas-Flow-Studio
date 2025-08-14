@@ -114,7 +114,6 @@ export function Header() {
         style={{
           backgroundColor: `color-mix(in oklch, var(--background) 80%, transparent)`,
         }}
-        suppressHydrationWarning
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
