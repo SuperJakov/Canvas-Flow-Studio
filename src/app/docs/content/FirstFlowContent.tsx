@@ -27,7 +27,7 @@ function Step({
         </span>
       </div>
       <div>
-        <h4 className="mb-1 text-lg font-medium">{title}</h4>
+        <h2 className="mb-1 text-lg font-medium">{title}</h2>
         <p className="">{description}</p>
       </div>
     </div>
@@ -131,10 +131,12 @@ export default function FirstFlowContent() {
         />
         <Card>
           <CardContent className="flex flex-col gap-2">
-            <CardTitle className="text-xl">Congratulations!</CardTitle>
+            <CardTitle as="h2" className="text-xl">
+              Congratulations!
+            </CardTitle>
             <p>
               You&apos;ve just created your first AI whiteboard! This simple
-              example demonstrates the fundamental concept behind AI Flow
+              example demonstrates the fundamental concept behind Canvas Flow
               Studio: visually connecting nodes to create powerful automations
               without coding.
             </p>

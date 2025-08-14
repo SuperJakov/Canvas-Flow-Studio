@@ -22,12 +22,12 @@ export default function NodesConnectionsContent() {
         </p>
 
         <div className="mb-8">
-          <h3 className="mb-4 text-xl font-semibold text-white">Node Types</h3>
+          <h2 className="mb-4 text-xl font-semibold text-white">Node Types</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-lg border border-blue-500/30 bg-blue-900/10 p-4">
               <div className="mb-3 flex items-center">
                 <Type className="mr-2 h-5 w-5 text-blue-400" />
-                <h4 className="text-lg font-medium text-white">Text Node</h4>
+                <h3 className="text-lg font-medium text-white">Text Node</h3>
               </div>
               <p className="mb-3">
                 Text nodes are the starting point of most workflows. They let
@@ -83,12 +83,9 @@ export default function NodesConnectionsContent() {
             <div className="rounded-lg border border-yellow-500/30 bg-yellow-900/10 p-4">
               <div className="mb-3 flex items-center">
                 <MessageSquare className="mr-2 h-5 w-5 text-yellow-400" />
-                <h4 className="text-lg font-medium text-white">
+                <h3 className="text-lg font-medium text-white">
                   Instruction Node
-                </h4>
-                <span className="ml-2 rounded-full bg-yellow-500/20 px-2 py-1 text-xs text-yellow-200">
-                  Beta
-                </span>
+                </h3>
               </div>
               <p className="mb-3">
                 Instruction nodes modify and process content from other nodes
@@ -115,7 +112,7 @@ export default function NodesConnectionsContent() {
             <div className="rounded-lg border border-orange-500/30 bg-orange-900/10 p-4">
               <div className="mb-3 flex items-center">
                 <Database className="mr-2 h-5 w-5 text-orange-400" />
-                <h4 className="text-lg font-medium text-white">Comment Node</h4>
+                <h3 className="text-lg font-medium text-white">Comment Node</h3>
               </div>
               <p className="mb-3">
                 Comment nodes help document your workflow. They don&apos;t
@@ -144,7 +141,7 @@ export default function NodesConnectionsContent() {
         </div>
 
         <div className="mb-8">
-          <h3 className="mb-4 text-xl font-semibold">How Connections Work</h3>
+          <h2 className="mb-4 text-xl font-semibold">How Connections Work</h2>
           <p className="mb-4">
             Connections allow nodes to work together by passing data between
             them. You can create a connection by dragging the handle from the
@@ -166,15 +163,15 @@ export default function NodesConnectionsContent() {
           <div className="mb-6 rounded-lg border border-gray-700 bg-gray-800/70 p-5">
             <div className="mb-4 flex items-center">
               <Share2 className="mr-2 h-5 w-5 text-blue-400" />
-              <h4 className="text-lg font-medium text-white">
+              <h3 className="text-lg font-medium text-white">
                 Basic Connections
-              </h4>
+              </h3>
             </div>
             <div className="space-y-4">
               <div>
-                <h5 className="mb-1 font-semibold text-blue-300">
+                <h4 className="mb-1 font-semibold text-blue-300">
                   Text to Image
-                </h5>
+                </h4>
                 <p className="ml-4">
                   The most common connection: Connect a Text Node to an Image
                   Node to generate an AI image based on your text description.
@@ -182,9 +179,9 @@ export default function NodesConnectionsContent() {
               </div>
 
               <div>
-                <h5 className="mb-1 font-semibold text-purple-300">
+                <h4 className="mb-1 font-semibold text-purple-300">
                   Creating Connections
-                </h5>
+                </h4>
                 <p className="ml-4">
                   Click and drag from an output handle (bottom) of one node to
                   an input handle (top) of another node.
@@ -197,7 +194,7 @@ export default function NodesConnectionsContent() {
         <div className="bg-muted/50 border-border-2 rounded-md border p-4">
           <div className="mb-3 flex items-center">
             <Lightbulb className="mr-2 h-5 w-5 text-yellow-400" />
-            <h4 className="text-lg font-medium">Tips for Success</h4>
+            <h3 className="text-lg font-medium">Tips for Success</h3>
           </div>
           <ul className="list-disc space-y-2 pl-5">
             <li>Start with a simple Text Node to Image Node connection</li>

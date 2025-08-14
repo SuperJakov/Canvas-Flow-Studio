@@ -12,9 +12,9 @@ export default function IntroductionContent() {
 
         <Separator className="my-6" />
 
-        <h3 className="pb-2 text-2xl font-black">
+        <h2 className="pb-2 text-2xl font-black">
           What is Canvas Flow Studio?
-        </h3>
+        </h2>
 
         <p>
           Canvas Flow Studio is an app which is used to create AI-powered
