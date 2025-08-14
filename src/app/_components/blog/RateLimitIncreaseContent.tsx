@@ -1,49 +1,7 @@
 import { SignUpButton } from "@clerk/nextjs";
 import EmailContactDialogContent from "../EmailContactDialogContent";
 import { Dialog, DialogTrigger } from "~/components/ui/dialog";
-
-function Section({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return <section className={`mt-12 ${className}`.trim()}>{children}</section>;
-}
-
-function H2({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-foreground text-2xl font-bold tracking-tight">
-      {children}
-    </h2>
-  );
-}
-
-function BodyP({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return <p className={`text-foreground ${className}`.trim()}>{children}</p>;
-}
-
-function RateLimitHeader() {
-  return (
-    <header className="mb-12 flex items-center gap-4">
-      <div>
-        <h1 className="text-foreground m-0 text-3xl font-bold tracking-tight">
-          We are increasing rate limits for free users! 🎉
-        </h1>
-        <p className="text-muted-foreground m-0 mt-1 text-sm">
-          More creative power for everyone
-        </p>
-      </div>
-    </header>
-  );
-}
+import { BodyP, H2, Section } from "./common";
 
 function Intro() {
   return (
@@ -134,11 +92,10 @@ function PostFooter() {
   );
 }
 
-function RateLimitIncreaseContent() {
+export default function RateLimitIncreaseContent() {
   return (
     <article className="prose max-w-none">
       <Dialog>
-        <RateLimitHeader />
         <Intro />
         <NewLimits />
         <ContinuousImprovements />
@@ -150,5 +107,3 @@ function RateLimitIncreaseContent() {
     </article>
   );
 }
-
-export default RateLimitIncreaseContent;

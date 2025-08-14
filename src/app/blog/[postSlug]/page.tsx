@@ -73,31 +73,6 @@ function BlogPost({ post }: { post: (typeof blogs)[number] }) {
 
         {/* Meta information */}
         <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-sm">
-          {/* Author */}
-          <div className="flex items-center gap-3">
-            <div className="bg-muted relative h-10 w-10 overflow-hidden rounded-full">
-              {post.author.avatar ? (
-                <Image
-                  src={post.author.avatar}
-                  alt={post.author.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="bg-primary text-primary-foreground flex h-full w-full items-center justify-center font-semibold">
-                  {post.author.name.charAt(0)}
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-foreground font-medium">{post.author.name}</p>
-              <p className="text-xs">{post.author.role}</p>
-            </div>
-          </div>
-
-          {/* Separator */}
-          <span className="text-border">•</span>
-
           {/* Date */}
           <time dateTime={post.date}>
             {new Date(post.date).toLocaleDateString("en-US", {

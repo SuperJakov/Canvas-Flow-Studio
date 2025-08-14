@@ -1,5 +1,3 @@
-// src/core/execution/InstructionNodeExecutor.ts
-
 import type { IExecutor, ExecutionContext } from "./types";
 import type { InstructionNodeType, AppNode, AppEdge } from "~/Types/nodes";
 import { v4 as uuidv4 } from "uuid";
@@ -45,36 +43,57 @@ class InstructionNodeExecutor implements IExecutor {
         inputNodeTypes,
       });
       const outputNodeType =
-        outputNodeTypeRaw === "texteditor" ? "textEditor" : outputNodeTypeRaw;
+        outputNodeTypeRaw === "texteditor" ? "textEditor" : outputNodeTypeRaw; // Edges that point from current instruction node to some other
 
-      const newNodeId = uuidv4();
-      const styleToUse =
-        outputNodeType === "image" && imageSource?.type === "image"
-          ? imageSource.data.style
-          : "auto";
-      const newNode = {
-        id: newNodeId,
-        type: outputNodeType,
-        position: {
-          x: instructionNode.position.x,
-          y: instructionNode.position.y + 300,
-        },
-        data: {
-          ...getDefaultNodeData(outputNodeType),
-          ...(outputNodeType === "image" && { style: styleToUse }),
-        },
-        ...(outputNodeType === "textEditor" && { width: 270, height: 170 }),
-      } as AppNode;
+      const outPutEdges = get(edgesAtom).filter(
+        (edge) => edge.source === instructionNode.id,
+      );
+      const nodes = get(nodesAtom);
+      // Find nodes that are targets of the current instruction node's outgoing edges
+      const targetNodeIds = new Set(outPutEdges.map((edge) => edge.target));
+      const targetNodes = nodes.filter((node) => targetNodeIds.has(node.id));
 
-      set(nodesAtom, [...get(nodesAtom), newNode]);
+      // Check if a target node with the determined outputNodeType already exists
+      const hasExistingOutputNode = targetNodes.some(
+        (node) => node.type === outputNodeType,
+      );
 
-      const newEdge: AppEdge = {
-        id: `edge-${instructionNode.id}-${newNodeId}`,
-        source: instructionNode.id,
-        target: newNodeId,
-        type: "default",
-      };
-      set(edgesAtom, [...get(edgesAtom), newEdge]);
+      // If no such node exists, create and connect a new one.
+      if (!hasExistingOutputNode) {
+        const newNodeId = uuidv4();
+        const styleToUse =
+          outputNodeType === "image" && imageSource?.type === "image"
+            ? imageSource.data.style
+            : "auto";
+
+        const newNode = {
+          id: newNodeId,
+          type: outputNodeType,
+          position: {
+            x: instructionNode.position.x,
+            y: instructionNode.position.y + 300,
+          },
+          data: {
+            ...getDefaultNodeData(outputNodeType),
+            ...(outputNodeType === "image" && { style: styleToUse }),
+          },
+          ...(outputNodeType === "textEditor" && { width: 270, height: 170 }),
+        } as AppNode;
+
+        set(nodesAtom, [...get(nodesAtom), newNode]);
+
+        const newEdge: AppEdge = {
+          id: `edge-${instructionNode.id}-${newNodeId}`,
+          source: instructionNode.id,
+          target: newNodeId,
+          type: "default",
+        };
+        set(edgesAtom, [...get(edgesAtom), newEdge]);
+      } else {
+        console.log(
+          `Skipping node creation as a target of type '${outputNodeType}' already exists.`,
+        );
+      }
     } catch (error) {
       console.error("Error executing instruction node:", error);
     } finally {

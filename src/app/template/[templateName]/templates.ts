@@ -12,6 +12,7 @@ import {
   PieChart,
   Users,
 } from "lucide-react";
+import { contentCreationTemplate } from "./contentCreation";
 
 export type Template = {
   title: string;
@@ -54,9 +55,8 @@ const templates: TemplateMap = {
     iconBg: "bg-gradient-to-r from-purple-600 to-pink-600",
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
     titleClasses: "group-hover:text-purple-400",
-    workInProgress: true,
-    nodes: [],
-    edges: [],
+    workInProgress: false,
+    ...contentCreationTemplate,
   },
   "image-generation": {
     ...imageGenerationTemplate,

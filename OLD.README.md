@@ -218,12 +218,12 @@ Our team will review all model recommendations and prioritize based on user dema
 - [ ] Mobile responsive design
 - [x] Docs
 - [ ] Onboarding tutorial/guided tour
-- [ ] Workflow templates/starter examples
+- [x] Workflow templates/starter examples
 - [ ] Workflow versioning
 
 ### Analytics & Monitoring
 
-- [ ] Posthog for analytics
+- [x] Posthog for analytics
 - [x] Sentry for error handling and user feedback
 
 ### Collaboration Features
@@ -262,8 +262,8 @@ Our team will review all model recommendations and prioritize based on user dema
 - [x] Fix gallery
 - [] Better error handling when running nodes
 - [] Finish docs
-- [] Blog, 1 post
-- [] Website node
+- [x] Blog, 1 post
+- [x] Website node
 - [] Stable credits system
 
 - Ship 2

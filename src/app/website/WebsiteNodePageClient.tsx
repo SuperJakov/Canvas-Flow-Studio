@@ -2,11 +2,25 @@
 
 import { type api } from "convex/_generated/api";
 import { type Preloaded, usePreloadedQuery } from "convex/react";
+import { Globe } from "lucide-react";
 import SwirlingEffectSpinner from "~/components/spinner";
 
 type Props = {
   preloadedWebsiteNode: Preloaded<typeof api.websiteNodes.getWebsiteNode>;
 };
+
+function NoWebsite() {
+  return (
+    <div className="flex h-screen flex-col items-center justify-center gap-4 text-center">
+      <span className="flex items-center gap-2 text-lg">
+        <Globe />
+      </span>
+      <p className="text-muted-foreground text-sm">
+        Website not generated or not found.
+      </p>
+    </div>
+  );
+}
 
 function Generating() {
   return (
@@ -23,7 +37,7 @@ function Generating() {
 
 export default function WebsiteNodePageClient({ preloadedWebsiteNode }: Props) {
   const website = usePreloadedQuery(preloadedWebsiteNode);
-  if (!website) return null;
+  if (!website) return <NoWebsite />;
 
   if (website.isGenerating || !website.srcDoc) return <Generating />;
 

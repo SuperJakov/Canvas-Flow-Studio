@@ -4,12 +4,20 @@ import { api } from "convex/_generated/api";
 
 interface WebsiteNodeContentProps {
   id: string;
+  isResizing: boolean;
+  isDragging: boolean;
 }
 
-export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
+export function WebsiteNodeContent({
+  id,
+  isDragging,
+  isResizing,
+}: WebsiteNodeContentProps) {
   const websiteNode = useConvexQuery(api.websiteNodes.getWebsiteNode, {
     nodeId: id,
   });
+
+  const isInteracting = isDragging || isResizing;
 
   if (websiteNode?.isGenerating) {
     return (
@@ -25,11 +33,13 @@ export function WebsiteNodeContent({ id }: WebsiteNodeContentProps) {
   if (websiteNode?.srcDoc) {
     return (
       <div className="group relative flex h-full w-full items-center justify-center bg-gray-800">
-        <iframe
-          srcDoc={websiteNode.srcDoc}
-          className="h-full w-full"
-          sandbox="allow-scripts"
-        />
+        <div className="group relative flex h-full w-full items-center justify-center overflow-hidden bg-gray-800">
+          <iframe
+            srcDoc={websiteNode.srcDoc}
+            sandbox="allow-scripts"
+            className={`transition-filter h-full w-full duration-200 ease-in-out ${isInteracting ? "pointer-events-none blur-sm" : "blur-none"} `}
+          />
+        </div>
       </div>
     );
   }
