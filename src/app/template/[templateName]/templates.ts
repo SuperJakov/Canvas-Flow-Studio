@@ -50,7 +50,7 @@ const templates: TemplateMap = {
   "content-creation": {
     title: "Content Creation",
     description:
-      "Create blog posts, social media content, and visuals from a single topic.",
+      "Create anything you want from a single topic using the website node.",
     icon: FileText,
     iconBg: "bg-gradient-to-r from-purple-600 to-pink-600",
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",

@@ -31,28 +31,17 @@ function WebsiteNodeSection() {
   );
 }
 
-function TemplatesSection() {
+function TemplateSection() {
   return (
     <Section>
-      <H2>Website Templates</H2>
+      <H2>New Template: Content Creation</H2>
       <BodyP className="mt-3">
-        To help you get started with the Website Node, we have added several
-        pre-built templates. They provide a starting point for common use cases,
-        including:
+        A new pre-built template, <strong>Content Creation</strong>, is now
+        available. It is the first template designed to demonstrate the
+        functionality of the Website Node.
       </BodyP>
-      <ul className="text-foreground mt-3 list-disc space-y-2 pl-6">
-        <li>
-          <strong>Blog Post Generator</strong>
-        </li>
-        <li>
-          <strong>Social Media Campaign Planner</strong>
-        </li>
-        <li>
-          <strong>Children&apos;s Story Writer</strong>
-        </li>
-      </ul>
       <BodyP className="mt-3">
-        You can find these templates on the home page or the{" "}
+        All templates are available on the home page or the{" "}
         <Link
           href="/templates"
           className="text-primary hover:text-primary/80 cursor-pointer font-semibold underline underline-offset-4 transition-colors hover:no-underline"
@@ -165,7 +154,7 @@ export default function IntroducingWebsiteNodeContent() {
         {/* <PostHeader /> */}
         <Intro />
         <WebsiteNodeSection />
-        <TemplatesSection />
+        <TemplateSection />
         <HowWebsiteNodeWorks />
         <FutureOfWebsiteNode />
         <GetStarted />

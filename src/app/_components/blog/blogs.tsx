@@ -198,10 +198,10 @@ export const blogs: Blog[] = [
   },
   {
     slug: "introducing-website-node",
-    title: "Introducing the Website Node and New Templates!",
+    title: "Introducing the Website Node and New Template!",
     date: "2025-08-13T19:00:00.216Z",
     excerpt:
-      "Generate entire websites and kickstart your projects with templates.",
+      "Generate entire websites and kickstart your projects with the new template.",
     thumbnail: AppLogo,
     author: {
       name: "Jakov",
