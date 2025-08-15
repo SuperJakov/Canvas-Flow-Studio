@@ -81,9 +81,7 @@ export default function DemoImageSection(): JSX.Element {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            See Canvas Flow Studio in Action
-          </span>
+          <span className="text-primary">See Canvas Flow Studio in Action</span>
         </motion.h2>
 
         <motion.p

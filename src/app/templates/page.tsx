@@ -83,9 +83,7 @@ export default function Templates() {
       id="templates"
     >
       <h1 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-        <span className="animate-[gradient-x_5s_ease_infinite] bg-gradient-to-r from-cyan-400 to-blue-500 bg-[length:200%_200%] bg-clip-text text-transparent">
-          Get Started with an Example
-        </span>
+        <span className="text-primary">Get Started with an Example</span>
       </h1>
       <p className="mb-10 text-center text-xl">
         Jump-start your workflow with one of our pre-built templates

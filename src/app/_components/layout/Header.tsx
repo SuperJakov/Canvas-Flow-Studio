@@ -70,9 +70,7 @@ export function Header() {
                 href="/"
                 onClick={() => capture("nav click", { label: "home" })}
               >
-                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
-                  CFS
-                </span>
+                <span className="text-primary text-2xl font-bold">CFS</span>
               </Link>
 
               {/* DESKTOP NAVIGATION */}

@@ -28,7 +28,7 @@ export const plans: Plan[] = [
         { name: "Website Generation", value: "1/month" },
       ],
       premium: [
-        { name: "Workflow History & Versioning", included: false },
+        { name: "Whiteboard History & Versioning", included: false },
         { name: "Priority Support", included: false },
         { name: "Beta Features", included: false },
       ],
@@ -62,7 +62,7 @@ export const plans: Plan[] = [
         { name: "Website Generation", value: "10/month" },
       ],
       premium: [
-        { name: "Workflow History & Versioning", included: false },
+        { name: "Whiteboard History & Versioning", included: false },
         { name: "Priority Support", included: true },
         { name: "Beta Features", included: true },
       ],
@@ -96,7 +96,7 @@ export const plans: Plan[] = [
         { name: "Website Generation", value: "40/month" },
       ],
       premium: [
-        { name: "Workflow History & Versioning", included: true },
+        { name: "Whiteboard History & Versioning", included: true },
         { name: "Priority Support", included: true },
         { name: "Beta Features", included: true },
       ],

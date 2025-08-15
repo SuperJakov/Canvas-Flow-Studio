@@ -39,7 +39,7 @@ const plans = [
       "100 Nodes per whiteboard",
       "650 Image & Text Credits/month",
       "Highest Image Quality",
-      "Workflow History & Versioning",
+      "Whiteboard History & Versioning",
       "All features from Plus",
     ],
   },

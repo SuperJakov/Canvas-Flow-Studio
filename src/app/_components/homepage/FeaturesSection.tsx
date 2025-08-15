@@ -59,9 +59,7 @@ export default function FeaturesSection() {
           <div className="flex-shrink-0 px-8 md:pl-16 lg:pr-16 lg:pl-36">
             <h2 className="text-4xl leading-tight font-bold whitespace-nowrap lg:text-5xl">
               <span className="block">What you&rsquo;ll unlock with</span>
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Canvas Flow Studio
-              </span>
+              <span className="text-primary">Canvas Flow Studio</span>
             </h2>
           </div>
 
