@@ -21,17 +21,46 @@ export const getRemainingCreditsPublic = query({
   },
 });
 
-export const getRemainingCredits = internalQuery({
-  args: {
-    userId: v.string(),
-    creditType: CreditType,
-  },
-  handler: async (ctx, { userId, creditType }) => {
-    const imageCredits = await creditsAggregate.sum(ctx, {
-      bounds: { prefix: [userId, creditType] },
-    });
+export const FREE_CREDITS = {
+  image: 20,
+  speech: 5,
+  website: 1,
+};
 
-    return imageCredits;
+export const refillFreeCredits = internalMutation({
+  handler: async (ctx) => {
+    const freeUsers = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("plan"), "Free"))
+      .collect();
+
+    for (const user of freeUsers) {
+      const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+      if (!user.lastCreditTopUp || user.lastCreditTopUp < thirtyDaysAgo) {
+        await ctx.runMutation(internal.credits.addCredits, {
+          userId: user.externalId,
+          creditType: "image",
+          creditAmount: FREE_CREDITS.image,
+          type: "trial",
+        });
+        await ctx.runMutation(internal.credits.addCredits, {
+          userId: user.externalId,
+          creditType: "speech",
+          creditAmount: FREE_CREDITS.speech,
+          type: "trial",
+        });
+        await ctx.runMutation(internal.credits.addCredits, {
+          userId: user.externalId,
+          creditType: "website",
+          creditAmount: FREE_CREDITS.website,
+          type: "trial",
+        });
+
+        await ctx.db.patch(user._id, {
+          lastCreditTopUp: BigInt(Date.now()),
+        });
+      }
+    }
   },
 });
 
@@ -52,6 +81,41 @@ export const spendCredits = internalMutation({
     });
     const doc = await ctx.db.get(id);
     await creditsAggregate.insert(ctx, doc!);
+  },
+});
+
+export const manualRefill = internalMutation({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("externalId"), userId))
+      .first();
+
+    if (user && user.plan === "Free") {
+      await ctx.runMutation(internal.credits.addCredits, {
+        userId: user.externalId,
+        creditType: "image",
+        creditAmount: FREE_CREDITS.image,
+        type: "trial",
+      });
+      await ctx.runMutation(internal.credits.addCredits, {
+        userId: user.externalId,
+        creditType: "speech",
+        creditAmount: FREE_CREDITS.speech,
+        type: "trial",
+      });
+      await ctx.runMutation(internal.credits.addCredits, {
+        userId: user.externalId,
+        creditType: "website",
+        creditAmount: FREE_CREDITS.website,
+        type: "trial",
+      });
+
+      await ctx.db.patch(user._id, {
+        lastCreditTopUp: BigInt(Date.now()),
+      });
+    }
   },
 });
 

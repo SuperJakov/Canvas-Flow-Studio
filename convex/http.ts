@@ -57,6 +57,11 @@ http.route({
             creditAmount: 15,
             type: "signup",
           });
+
+          await ctx.runMutation(internal.users.setLastCreditTopUp, {
+            userId: event.data.id,
+            timestamp: Date.now(),
+          });
           break;
 
         case "user.updated":
