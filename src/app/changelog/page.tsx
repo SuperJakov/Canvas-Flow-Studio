@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { changelogs } from "./changelogs";
 import { formatDate, formatDistanceToNow, parseISO } from "date-fns";
+import nodeToString from "react-node-to-string";
 
 export const metadata: Metadata = {
   title: "Changelog | Latest Updates & New Features - Canvas Flow Studio",
@@ -31,7 +32,9 @@ export default function ChangelogPage() {
       "@type": "ListItem",
       position: index + 1,
       name: `Release ${log.date}`,
-      description: log.changes.join(" | "),
+      description: log.changes
+        .map((change) => nodeToString(change))
+        .join(" | "),
       datePublished: parseISO(log.date).toISOString(),
     })),
   };

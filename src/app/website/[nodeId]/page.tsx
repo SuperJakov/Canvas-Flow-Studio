@@ -1,7 +1,7 @@
 import { RedirectToSignIn } from "@clerk/nextjs";
 import { api } from "convex/_generated/api";
 import { preloadQuery } from "convex/nextjs";
-import { redirect } from "node_modules/next/navigation";
+// import { redirect } from "node_modules/next/navigation";
 import { getConvexToken } from "~/helpers/getConvexToken";
 import WebsiteNodePageClient from "../WebsiteNodePageClient";
 
@@ -23,7 +23,7 @@ export default async function WebsiteNodePage(props: Props) {
       nodeId,
     },
   );
-  if (!preloadedWebsiteNode._valueJSON) redirect("/whiteboards");
+  // if (!preloadedWebsiteNode._valueJSON) redirect("/whiteboards");
 
   return <WebsiteNodePageClient preloadedWebsiteNode={preloadedWebsiteNode} />;
 }

@@ -108,7 +108,7 @@ const templates = [
     href: "/template/content-creation",
     title: "Content Creation",
     description:
-      "Create blog posts, social media content, and visuals from a single topic.",
+      "Create anything you want from a single topic using the website node.",
     icon: FileText,
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
     hoverColorClass: "group-hover:text-purple-400",
