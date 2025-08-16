@@ -7,7 +7,7 @@ export default function CTASection() {
     <section className="px-4 py-16 sm:px-6 lg:px-8">
       <div className="border-primary/30 from-primary/10 via-accent/10 to-chart-5/10 mx-auto max-w-4xl rounded-2xl border bg-gradient-to-r p-8 shadow-xl backdrop-blur-sm">
         <div className="text-center">
-          <h2 className="text-foreground mb-4 text-3xl font-bold">
+          <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
             Ready to Build Your AI Workflow?
           </h2>
           <p className="text-muted-foreground mb-8 text-xl">
@@ -19,7 +19,7 @@ export default function CTASection() {
               className="bg-primary text-primary-foreground hover:bg-primary/90 mx-auto flex w-full items-center justify-center rounded-lg px-8 py-4 font-medium shadow-lg transition-all hover:shadow-xl"
               size="xl"
             >
-              Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
+              Get Started for Free <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>

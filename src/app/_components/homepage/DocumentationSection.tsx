@@ -6,10 +6,8 @@ export default function DocumentationSection() {
   return (
     <section className="w-full px-4 py-16 shadow-lg sm:px-6 lg:px-8">
       <div className="p-8">
-        <h3 className="mb-4 text-center text-3xl font-extrabold">
-          <span className="bg-gradient-to-r from-blue-400 to-cyan-500 bg-clip-text text-transparent">
-            Comprehensive Documentation
-          </span>
+        <h3 className="mb-4 text-center text-3xl font-bold sm:text-4xl">
+          <span className="text-primary">Documentation</span>
         </h3>
 
         <div className="mx-auto mb-8 max-w-2xl text-center">

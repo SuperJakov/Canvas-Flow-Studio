@@ -42,9 +42,7 @@ export default function HowItWorksSection() {
       {/* Header */}
       <div className="mb-16 text-center">
         <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
-          <span className="bg-gradient-to-r from-[var(--chart-1)] via-[var(--chart-3)] to-[var(--chart-5)] bg-clip-text text-transparent">
-            How It Works
-          </span>
+          <span className="text-primary">How It Works</span>
         </h2>
         <p className="text-muted-foreground mx-auto max-w-2xl">
           Build powerful AI workflows in four simple steps

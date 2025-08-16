@@ -93,11 +93,11 @@ Each subscription tier comes with different rate limits for our core features. A
 
 ### Premium Features
 
-| Feature                           | Free Tier | Plus Tier | Pro Tier |
-| --------------------------------- | --------- | --------- | -------- |
-| **Workflow History & Versioning** | ❌        | ❌        | ✅       |
-| **Priority Support**              | ❌        | ✅        | ✅       |
-| **Beta features**                 | ❌        | ✅        | ✅       |
+| Feature                             | Free Tier | Plus Tier | Pro Tier |
+| ----------------------------------- | --------- | --------- | -------- |
+| **Whiteboard History & Versioning** | ❌        | ❌        | ✅       |
+| **Priority Support**                | ❌        | ✅        | ✅       |
+| **Beta features**                   | ❌        | ✅        | ✅       |
 
 If the user uses all limits they can each month, we won't have any profit. Of course, we don't expect the user to always reach the limits.
 

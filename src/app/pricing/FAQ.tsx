@@ -44,9 +44,7 @@ export default function FAQ() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold">
-            <span className="from-primary to-secondary bg-gradient-to-r bg-clip-text text-transparent">
-              Frequently Asked Questions
-            </span>
+            <span className="text-primary">Frequently Asked Questions</span>
           </h2>
           <p className="text-muted-foreground mt-3">
             Everything you need to know

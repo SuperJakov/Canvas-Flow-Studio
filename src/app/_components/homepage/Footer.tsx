@@ -18,7 +18,7 @@ export default function Footer() {
     <footer className="px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center justify-between space-y-6 pb-4 lg:flex-row lg:space-y-0">
         <div className="text-center lg:text-left">
-          <h2 className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent">
+          <h2 className="text-primary text-2xl font-bold">
             Canvas Flow Studio
           </h2>
           <p className="mt-1 text-sm sm:text-base">
