@@ -29,24 +29,22 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={nunito.variable}>
-      <ConvexAuthNextjsServerProvider>
-        <Providers>
-          <head>
-            {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
-              <script
-                crossOrigin="anonymous"
-                src="//unpkg.com/react-scan/dist/auto.global.js"
-                async={true}
-              />
-            )}
-          </head>
-          <body className="dark">
-            <Header />
-            {children}
-            <Toaster />
-          </body>
-        </Providers>
-      </ConvexAuthNextjsServerProvider>
+      <Providers>
+        <head>
+          {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
+            <script
+              crossOrigin="anonymous"
+              src="//unpkg.com/react-scan/dist/auto.global.js"
+              async={true}
+            />
+          )}
+        </head>
+        <body className="dark">
+          <Header />
+          {children}
+          <Toaster />
+        </body>
+      </Providers>
     </html>
   );
 }
