@@ -179,12 +179,12 @@ export default async function BlogPostPage({ params }: Props) {
   };
 
   return (
-    <>
+    <main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <BlogPost post={post} />
-    </>
+    </main>
   );
 }
