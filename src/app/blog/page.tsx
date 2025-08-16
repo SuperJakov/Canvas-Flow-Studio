@@ -56,7 +56,7 @@ export default async function BlogPage() {
   };
 
   return (
-    <>
+    <main>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -65,6 +65,6 @@ export default async function BlogPage() {
         <TopSection />
         <AllBlogPosts />
       </div>
-    </>
+    </main>
   );
 }
