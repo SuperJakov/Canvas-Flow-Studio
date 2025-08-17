@@ -20,7 +20,7 @@ export const features = [
   {
     title: "Process Chaining",
     description:
-      "Chain together multiple AI processes to create sophisticated automations and workflows.",
+      "Let the output of one step become the input for the next, creating powerful, multi-stage automations.",
     src: ProcessChaining,
   },
   {
