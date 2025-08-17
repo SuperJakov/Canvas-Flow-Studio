@@ -15,7 +15,6 @@ jobs:
     env:
       SKIP_ENV_VALIDATION: "true"
       BASE_URL: "http://localhost:3000"
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
     permissions:
       actions: read
       contents: read
@@ -67,9 +66,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Build Next.js app
-        run: pnpm build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
