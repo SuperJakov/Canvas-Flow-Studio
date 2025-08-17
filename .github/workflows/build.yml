@@ -14,6 +14,7 @@ jobs:
       SKIP_ENV_VALIDATION: "true"
       BASE_URL: "http://localhost:3000"
       NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_JA=="
 
     steps:
       - name: Checkout code
