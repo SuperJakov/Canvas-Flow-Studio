@@ -6,7 +6,9 @@
   "scripts": {
     "build": "next build --turbopack",
     "check": "pnpm lint && pnpm typecheck",
-    "dev": "next dev --turbo",
+    "dev": "concurrently \"pnpm dev:frontend\" \"pnpm dev:backend\"",
+    "dev:frontend": "next dev --turbo",
+    "dev:backend": "convex dev",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "lint": "cross-env SKIP_ENV_VALIDATION=true next lint",
@@ -77,6 +79,7 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@typescript/native-preview": "7.0.0-dev.20250812.1",
+    "concurrently": "^9.2.0",
     "cross-env": "^10.0.0",
     "eslint": "^9.33.0",
     "eslint-config-next": "^15.4.6",

@@ -3,34 +3,34 @@ export default function HowItWorksSection() {
     {
       number: 1,
       title: "Create Your Foundation",
-      description:
-        "Start by dragging input nodes onto the canvas. These are the building blocks for your AI workflow.",
-      color: "bg-primary",
-      textColor: "text-primary-foreground",
+      description: "Start by dragging input nodes onto the canvas.",
+      color: "border-primary text-primary",
+      hoverColor: "group-hover:bg-primary group-hover:text-primary-foreground",
     },
     {
       number: 2,
       title: "Build Connections",
       description:
         "Connect nodes to build your workflow. Link different types of nodes and experiment to see what you can create.",
-      color: "bg-chart-4",
-      textColor: "text-primary-foreground",
+      color: "border-chart-4 text-chart-4",
+      hoverColor: "group-hover:bg-chart-4 group-hover:text-primary-foreground",
     },
     {
       number: 3,
       title: "Chain & Transform",
       description:
         "Use the output of one node as the input for another to create more powerful and complex workflows.",
-      color: "bg-chart-3",
-      textColor: "text-background",
+      color: "border-chart-3 text-chart-3",
+      hoverColor: "group-hover:bg-chart-3 group-hover:text-background",
     },
     {
       number: 4,
       title: "Execute & Refine",
       description:
-        "Run your entire workflow with one click and see the results instantly. You can easily make changes, and all your work is saved automatically.",
-      color: "bg-destructive",
-      textColor: "text-destructive-foreground",
+        "Run your entire workflow with one click and see the results. You can easily make changes, and all your work is saved automatically.",
+      color: "border-destructive text-destructive",
+      hoverColor:
+        "group-hover:bg-destructive group-hover:text-destructive-foreground",
     },
   ];
 
@@ -49,38 +49,40 @@ export default function HowItWorksSection() {
         </p>
       </div>
 
-      {/* Steps */}
-      <div className="mx-auto max-w-4xl">
-        <div className="grid gap-8 md:gap-12">
+      {/* Steps with Single-Sided Layout */}
+      <div className="relative mx-auto max-w-4xl">
+        <div className="space-y-8">
           {steps.map((step, index) => (
             <div
               key={step.number}
               className="group relative flex items-start gap-6 md:gap-8"
             >
-              {/* Connection Line */}
+              {/* Conditionally render the connecting line */}
               {index < steps.length - 1 && (
-                <div className="bg-border absolute top-12 left-5 z-0 h-full w-0.5 md:left-6" />
+                <div className="bg-border absolute top-12 left-6 z-0 h-full w-0.5 -translate-x-1/2" />
               )}
 
               {/* Step Number Circle */}
-              <div
-                className={`${step.color} relative z-10 mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl md:h-12 md:w-12`}
-              >
-                <span
-                  className={`${step.textColor} text-sm font-bold select-none md:text-base`}
+              <div className="bg-background relative z-10 mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 shadow-lg transition-all duration-300 ease-in-out group-hover:scale-110">
+                <div
+                  className={`flex h-full w-full items-center justify-center rounded-full ${step.color} ${step.hoverColor}`}
                 >
-                  {step.number}
-                </span>
+                  <span className="text-lg font-bold select-none">
+                    {step.number}
+                  </span>
+                </div>
               </div>
 
-              {/* Step Content */}
-              <div className="flex-1 pb-2">
-                <h3 className="text-foreground group-hover:text-primary mb-3 text-xl font-semibold transition-colors duration-300">
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+              {/* Step Content Card */}
+              <div className="flex-1">
+                <div className="bg-card/60 border-border/60 hover:border-primary/80 transform-gpu rounded-lg border p-6 shadow-md backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:-translate-y-1">
+                  <h3 className="text-foreground mb-2 text-xl font-semibold">
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

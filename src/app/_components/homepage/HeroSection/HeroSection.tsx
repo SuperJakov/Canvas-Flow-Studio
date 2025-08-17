@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import RotatingWords from "./HeroSection/RotatingWords";
-import DynamicAnimatedBackground from "./HeroSection/DynamicAnimatedBackground";
+import RotatingWords from "./RotatingWords";
+import DynamicAnimatedBackground from "./DynamicAnimatedBackground";
 
 export default function HeroSection() {
   return (
