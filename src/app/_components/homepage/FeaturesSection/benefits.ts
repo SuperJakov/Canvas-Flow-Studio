@@ -9,7 +9,7 @@ export const benefits = [
     description:
       "Go from idea to a fully functional AI workflow faster than ever. Our drag-and-drop canvas makes building complex systems surprisingly simple.",
 
-    src: IntuitiveCanvas,
+    src: undefined,
   },
   {
     title: "The Best AI, Instantly",

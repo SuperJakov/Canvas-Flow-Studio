@@ -93,7 +93,7 @@ export default function BenefitsSection() {
                 </div>
               )}
 
-              <p className="text-muted-foreground break-words whitespace-normal">
+              <p className="text-muted-foreground min-h-[100px] break-words whitespace-normal">
                 {benefit.description}
               </p>
             </div>
