@@ -21,8 +21,8 @@ export default function ThrowErrorPage() {
     <div className="bg-background flex min-h-screen items-center justify-center px-4">
       <Card className="mx-auto max-w-md">
         <CardHeader className="text-center">
-          <div className="to-destructive mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 shadow-lg">
-            <AlertTriangle className="h-6 w-6 text-white" />
+          <div className="bg-destructive mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+            <AlertTriangle className="text-destructive-foreground h-6 w-6" />
           </div>
           <CardTitle className="text-2xl">Error Testing Page</CardTitle>
         </CardHeader>
@@ -31,11 +31,7 @@ export default function ThrowErrorPage() {
             Click the button below to throw an example error and test the error
             boundary.
           </p>
-          <Button
-            onClick={throwError}
-            variant="destructive"
-            className="from-destructive text-destructive-foreground bg-gradient-to-r to-red-600 shadow-lg hover:scale-[1.02] hover:shadow-xl"
-          >
+          <Button onClick={throwError} variant="destructive">
             <AlertTriangle className="mr-2 h-4 w-4" />
             Throw Test Error
           </Button>
