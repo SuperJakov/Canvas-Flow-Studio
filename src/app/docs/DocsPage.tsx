@@ -1,7 +1,7 @@
-import Sidebar from "./components/Sidebar";
-import ChapterContent from "./components/ChapterContent";
+import Sidebar from "../_components/docs/Sidebar";
+import ChapterContent from "../_components/docs/ChapterContent";
 import { chapters } from "./chapters";
-import { MobileMenuButton } from "./components/MobileMenuButton";
+import { MobileMenuButton } from "../_components/docs/MobileMenuButton";
 import { contentMap } from "./contentMap";
 
 type Props = {
