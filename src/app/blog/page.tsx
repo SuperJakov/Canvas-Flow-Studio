@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import TopSection from "../_components/blog/TopSection";
 import AllBlogPosts from "../_components/blog/AllBlogPosts";
 import { getBaseUrl } from "~/helpers/baseurl";
+import { blogs } from "../_components/blog/blogs";
 
 const baseUrl = getBaseUrl();
 
@@ -53,6 +54,17 @@ export default async function BlogPage() {
         url: `${baseUrl}/logo.png`,
       },
     },
+    blogPost: blogs.map(post => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      url: `${baseUrl}/blog/${post.slug}`,
+      datePublished: post.date,
+      image: typeof post.thumbnail === "string" ? post.thumbnail : post.thumbnail.src,
+      author: {
+        "@type": "Person",
+        name: post.author.name,
+      },
+    })),
   };
 
   return (
