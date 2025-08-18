@@ -40,11 +40,11 @@ export default function HowItWorksSection() {
       className="container mx-auto px-4 py-20 sm:px-6 lg:px-8"
     >
       {/* Header */}
-      <div className="mb-16 text-center">
-        <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
+      <div className="mx-auto mb-10 max-w-2xl space-y-4 text-center">
+        <h2 className="text-3xl font-bold sm:text-4xl">
           <span className="text-primary">How It Works</span>
         </h2>
-        <p className="text-muted-foreground mx-auto max-w-2xl">
+        <p className="text-muted-foreground">
           Build powerful AI workflows in four simple steps
         </p>
       </div>

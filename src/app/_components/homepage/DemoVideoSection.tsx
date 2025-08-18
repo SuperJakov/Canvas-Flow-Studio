@@ -75,24 +75,28 @@ export default function DemoImageSection(): JSX.Element {
   return (
     <section id="demo" className="container mx-auto px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <motion.h2
-          className="mb-8 text-center text-3xl font-bold sm:text-4xl"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-primary">See Canvas Flow Studio in Action</span>
-        </motion.h2>
+        <div className="mx-auto mb-10 max-w-2xl space-y-4 text-center">
+          <motion.h2
+            className="text-3xl font-bold sm:text-4xl"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="text-primary">
+              See Canvas Flow Studio in Action
+            </span>
+          </motion.h2>
 
-        <motion.p
-          className="mb-10 text-center text-xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          Watch how easy it is to create and run AI-powered workflows with our
-          visual canvas
-        </motion.p>
+          <motion.p
+            className="text-muted-foreground"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Watch how easy it is to create and run AI-powered workflows with our
+            visual canvas
+          </motion.p>
+        </div>
 
         <motion.div
           className="bg-secondary relative overflow-hidden rounded-xl border-2 shadow-2xl shadow-purple-900/20"
