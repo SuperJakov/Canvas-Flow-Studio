@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
         pathname: "/api/storage/**",
       },
     ],
+    qualities: [50, 75, 85, 90, 100],
   },
 
   async headers() {
