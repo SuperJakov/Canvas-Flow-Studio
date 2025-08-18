@@ -82,12 +82,15 @@ export default function Templates() {
       className="text-foreground container mx-auto px-4 py-8 pt-20 sm:px-6 lg:px-8"
       id="templates"
     >
-      <h1 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-        <span className="text-primary">Get Started with an Example</span>
-      </h1>
-      <p className="mb-10 text-center text-xl">
-        Jump-start your workflow with one of our pre-built templates
-      </p>
+      <div className="mx-auto mb-10 max-w-2xl space-y-8 text-center">
+        <h1 className="text-center text-3xl font-bold sm:text-4xl">
+          <span className="text-primary">Get Started with an Example</span>
+        </h1>
+        <p className="text-muted-foreground text-center text-xl">
+          Jump-start your workflow with one of our pre-built templates
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {templates.map((template) => (
           <Link
