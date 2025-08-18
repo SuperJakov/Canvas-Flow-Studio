@@ -1,3 +1,3 @@
-import FeaturesSection from "./FeaturesSection";
+import BenefitsSection from "./BenefitsSection";
 
-export default FeaturesSection;
+export default BenefitsSection;

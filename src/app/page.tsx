@@ -1,6 +1,6 @@
 import HeroSection from "./_components/homepage/HeroSection";
 import DemoVideoSection from "./_components/homepage/DemoVideoSection";
-import FeaturesSection from "./_components/homepage/FeaturesSection";
+import BenefitsSection from "./_components/homepage/FeaturesSection";
 import HowItWorksSection from "./_components/homepage/HowItWorksSection";
 import TemplatesSection from "./_components/homepage/TemplatesSection";
 import DocumentationSection from "./_components/homepage/DocumentationSection";
@@ -16,8 +16,8 @@ export default function HomePage() {
       {/* Demo Video Section */}
       <DemoVideoSection />
 
-      {/* Features Section */}
-      <FeaturesSection />
+      {/* Benefits Section */}
+      <BenefitsSection />
 
       {/* How It Works Section */}
       <HowItWorksSection />

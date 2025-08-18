@@ -3,11 +3,11 @@ import { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
-import { features } from "./features";
+import { benefits } from "./benefits";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function FeaturesSection() {
+export default function BenefitsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
 
@@ -64,20 +64,20 @@ export default function FeaturesSection() {
           </div>
 
           {/* Feature cards */}
-          {features.map((feature, index) => (
+          {benefits.map((benefit, index) => (
             <div
               key={index}
               className="bg-card w-80 flex-shrink-0 rounded-xl border p-6 shadow-md transition hover:border-purple-700/50 hover:shadow-purple-900/20"
             >
               <div className="mb-4">
-                <h3 className="text-xl font-semibold">{feature.title}</h3>
+                <h3 className="text-xl font-semibold">{benefit.title}</h3>
               </div>
 
-              {feature.src ? (
+              {benefit.src ? (
                 <div className="mb-4 aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700">
                   <Image
-                    src={feature.src}
-                    alt={feature.title}
+                    src={benefit.src}
+                    alt={benefit.title}
                     placeholder="blur"
                     loading="eager"
                     className="h-full w-full object-cover"
@@ -94,7 +94,7 @@ export default function FeaturesSection() {
               )}
 
               <p className="text-muted-foreground break-words whitespace-normal">
-                {feature.description}
+                {benefit.description}
               </p>
             </div>
           ))}
