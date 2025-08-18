@@ -54,12 +54,15 @@ export default async function BlogPage() {
         url: `${baseUrl}/logo.png`,
       },
     },
-    blogPost: blogs.map(post => ({
+    blogPost: blogs.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       url: `${baseUrl}/blog/${post.slug}`,
       datePublished: post.date,
-      image: typeof post.thumbnail === "string" ? post.thumbnail : post.thumbnail.src,
+      image:
+        typeof post.thumbnail === "string"
+          ? post.thumbnail
+          : post.thumbnail.src,
       author: {
         "@type": "Person",
         name: post.author.name,
