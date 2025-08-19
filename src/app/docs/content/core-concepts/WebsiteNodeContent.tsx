@@ -4,6 +4,8 @@ import TheLuminousDeep from "public/the_luminous_deep.png";
 import StarlightCinema from "public/starlight_cinema.png";
 import PageTitle from "../../components/PageTitle";
 import WebsiteNodeUsage from "public/website_node_usage.png";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
 
 export default function WebsiteNodeContent() {
   return (
@@ -51,8 +53,15 @@ export default function WebsiteNodeContent() {
         src={TheLuminousDeep}
         alt="The Luminous Deep"
         placeholder="blur"
-        className="my-5 rounded-lg outline-2 outline-white select-none"
+        className="mt-5 rounded-lg outline-2 outline-white select-none"
       />
+      <div className="flex justify-center">
+        <Button asChild className="my-2 mb-5">
+          <Link href="/template/the-luminous-deep">
+            Try out The Luminous Deep
+          </Link>
+        </Button>
+      </div>
 
       <h2 className="pb-1 text-lg font-semibold">Starlight Cinema</h2>
       <p>
@@ -63,8 +72,13 @@ export default function WebsiteNodeContent() {
         src={StarlightCinema}
         alt="Starlight Cinema"
         placeholder="blur"
-        className="my-5 rounded-lg outline-2 outline-white select-none"
+        className="mt-5 rounded-lg outline-2 outline-white select-none"
       />
+      <div className="flex justify-center">
+        <Button asChild className="my-2 mb-5">
+          <Link href="/template/local-event">Try out The Starlight Cinema</Link>
+        </Button>
+      </div>
     </main>
   );
 }
