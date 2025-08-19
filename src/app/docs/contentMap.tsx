@@ -1,8 +1,8 @@
-import IntroductionContent from "./content/IntroductionContent";
-import FirstFlowContent from "./content/FirstFlowContent";
-import CanvasContent from "./content/CanvasContent";
-import NodesConnectionsContent from "./content/NodesConnectionsContent";
-import TextNodeContent from "./content/TextNodeContent";
+import IntroductionContent from "./content/getting-started/IntroductionContent";
+import FirstFlowContent from "./content/getting-started/FirstFlowContent";
+import CanvasContent from "./content/getting-started/CanvasContent";
+import NodesConnectionsContent from "./content/core-concepts/NodesConnectionsContent";
+import TextNodeContent from "./content/core-concepts/TextNodeContent";
 import { type chapters } from "./chapters";
 import PageTitle from "./components/PageTitle";
 
