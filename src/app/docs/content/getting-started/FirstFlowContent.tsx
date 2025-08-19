@@ -27,7 +27,7 @@ function Step({
         </span>
       </div>
       <div>
-        <h2 className="mb-1 text-lg font-medium">{title}</h2>
+        <h2 className="mb-1 text-lg font-bold">{title}</h2>
         <p className="">{description}</p>
       </div>
     </div>
@@ -131,7 +131,7 @@ export default function FirstFlowContent() {
         />
         <Card>
           <CardContent className="flex flex-col gap-2">
-            <CardTitle as="h2" className="text-xl">
+            <CardTitle as="h2" className="text-xl font-bold">
               Congratulations!
             </CardTitle>
             <p>

@@ -32,7 +32,7 @@ export default function WebsiteNodeContent() {
       </div>
       <Separator className="my-4" />
 
-      <h2 className="pb-1 text-lg font-semibold">Usage</h2>
+      <h2 className="pb-1 text-lg font-bold">Usage</h2>
       <p>Simply connect text nodes to a website node and run it!</p>
       <Image
         src={WebsiteNodeUsage}
@@ -41,7 +41,7 @@ export default function WebsiteNodeContent() {
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
 
-      <h2 className="pb-1 text-lg font-semibold">The Luminous Deep</h2>
+      <h2 className="pb-1 text-lg font-bold">The Luminous Deep</h2>
       <p>
         This example showcases how a text prompt describing the desired content,
         layout, and theme in this case, the world of bioluminescence, can be
@@ -63,7 +63,7 @@ export default function WebsiteNodeContent() {
         </Button>
       </div>
 
-      <h2 className="pb-1 text-lg font-semibold">Starlight Cinema</h2>
+      <h2 className="pb-1 text-lg font-bold">Starlight Cinema</h2>
       <p>
         This example demonstrates a fun, informative, single-purpose website for
         an event.
