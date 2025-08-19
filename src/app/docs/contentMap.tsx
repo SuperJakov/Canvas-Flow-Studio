@@ -5,6 +5,7 @@ import NodesConnectionsContent from "./content/core-concepts/NodesConnectionsCon
 import TextNodeContent from "./content/core-concepts/TextNodeContent";
 import { type chapters } from "./chapters";
 import PageTitle from "./components/PageTitle";
+import WebsiteNodeContent from "./content/core-concepts/WebsiteNodeContent";
 
 type ChapterStructure = {
   [K in (typeof chapters)[number] as K["slug"]]: {
@@ -21,6 +22,7 @@ export const contentMap: ChapterStructure = {
   "core-concepts": {
     "nodes-connections": NodesConnectionsContent,
     "text-node": TextNodeContent,
+    "website-node": () => <WebsiteNodeContent />,
   },
   "advanced-usage": {
     "complex-workflows": () => <Placeholder title="Complex Workflows" />,
