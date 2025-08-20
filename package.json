@@ -13,7 +13,8 @@
     "lint:fix": "cross-env SKIP_ENV_VALIDATION=true next lint --fix",
     "preview": "pnpm build && pnpm start",
     "start": "next start",
-    "typecheck": "cross-env SKIP_ENV_VALIDATION=true tsgo --noEmit"
+    "typecheck": "cross-env SKIP_ENV_VALIDATION=true tsgo --noEmit",
+    "build:cf": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@clerk/backend": "^2.7.1",
