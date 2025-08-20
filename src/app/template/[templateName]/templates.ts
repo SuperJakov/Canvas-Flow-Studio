@@ -10,9 +10,13 @@ import {
   Image as ImageIcon,
   MessageSquare,
   PieChart,
+  Sparkles,
+  Ticket,
   Users,
 } from "lucide-react";
 import { contentCreationTemplate } from "./contentCreation";
+import { theLuminousDeepTemplate } from "./theLuminousDeep";
+import { localEventTemplate } from "./localEvent";
 
 export type Template = {
   title: string;
@@ -87,6 +91,22 @@ const templates: TemplateMap = {
     workInProgress: true,
     nodes: [],
     edges: [],
+  },
+  "the-luminous-deep": {
+    ...theLuminousDeepTemplate,
+    description: "A journey into the world of living light.",
+    icon: Sparkles,
+    iconBg: "bg-gradient-to-r from-cyan-600 to-blue-600",
+    hoverClasses: "hover:border-cyan-500/50 hover:shadow-cyan-900/20",
+    titleClasses: "group-hover:text-cyan-400",
+  },
+  "local-event": {
+    ...localEventTemplate,
+    description: "Create a webpage for a local event.",
+    icon: Ticket,
+    iconBg: "bg-gradient-to-r from-lime-600 to-green-600",
+    hoverClasses: "hover:border-lime-500/50 hover:shadow-lime-900/20",
+    titleClasses: "group-hover:text-lime-400",
   },
 };
 

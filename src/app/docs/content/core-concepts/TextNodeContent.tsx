@@ -20,7 +20,7 @@ export default function TextNodeContent() {
 
       <Separator className="my-4" />
 
-      <h2 className="pb-1 text-lg font-semibold">Text to Text Connection</h2>
+      <h2 className="pb-1 text-lg font-bold">Text to Text Connection</h2>
       <p>
         Connecting two Text Nodes results in the content of the source node
         being copied to the target node. While not a frequent use case, it can
@@ -33,7 +33,7 @@ export default function TextNodeContent() {
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
 
-      <h2 className="pb-1 text-lg font-semibold">Text to Image Generation</h2>
+      <h2 className="pb-1 text-lg font-bold">Text to Image Generation</h2>
       <p>
         This is where the magic happens. Connecting a Text Node to an Image Node
         allows you to generate images using AI. You can even connect multiple
@@ -47,7 +47,7 @@ export default function TextNodeContent() {
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
 
-      <h2 className="pb-1 text-lg font-semibold">
+      <h2 className="pb-1 text-lg font-bold">
         Modifying Text with an Instruction
       </h2>
       <p>
@@ -61,7 +61,7 @@ export default function TextNodeContent() {
         placeholder="blur"
         className="my-5 rounded-lg outline-2 outline-white select-none"
       />
-      <h2 className="pb-1 text-lg font-semibold">
+      <h2 className="pb-1 text-lg font-bold">
         Instruction-driven Image Generation
       </h2>
       <p>

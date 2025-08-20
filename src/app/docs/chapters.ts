@@ -17,6 +17,7 @@ export const chapters: DocChapter[] = [
     sections: [
       { title: "Nodes & Connections", slug: "nodes-connections" },
       { title: "Text Node", slug: "text-node" },
+      { title: "Website Node", slug: "website-node" },
     ],
   },
   {
