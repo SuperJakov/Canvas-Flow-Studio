@@ -10,6 +10,8 @@ import { Authenticated, AuthLoading } from "convex/react";
 import * as Sentry from "@sentry/nextjs";
 import Loading from "./loading";
 
+export const runtime = "edge";
+
 export default function NotFound() {
   const [eventId, setEventId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
