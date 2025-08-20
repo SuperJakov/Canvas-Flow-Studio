@@ -3,7 +3,7 @@
 import { Delete } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import PageTitle from "../components/PageTitle";
+import PageTitle from "../../components/PageTitle";
 
 export default function CanvasContent() {
   return (
@@ -21,7 +21,7 @@ export default function CanvasContent() {
           <Card className="gap-2.5">
             <CardHeader>
               <div className="inline-flex items-center gap-1">
-                <CardTitle>Sidebar</CardTitle>
+                <CardTitle className="font-bold">Sidebar</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -53,7 +53,7 @@ export default function CanvasContent() {
 
           <Card className="gap-2.5">
             <CardHeader>
-              <CardTitle>Canvas Area</CardTitle>
+              <CardTitle className="font-bold">Canvas Area</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -84,7 +84,7 @@ export default function CanvasContent() {
 
           <Card className="gap-2.5">
             <CardHeader>
-              <CardTitle>Connections</CardTitle>
+              <CardTitle className="font-bold">Connections</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="">
@@ -103,7 +103,7 @@ export default function CanvasContent() {
 
         <Card className="gap-2.5">
           <CardHeader>
-            <CardTitle>Canvas Controls</CardTitle>
+            <CardTitle className="font-bold">Canvas Controls</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

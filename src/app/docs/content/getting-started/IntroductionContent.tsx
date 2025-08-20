@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "~/components/ui/separator";
-import PageTitle from "../components/PageTitle";
+import PageTitle from "../../components/PageTitle";
 
 export default function IntroductionContent() {
   return (
@@ -12,9 +12,7 @@ export default function IntroductionContent() {
 
         <Separator className="my-6" />
 
-        <h2 className="pb-2 text-2xl font-black">
-          What is Canvas Flow Studio?
-        </h2>
+        <h2 className="pb-2 text-2xl font-bold">What is Canvas Flow Studio?</h2>
 
         <p>
           Canvas Flow Studio is an app which is used to create AI-powered

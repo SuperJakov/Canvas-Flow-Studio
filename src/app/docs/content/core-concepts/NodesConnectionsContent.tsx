@@ -8,7 +8,7 @@ import {
   Lightbulb,
   Type,
 } from "lucide-react";
-import PageTitle from "../components/PageTitle";
+import PageTitle from "../../components/PageTitle";
 
 export default function NodesConnectionsContent() {
   return (

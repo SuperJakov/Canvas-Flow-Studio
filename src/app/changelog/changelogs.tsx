@@ -7,6 +7,13 @@ export type ChangeLog = {
 
 export const changelogs: ChangeLog[] = [
   {
+    date: "2025-08-19",
+    changes: [
+      "Updated documentation for Website Node.",
+      "Added 3 new templates for Website Node.",
+    ],
+  },
+  {
     date: "2025-08-15",
     changes: ["Added new template: Content Creation."],
   },
