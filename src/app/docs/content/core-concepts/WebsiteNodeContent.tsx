@@ -29,6 +29,7 @@ export default function WebsiteNodeContent() {
           are working to optimize this duration. Future development will expand
           the node&apos;s capabilities, including support for web-based images.
         </p>
+        <p>A more detailed prompt will produce better and faster results.</p>
       </div>
       <Separator className="my-4" />
 
