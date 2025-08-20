@@ -17,7 +17,7 @@ const withPwa = nextPwa({
 const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
-    ppr: true,
+    ppr: false,
   },
   images: {
     remotePatterns: [
