@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import nextPwa from "next-pwa";
 import { withSentryConfig } from "@sentry/nextjs";
 import "./src/env.js";
+import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
+
+if (process.env.NODE_ENV === "development") {
+  await setupDevPlatform();
+}
 
 const withPwa = nextPwa({
   dest: "public",
@@ -12,7 +17,7 @@ const withPwa = nextPwa({
 const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
-    ppr: false,
+    ppr: true,
   },
   images: {
     remotePatterns: [

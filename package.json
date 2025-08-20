@@ -14,7 +14,8 @@
     "preview": "pnpm build && pnpm start",
     "start": "next start",
     "typecheck": "cross-env SKIP_ENV_VALIDATION=true tsgo --noEmit",
-    "build:cf": "npx @cloudflare/next-on-pages"
+    "build:cf": "npx @cloudflare/next-on-pages",
+    "analyze": "cross-env ANALYZE=true pnpm build"
   },
   "dependencies": {
     "@clerk/backend": "^2.7.1",
@@ -70,6 +71,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.14",
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/lodash": "^4.17.20",
@@ -81,6 +83,7 @@
     "cross-env": "^10.0.0",
     "eslint": "^9.33.0",
     "eslint-config-next": "^15.4.6",
+    "eslint-plugin-next-on-pages": "^1.13.14",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",

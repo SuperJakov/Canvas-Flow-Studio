@@ -7,8 +7,6 @@ import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { Header } from "./_components/Header";
 import { Toaster } from "~/components/ui/sonner";
 
-export const runtime = "edge";
-
 export const metadata: Metadata = {
   title: "Canvas Flow Studio",
   description:

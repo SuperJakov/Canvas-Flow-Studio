@@ -7,6 +7,8 @@ import CTASection from "./_components/homepage/CTASection";
 import HowItWorksSection from "./_components/homepage/HowItWorksSection";
 import HeroSection from "./_components/homepage/HeroSection";
 
+export const runtime = "edge";
+
 export default function HomePage() {
   return (
     <div className="bg-background text-foreground min-h-screen bg-gradient-to-b">
