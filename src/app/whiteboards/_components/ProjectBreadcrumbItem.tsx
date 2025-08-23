@@ -9,6 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import type { Route } from "next";
 
 function ProjectBreadcrumbItem({
   projectId,
@@ -33,7 +34,9 @@ function ProjectBreadcrumbItem({
           <BreadcrumbPage>{project.name}</BreadcrumbPage>
         ) : (
           <BreadcrumbLink
-            href={`/whiteboards/${projectIds.slice(0, projectIds.indexOf(projectId) + 1).join("/")}`}
+            href={
+              `/whiteboards/${projectIds.slice(0, projectIds.indexOf(projectId) + 1).join("/")}` as Route
+            }
             prefetch={true}
           >
             {project.name}

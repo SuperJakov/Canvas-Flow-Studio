@@ -19,6 +19,7 @@ export const templates = [
     hoverClasses: "hover:border-orange-500/50 hover:shadow-orange-900/20",
     hoverColorClass: "group-hover:text-orange-400",
     workInProgress: false,
+    unlisted: false,
   },
   {
     href: "/template/company-meeting",
@@ -29,6 +30,7 @@ export const templates = [
     hoverClasses: "hover:border-blue-500/50 hover:shadow-blue-900/20",
     hoverColorClass: "group-hover:text-blue-400",
     workInProgress: false,
+    unlisted: false,
   },
   {
     href: "/template/content-creation",
@@ -39,6 +41,7 @@ export const templates = [
     hoverClasses: "hover:border-purple-500/50 hover:shadow-purple-900/20",
     hoverColorClass: "group-hover:text-purple-400",
     workInProgress: false,
+    unlisted: false,
   },
   {
     href: "/template/image-generation",
@@ -49,6 +52,7 @@ export const templates = [
     hoverClasses: "hover:border-pink-500/50 hover:shadow-pink-900/20",
     hoverColorClass: "group-hover:text-pink-400",
     workInProgress: false,
+    unlisted: false,
   },
   {
     href: "/template/language-translation",
@@ -59,6 +63,7 @@ export const templates = [
     hoverClasses: "hover:border-green-500/50 hover:shadow-green-900/20",
     hoverColorClass: "group-hover:text-green-400",
     workInProgress: false,
+    unlisted: false,
   },
   {
     href: "/template/data-analysis",
@@ -69,6 +74,7 @@ export const templates = [
     hoverClasses: "hover:border-teal-500/50 hover:shadow-teal-900/20",
     hoverColorClass: "group-hover:text-teal-400",
     workInProgress: true,
+    unlisted: false,
   },
   {
     href: "/template/the-luminous-deep",
@@ -88,4 +94,4 @@ export const templates = [
     hoverColorClass: "group-hover:text-lime-400",
     unlisted: true,
   },
-];
+] as const;

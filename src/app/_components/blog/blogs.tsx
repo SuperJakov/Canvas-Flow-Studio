@@ -7,6 +7,7 @@ import IntroducingWebsiteNodeContent from "./IntroducingWebsiteNodeContent";
 import { BodyP, Card, EmLink, H2, Section } from "./common";
 import type { StaticImageData } from "next/image";
 import type { FC } from "react";
+import type { Route } from "next";
 
 type Blog = {
   slug: string;
@@ -72,7 +73,7 @@ const KeyFeatures = () => (
       <FeatureItem index={2} title="Nodes">
         Text, image, instruction, and comment nodes - all working together.
         Learn more in the{" "}
-        <EmLink href="/docs/core-concepts/nodes-connections">
+        <EmLink href={"/docs/core-concepts/nodes-connections" as Route}>
           documentation
         </EmLink>
         .

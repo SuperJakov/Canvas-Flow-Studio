@@ -12,7 +12,6 @@ const withPwa = nextPwa({
 const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
-    ppr: true,
   },
   images: {
     remotePatterns: [
@@ -57,6 +56,7 @@ const nextConfig: NextConfig = {
   },
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
+  typedRoutes: true,
 };
 
 const configWithSentry = withSentryConfig(withPwa(nextConfig), {
