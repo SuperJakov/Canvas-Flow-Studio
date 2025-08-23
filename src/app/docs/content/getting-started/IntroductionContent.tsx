@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "~/components/ui/separator";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../../_components/docs/PageTitle";
 
 export default function IntroductionContent() {
   return (

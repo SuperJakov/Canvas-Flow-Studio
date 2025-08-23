@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
 import nextPwa from "next-pwa";
 import { withSentryConfig } from "@sentry/nextjs";
 import "./src/env.js";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+  openAnalyzer: true,
+});
 
 const withPwa = nextPwa({
   dest: "public",
@@ -21,6 +27,7 @@ const nextConfig: NextConfig = {
         pathname: "/api/storage/**",
       },
     ],
+    qualities: [50, 75, 85, 90, 100],
   },
 
   async headers() {
@@ -59,17 +66,19 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
 };
 
-const configWithSentry = withSentryConfig(withPwa(nextConfig), {
-  org: "y-fq",
-  project: "ai-flow-studio",
-  // Only print logs for uploading source maps in CI
-  // Set to `true` to suppress logs
-  silent: !process.env.CI,
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-  reactComponentAnnotation: {
-    enabled: true,
-  },
-});
+const configWithSentry = withBundleAnalyzer(
+  withSentryConfig(withPwa(nextConfig), {
+    org: "y-fq",
+    project: "ai-flow-studio",
+    // Only print logs for uploading source maps in CI
+    // Set to `true` to suppress logs
+    silent: !process.env.CI,
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    disableLogger: true,
+    reactComponentAnnotation: {
+      enabled: true,
+    },
+  }),
+);
 
 export default configWithSentry;

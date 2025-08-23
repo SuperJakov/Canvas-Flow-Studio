@@ -14,14 +14,15 @@ export default function TemplatesSection() {
       className="container mx-auto px-4 pt-20 sm:px-6 lg:px-8"
       id="templates"
     >
-      <h2 className="mb-12 text-center text-3xl font-bold sm:text-4xl">
-        <span className="animate-[gradient-x_5s_ease_infinite] bg-gradient-to-r from-cyan-400 to-blue-500 bg-[length:200%_200%] bg-clip-text text-transparent">
-          Get Started with an Example
-        </span>
-      </h2>
-      <p className="mb-10 text-center text-xl">
-        Jump-start your workflow with one of our pre-built templates
-      </p>
+      <div className="mx-auto mb-10 max-w-2xl space-y-4 text-center">
+        <h2 className="text-3xl font-bold sm:text-4xl">
+          <span className="text-primary">Get Started with an Example</span>
+        </h2>
+        <p className="text-muted-foreground">
+          Jump-start your workflow with one of our pre-built templates
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visibleTemplates.map((template) => (
           <Link

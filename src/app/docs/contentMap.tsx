@@ -4,7 +4,7 @@ import CanvasContent from "./content/getting-started/CanvasContent";
 import NodesConnectionsContent from "./content/core-concepts/NodesConnectionsContent";
 import TextNodeContent from "./content/core-concepts/TextNodeContent";
 import { type chapters } from "./chapters";
-import PageTitle from "./components/PageTitle";
+import PageTitle from "../_components/docs/PageTitle";
 import WebsiteNodeContent from "./content/core-concepts/WebsiteNodeContent";
 
 type ChapterStructure = {

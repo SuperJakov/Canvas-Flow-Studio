@@ -6,7 +6,7 @@ import TextToImageExample from "public/text_to_image_example.png";
 import ModifyingTextExample from "public/modifying_text_example.png";
 import ModifyingText2Example from "public/modifying_text_2_example.png";
 import GeneratingSpeech from "public/speech_generation.png";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../../_components/docs/PageTitle";
 
 export default function TextNodeContent() {
   return (

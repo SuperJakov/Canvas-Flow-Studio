@@ -1,4 +1,4 @@
-import type { DocChapter } from "./components/Sidebar";
+import type { DocChapter } from "../_components/docs/Sidebar";
 
 // Documentation structure
 export const chapters: DocChapter[] = [

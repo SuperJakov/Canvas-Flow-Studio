@@ -2,7 +2,8 @@ import Image from "next/image";
 import { Separator } from "~/components/ui/separator";
 import TheLuminousDeep from "public/the_luminous_deep.png";
 import StarlightCinema from "public/starlight_cinema.png";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../../_components/docs/PageTitle";
+
 import WebsiteNodeUsage from "public/website_node_usage.png";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";

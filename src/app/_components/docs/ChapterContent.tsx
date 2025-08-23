@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
-import { chapters } from "../chapters";
+import { chapters } from "../../docs/chapters";
 
 import {
   Breadcrumb,
@@ -10,7 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
-import { contentMap } from "../contentMap";
+import { contentMap } from "../../docs/contentMap";
 
 interface Props {
   activeChapter: string;

@@ -3,8 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Providers from "./_components/providers";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { Header } from "./_components/Header";
+import { Header } from "./_components/layout/Header";
 import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -29,24 +28,22 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={nunito.variable}>
-      <ConvexAuthNextjsServerProvider>
-        <Providers>
-          <head>
-            {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
-              <script
-                crossOrigin="anonymous"
-                src="//unpkg.com/react-scan/dist/auto.global.js"
-                async={true}
-              />
-            )}
-          </head>
-          <body className="dark">
-            <Header />
-            {children}
-            <Toaster />
-          </body>
-        </Providers>
-      </ConvexAuthNextjsServerProvider>
+      <Providers>
+        <head>
+          {process.env.NEXT_PUBLIC_REACT_SCAN === "true" && (
+            <script
+              crossOrigin="anonymous"
+              src="//unpkg.com/react-scan/dist/auto.global.js"
+              async={true}
+            />
+          )}
+        </head>
+        <body className="dark">
+          <Header />
+          {children}
+          <Toaster />
+        </body>
+      </Providers>
     </html>
   );
 }

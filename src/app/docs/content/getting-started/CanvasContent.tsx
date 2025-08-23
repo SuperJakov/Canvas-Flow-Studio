@@ -3,7 +3,7 @@
 import { Delete } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../../_components/docs/PageTitle";
 
 export default function CanvasContent() {
   return (

@@ -8,7 +8,7 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 
 import screenshot from "public/firstflow_screenshot.png";
 import Image from "next/image";
-import PageTitle from "../../components/PageTitle";
+import PageTitle from "../../../_components/docs/PageTitle";
 
 function Step({
   number,
