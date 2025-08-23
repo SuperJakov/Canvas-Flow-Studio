@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { formatDate } from "~/helpers/formatDate";
+import type { Route } from "next";
 
 export default function ProjectCard({
   project,
@@ -98,7 +99,7 @@ export default function ProjectCard({
   return (
     <div className="group bg-card hover:ring-accent relative overflow-hidden rounded-lg border shadow-sm transition-all duration-300 ease-in-out hover:shadow-lg hover:ring-2">
       <Link
-        href={href}
+        href={href as Route}
         onClick={(e) => {
           if ((e.target as Element).closest(".no-link")) {
             e.preventDefault();

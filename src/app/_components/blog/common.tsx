@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 
 export const Section = ({
@@ -30,7 +31,7 @@ export const EmLink = ({
   href,
   children,
 }: {
-  href: string;
+  href: Route;
   children: React.ReactNode;
 }) => (
   <Link

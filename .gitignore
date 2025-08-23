@@ -51,3 +51,8 @@ yarn-error.log*
 
 # My own script
 copy.ps1
+
+public/sw.js
+public/sw.js.map
+public/workbox-*.js*
+public/worker-*.js*

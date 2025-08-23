@@ -6,9 +6,9 @@ const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
 });
 
-export default tseslint.config(
+const config = tseslint.config(
   {
-    ignores: [".next"],
+    ignores: [".next", "next-env.d.ts"],
   },
   ...compat.extends("next/core-web-vitals"),
   {
@@ -50,3 +50,4 @@ export default tseslint.config(
     },
   },
 );
+export default config;
