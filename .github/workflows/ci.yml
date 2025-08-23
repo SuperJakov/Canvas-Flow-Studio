@@ -5,9 +5,7 @@ name: "Continuous Integration"
 
 on:
   push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
+    branches: ["**"] # Run on every commit, but once per commit (no need to duplicate)
   schedule:
     # The CodeQL job also runs on a schedule
     - cron: "20 14 * * 1"
