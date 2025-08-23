@@ -1,16 +1,17 @@
 import { DiscordIcon } from "~/components/icons";
 import AppLogo from "public/logo.png";
 import Image from "next/image";
+import { type Route } from "next";
 
 // Define a type for our navigation items for type safety
 export interface NavItem {
   label: string;
-  href?: string;
+  href?: Route;
   dropdown?: DropdownItem[];
 }
 
 export interface DropdownItem {
-  href: string;
+  href: Route;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -44,7 +45,7 @@ export const navItems: NavItem[] = [
     label: "Community",
     dropdown: [
       {
-        href: process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ?? "#",
+        href: (process.env.NEXT_PUBLIC_DISCORD_INVITE_URL as Route) ?? "#",
         title: "Discord",
         description: "Join our community",
         icon: (
