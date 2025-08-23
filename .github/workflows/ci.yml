@@ -13,7 +13,7 @@ on:
     - cron: "20 14 * * 1"
 
 jobs:
-  # Job to check if the project builds successfully
+  # Job to check if the project builds successfully and upload the result
   build:
     name: "Build Check"
     runs-on: ubuntu-latest
@@ -42,10 +42,17 @@ jobs:
       - name: "Build Next.js app"
         run: pnpm build
 
-  # Job to run the linter (includes a build step as it's a dependency)
+      - name: "Upload build artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next
+
+  # Job to run the linter, depends on the build artifact
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    needs: build # This job now waits for the 'build' job to complete
     env:
       SKIP_ENV_VALIDATION: "true"
       BASE_URL: "http://localhost:3000"
@@ -57,24 +64,27 @@ jobs:
       - name: "Setup Node.js and pnpm"
         uses: pnpm/action-setup@v3
         with:
-          version: 10.13.1 # Standardized version
+          version: 10.13.1
 
       - name: "Setup Node.js version"
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12.0 # Standardized version
+          node-version: 22.12.0
           cache: "pnpm"
 
       - name: "Install dependencies"
         run: pnpm install
 
-      - name: "Build project"
-        run: pnpm build
+      - name: "Download build artifact"
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next
 
       - name: "Run linter"
         run: pnpm lint
 
-  # Job to check for code formatting issues
+  # Job to check for code formatting issues (independent of build)
   format:
     name: "Format Check"
     runs-on: ubuntu-latest
@@ -99,7 +109,7 @@ jobs:
       - name: "Check code formatting"
         run: pnpm format:check
 
-  # Job to run TypeScript type checking
+  # Job to run Type,Script type checking (independent of build)
   typecheck:
     name: "Typecheck"
     runs-on: ubuntu-latest
@@ -124,10 +134,11 @@ jobs:
       - name: "Run typecheck"
         run: pnpm typecheck
 
-  # Job for CodeQL security analysis
+  # Job for CodeQL security analysis, depends on the build artifact
   analyze:
     name: "CodeQL Analysis"
     runs-on: ubuntu-latest
+    needs: build # This job now waits for the 'build' job to complete
     permissions:
       actions: read
       contents: read
@@ -162,8 +173,11 @@ jobs:
       - name: "Install dependencies"
         run: pnpm install --frozen-lockfile
 
-      - name: "Build Next.js app"
-        run: pnpm build
+      - name: "Download build artifact"
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next
 
       - name: "Perform CodeQL Analysis"
         uses: github/codeql-action/analyze@v3
