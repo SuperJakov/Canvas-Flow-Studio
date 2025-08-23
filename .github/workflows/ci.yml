@@ -1,0 +1,171 @@
+# .github/workflows/ci.yml
+# This is a single, consolidated CI workflow that combines build, lint, format, typecheck, and CodeQL analysis.
+
+name: "Continuous Integration"
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  schedule:
+    # The CodeQL job also runs on a schedule
+    - cron: "20 14 * * 1"
+
+jobs:
+  # Job to check if the project builds successfully
+  build:
+    name: "Build Check"
+    runs-on: ubuntu-latest
+    env:
+      SKIP_ENV_VALIDATION: "true"
+      BASE_URL: "http://localhost:3000"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js and pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1
+
+      - name: "Setup Node.js version"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "Build Next.js app"
+        run: pnpm build
+
+  # Job to run the linter (includes a build step as it's a dependency)
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    env:
+      SKIP_ENV_VALIDATION: "true"
+      BASE_URL: "http://localhost:3000"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js and pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1 # Standardized version
+
+      - name: "Setup Node.js version"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0 # Standardized version
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install
+
+      - name: "Build project"
+        run: pnpm build
+
+      - name: "Run linter"
+        run: pnpm lint
+
+  # Job to check for code formatting issues
+  format:
+    name: "Format Check"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js and pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1
+
+      - name: "Setup Node.js version"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install
+
+      - name: "Check code formatting"
+        run: pnpm format:check
+
+  # Job to run TypeScript type checking
+  typecheck:
+    name: "Typecheck"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Setup Node.js and pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1
+
+      - name: "Setup Node.js version"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install
+
+      - name: "Run typecheck"
+        run: pnpm typecheck
+
+  # Job for CodeQL security analysis
+  analyze:
+    name: "CodeQL Analysis"
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    env:
+      SKIP_ENV_VALIDATION: "true"
+      BASE_URL: "http://localhost:3000"
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript"]
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Initialize CodeQL"
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: "Setup Node.js and pnpm"
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1
+
+      - name: "Setup Node.js version"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: "pnpm"
+
+      - name: "Install dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "Build Next.js app"
+        run: pnpm build
+
+      - name: "Perform CodeQL Analysis"
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
