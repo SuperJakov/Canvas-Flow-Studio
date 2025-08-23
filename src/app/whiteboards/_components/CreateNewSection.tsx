@@ -17,6 +17,7 @@ import { useConvexQuery } from "~/helpers/convex";
 import Loading from "~/app/loading";
 import { useAtom } from "jotai";
 import { errorMessageAtom, upgradeBannerAtom } from "../atoms";
+import type { Route } from "next";
 
 type Props = {
   lastProjectId: Id<"projects"> | undefined;
@@ -76,7 +77,7 @@ export default function CreateNewSection({ lastProjectId }: Props) {
       });
       setNewItemName("");
       const currentUrl = new URL(window.location.href);
-      const newPath = `${currentUrl.pathname}/${newProjectId}`;
+      const newPath = `${currentUrl.pathname}/${newProjectId}` as Route;
 
       void router.push(newPath);
     } catch (error) {

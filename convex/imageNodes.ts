@@ -151,6 +151,7 @@ const systemPrompts: Record<StyleType, string> = {
     "surrealist style depicting dream-like scenes with illogical juxtapositions rendered in polished detail",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function generateAIImage(
   identity: UserIdentity,
   textContents: string[],
